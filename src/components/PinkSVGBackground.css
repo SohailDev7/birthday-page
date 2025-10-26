@@ -1,0 +1,104 @@
+/* components/PinkSVGBackground.css */
+.pink-svg-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+  contain: layout style paint;
+}
+
+.svg-element {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Performance optimizations */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000;
+  will-change: transform, opacity;
+  contain: layout style;
+}
+
+.svg-element svg {
+  width: 100%;
+  height: 100%;
+  filter: none; /* No blur for crisp SVG rendering */
+}
+
+/* Theme-specific colors */
+body[data-theme="soft"] .svg-element {
+  color: rgba(236, 72, 153, 0.4); /* Soft pink */
+}
+
+body[data-theme="luxury"] .svg-element {
+  color: rgba(255, 255, 255, 0.3); /* Soft white */
+}
+
+/* Individual element styling */
+.svg-flower {
+  /* Flowers are slightly more opaque */
+  opacity: 0.5 !important;
+}
+
+.svg-heart {
+  /* Hearts have subtle scale variation */
+  animation: gentlePulse 8s ease-in-out infinite;
+}
+
+.svg-sparkle {
+  /* Sparkles have extra rotation */
+  animation: gentleSpin 15s linear infinite;
+}
+
+@keyframes gentlePulse {
+  0%, 100% { transform: scale(1) translateZ(0); }
+  50% { transform: scale(1.05) translateZ(0); }
+}
+
+@keyframes gentleSpin {
+  from { transform: rotate(0deg) translateZ(0); }
+  to { transform: rotate(360deg) translateZ(0); }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .pink-svg-background {
+    opacity: 0.8;
+  }
+  
+  .svg-element {
+    /* Smaller movements on mobile */
+    transform: translateZ(0) scale(0.8);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .svg-element {
+    animation: none !important;
+  }
+  
+  .motion-div {
+    animation: none !important;
+  }
+}
+
+/* High-DPI screen optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .svg-element svg {
+    shape-rendering: geometricPrecision;
+  }
+}
+
+/* Performance optimizations for lower-end devices */
+@media (max-width: 480px) {
+  .pink-svg-background {
+    display: none; /* Hide on very small screens for performance */
+  }
+}

@@ -1,0 +1,474 @@
+.tic-tac-toe-container {
+  min-height: 100vh;
+  padding: 80px 1rem 1rem; /* Account for navbar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Comic Neue', cursive;
+}
+
+/* Theme-based backgrounds */
+.tic-tac-toe-container.soft {
+  background: linear-gradient(135deg, var(--pink-50) 0%, var(--soft-pink) 50%, var(--pastel-pink) 100%);
+}
+
+.tic-tac-toe-container.luxury {
+  background: linear-gradient(135deg, var(--pink-800) 0%, var(--pink-700) 50%, var(--pink-600) 100%);
+}
+
+/* Main Layout */
+.game-layout {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2rem;
+  max-width: 1000px;
+  width: 100%;
+  align-items: start;
+}
+
+/* Left Side - Game Board */
+.game-board-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: 400px;
+}
+
+.game-header {
+  text-align: center;
+}
+
+.game-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.soft .game-title {
+  color: var(--soft-primary);
+  text-shadow: 2px 2px 4px rgba(236, 72, 153, 0.2);
+}
+
+.luxury .game-title {
+  color: var(--luxury-primary);
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+/* Game Board */
+.board-container {
+  display: flex;
+  justify-content: center;
+}
+
+.game-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  background: var(--soft-card);
+  padding: 1rem;
+  border-radius: 16px;
+  border: 2px solid rgba(236, 72, 153, 0.2);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  max-width: 300px;
+}
+
+.luxury .game-board {
+  background: var(--luxury-card);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.game-board.disabled {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.game-cell {
+  width: 80px;
+  height: 80px;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury .game-cell {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.game-cell:hover:not(.disabled) {
+  box-shadow: 0 6px 12px rgba(244, 114, 182, 0.3);
+}
+
+.game-cell.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.symbol {
+  font-size: 2.5rem;
+  font-weight: bold;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.symbol.o {
+  color: var(--soft-primary);
+}
+
+.luxury .symbol.o {
+  color: var(--luxury-secondary);
+}
+
+.symbol.x {
+  color: #dc2626;
+}
+
+/* Game Controls */
+.game-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.status-section {
+  text-align: center;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.status-message {
+  font-size: 1.1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.soft .status-message {
+  color: var(--soft-text);
+}
+
+.luxury .status-message {
+  color: var(--luxury-text);
+}
+
+.winner-text {
+  color: #dc2626;
+}
+
+.draw-text {
+  color: #6b7280;
+}
+
+.thinking-text {
+  color: #f59e0b;
+}
+
+.cheat-alert {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #d97706;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid #f59e0b;
+  font-size: 0.9rem;
+}
+
+.reset-button {
+  background: linear-gradient(135deg, var(--soft-primary), var(--soft-secondary));
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 6px 15px rgba(236, 72, 153, 0.3);
+  font-size: 0.9rem;
+}
+
+.luxury .reset-button {
+  background: linear-gradient(135deg, var(--luxury-primary), var(--luxury-accent));
+}
+
+/* Right Side - Players */
+.players-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 200px;
+}
+
+.player-card {
+  padding: 1.25rem;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.soft .player-o {
+  background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+  border: 2px solid var(--soft-primary);
+}
+
+.soft .player-x {
+  background: linear-gradient(135deg, #fecdd3, #fda4af);
+  border: 2px solid #dc2626;
+}
+
+.luxury .player-o {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--luxury-secondary);
+}
+
+.luxury .player-x {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid #ef4444;
+}
+
+.player-card.active {
+  box-shadow: 0 8px 20px rgba(244, 114, 182, 0.3);
+}
+
+.player-card.winner {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.player-header {
+  margin-bottom: 0.5rem;
+}
+
+.player-card h3 {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.soft .player-o h3 {
+  color: var(--soft-primary);
+}
+
+.soft .player-x h3 {
+  color: #dc2626;
+}
+
+.luxury .player-card h3 {
+  color: var(--luxury-text);
+}
+
+.player-symbol {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.o-symbol {
+  color: var(--soft-primary);
+}
+
+.luxury .o-symbol {
+  color: var(--luxury-secondary);
+}
+
+.x-symbol {
+  color: #dc2626;
+}
+
+.player-desc {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.luxury .player-desc {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.player-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.soft .player-score {
+  color: var(--soft-text);
+}
+
+.luxury .player-score {
+  color: var(--luxury-text);
+}
+
+.vs-divider {
+  background: var(--soft-primary);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  align-self: center;
+  box-shadow: 0 3px 8px rgba(244, 114, 182, 0.3);
+}
+
+.luxury .vs-divider {
+  background: var(--luxury-primary);
+}
+
+.draws-counter {
+  text-align: center;
+  padding: 0.75rem;
+  background: var(--soft-card);
+  border-radius: 8px;
+  border: 1px solid rgba(236, 72, 153, 0.2);
+}
+
+.luxury .draws-counter {
+  background: var(--luxury-card);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.draws-label {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.soft .draws-label {
+  color: var(--soft-text);
+}
+
+.luxury .draws-label {
+  color: var(--luxury-text);
+}
+
+/* Confetti */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Mobile Layout */
+@media (max-width: 768px) {
+  .tic-tac-toe-container {
+    padding: 80px 0.5rem 0.5rem;
+  }
+
+  .game-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 1rem;
+  }
+
+  .players-section {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    min-width: auto;
+  }
+
+  .player-card {
+    flex: 1;
+    min-width: 140px;
+    min-height: 120px;
+  }
+
+  .vs-divider {
+    order: -1;
+    width: 100%;
+    border-radius: 25px;
+    height: auto;
+    padding: 0.5rem;
+  }
+
+  .draws-counter {
+    width: 100%;
+  }
+
+  .game-board {
+    max-width: 260px;
+    gap: 0.4rem;
+    padding: 0.75rem;
+  }
+
+  .game-cell {
+    width: 70px;
+    height: 70px;
+  }
+
+  .symbol {
+    font-size: 2rem;
+  }
+
+  .game-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .player-card {
+    min-width: 120px;
+  }
+
+  .game-board {
+    max-width: 240px;
+  }
+
+  .game-cell {
+    width: 65px;
+    height: 65px;
+  }
+
+  .symbol {
+    font-size: 1.8rem;
+  }
+}

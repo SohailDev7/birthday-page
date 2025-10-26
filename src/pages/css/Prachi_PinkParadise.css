@@ -1,0 +1,534 @@
+/* components/css/Prachi_PinkParadise.css */
+.pink-paradise-page {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow-x: hidden;
+  font-family: 'Comic Neue', cursive;
+}
+
+/* Theme Base Styles */
+body[data-theme="soft"] .pink-paradise-page {
+  background: linear-gradient(135deg, #fff0f6 0%, #fce7f3 50%, #fbcfe8 100%);
+}
+
+body[data-theme="luxury"] .pink-paradise-page {
+  background: linear-gradient(135deg, #9d174d 0%, #be185d 50%, #db2777 100%);
+}
+
+.paradise-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+/* Header Styles */
+.paradise-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  position: relative;
+}
+
+.paradise-title {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  position: relative;
+  display: inline-block;
+}
+
+body[data-theme="soft"] .paradise-title {
+  background: linear-gradient(135deg, #ec4899, #f472b6, #f9a8d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+body[data-theme="luxury"] .paradise-title {
+  background: linear-gradient(135deg, #ffffff, #fbcfe8, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: 'Playfair Display', serif;
+}
+
+.paradise-subtitle {
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  margin-bottom: 2rem;
+}
+
+body[data-theme="soft"] .paradise-subtitle {
+  color: #ec4899;
+}
+
+body[data-theme="luxury"] .paradise-subtitle {
+  color: #fbcfe8;
+}
+
+.title-underline {
+  height: 4px;
+  border-radius: 2px;
+  margin: 0 auto;
+  max-width: 200px;
+}
+
+body[data-theme="soft"] .title-underline {
+  background: linear-gradient(90deg, #ec4899, #f472b6, #f9a8d4);
+}
+
+body[data-theme="luxury"] .title-underline {
+  background: linear-gradient(90deg, #ffffff, #fbcfe8, #f472b6);
+}
+
+/* Games Grid */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+/* Game Card */
+.game-card {
+  background: var(--soft-card);
+  border-radius: 2rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 3px solid;
+  min-height: 350px;
+}
+
+body[data-theme="soft"] .game-card {
+  background: linear-gradient(135deg, #ffdeeb 0%, #fbcfe8 100%);
+  border-color: rgba(236, 72, 153, 0.2);
+  box-shadow: 0 10px 30px rgba(244, 114, 182, 0.2);
+}
+
+body[data-theme="luxury"] .game-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(251, 207, 232, 0.1) 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+}
+
+.game-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+  transform: rotate(30deg);
+  transition: all 0.5s ease;
+  opacity: 0;
+}
+
+.game-card:hover::before {
+  opacity: 1;
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { left: -50%; }
+  100% { left: 150%; }
+}
+
+/* Game Icon */
+.game-icon {
+  width: 5rem;
+  height: 5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.icon-emoji {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+/* Game Content */
+.game-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.game-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+body[data-theme="soft"] .game-title {
+  color: #831843;
+}
+
+body[data-theme="luxury"] .game-title {
+  color: #ffffff;
+}
+
+.game-description {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+body[data-theme="soft"] .game-description {
+  color: #ec4899;
+}
+
+body[data-theme="luxury"] .game-description {
+  color: #fbcfe8;
+}
+
+/* Game Action */
+.game-action {
+  width: 100%;
+}
+
+/* Nav.Link Styling for Play Button */
+.play-button {
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  text-decoration: none !important;
+  background: linear-gradient(135deg, #ec4899, #f472b6);
+  color: white !important;
+  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3);
+}
+
+body[data-theme="soft"] .play-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(236, 72, 153, 0.4);
+  background: linear-gradient(135deg, #db2777, #ec4899);
+  color: white !important;
+  text-decoration: none !important;
+}
+
+body[data-theme="luxury"] .play-button {
+  background: linear-gradient(135deg, #ffffff, #fbcfe8);
+  color: #9d174d !important;
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+}
+
+body[data-theme="luxury"] .play-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, #fbcfe8, #ffffff);
+  color: #9d174d !important;
+  text-decoration: none !important;
+}
+
+/* Remove default Nav.Link styles */
+.play-button:hover,
+.play-button:focus,
+.play-button:active {
+  text-decoration: none !important;
+  outline: none !important;
+  border: none !important;
+}
+
+.disabled-button {
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: not-allowed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  background: #9ca3af;
+  color: white;
+  opacity: 0.7;
+}
+
+/* Hover Effect */
+.game-hover-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 2rem;
+  z-index: -1;
+}
+
+body[data-theme="soft"] .game-hover-effect {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(244, 114, 182, 0.1));
+}
+
+body[data-theme="luxury"] .game-hover-effect {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(251, 207, 232, 0.1));
+}
+
+/* Corner Decoration */
+.corner-decoration {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  opacity: 0.3;
+}
+
+body[data-theme="soft"] .corner-decoration {
+  color: #ec4899;
+}
+
+body[data-theme="luxury"] .corner-decoration {
+  color: #ffffff;
+}
+
+/* Footer */
+.paradise-footer {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.footer-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+body[data-theme="soft"] .footer-text {
+  color: #ec4899;
+}
+
+body[data-theme="luxury"] .footer-text {
+  color: #fbcfe8;
+}
+
+/* Floating Elements - Fixed positioning */
+.floating-element {
+  position: fixed;
+  z-index: 1;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+body[data-theme="soft"] .floating-element {
+  color: #f472b6;
+}
+
+body[data-theme="luxury"] .floating-element {
+  color: #fbcfe8;
+}
+
+/* Sparkle Decorations - Fixed positioning */
+.sparkle {
+  position: fixed;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+body[data-theme="soft"] .sparkle {
+  background: #f472b6;
+  box-shadow: 0 0 10px #f472b6;
+}
+
+body[data-theme="luxury"] .sparkle {
+  background: #ffffff;
+  box-shadow: 0 0 10px #ffffff;
+}
+
+/* Particles */
+.particles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  bottom: -10px;
+}
+
+body[data-theme="soft"] .particle {
+  background: #ec4899;
+}
+
+body[data-theme="luxury"] .particle {
+  background: #ffffff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pink-paradise-page {
+    padding: 1rem 0.5rem;
+  }
+
+  .paradise-container {
+    padding-top: 2rem;
+  }
+
+  .paradise-header {
+    margin-bottom: 3rem;
+  }
+
+  .games-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .game-card {
+    padding: 1.5rem;
+    min-height: 320px;
+  }
+
+  .game-title {
+    font-size: 1.3rem;
+  }
+
+  /* Hide some decorative elements on mobile */
+  .floating-element:nth-child(n+5),
+  .sparkle:nth-child(n+6) {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .paradise-title {
+    font-size: 2rem;
+  }
+
+  .game-card {
+    padding: 1.25rem;
+    min-height: 300px;
+  }
+
+  .game-icon {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .icon-emoji {
+    font-size: 2rem;
+  }
+
+  .play-button, .disabled-button {
+    padding: 0.8rem 1.25rem;
+    font-size: 0.85rem;
+  }
+
+  .disabled-button {
+    font-size: 0.75rem;
+  }
+}
+
+/* Enhanced hover effects */
+.game-card:hover {
+  transform: translateY(-8px);
+}
+
+body[data-theme="soft"] .game-card:hover {
+  box-shadow: 0 20px 50px rgba(244, 114, 182, 0.3);
+}
+
+body[data-theme="luxury"] .game-card:hover {
+  box-shadow: 0 20px 50px rgba(255, 255, 255, 0.2);
+}
+
+/* Loading animation for cards */
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.game-card {
+  animation: cardEntrance 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+/* Stagger animation for cards */
+.game-card:nth-child(1) { animation-delay: 0.1s; }
+.game-card:nth-child(2) { animation-delay: 0.2s; }
+.game-card:nth-child(3) { animation-delay: 0.3s; }
+.game-card:nth-child(4) { animation-delay: 0.4s; }
+.game-card:nth-child(5) { animation-delay: 0.5s; }
+.game-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* Gradient text animation */
+.paradise-title {
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Focus states for accessibility */
+.play-button:focus,
+.disabled-button:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .game-card,
+  .floating-element,
+  .sparkle,
+  .particle {
+    animation: none;
+    transition: none;
+  }
+  
+  .paradise-title {
+    animation: none;
+  }
+  
+  .game-card:hover {
+    transform: none;
+  }
+}

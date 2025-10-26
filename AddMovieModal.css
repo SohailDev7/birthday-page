@@ -1,0 +1,163 @@
+/* Add Movie Modal Base Styles */
+.add-movie-modal .modal-content {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Soft Theme */
+.soft-theme .add-movie-modal .modal-content {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(236, 72, 153, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.soft-theme .add-movie-modal .modal-header {
+  background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+  border-bottom: 1px solid rgba(236, 72, 153, 0.1);
+  color: #831843;
+}
+
+.soft-theme .add-movie-modal .modal-title {
+  color: #831843;
+  font-weight: 600;
+}
+
+.soft-theme .add-movie-modal .form-label {
+  color: #831843;
+  font-weight: 500;
+}
+
+.soft-theme .add-movie-modal .form-control,
+.soft-theme .add-movie-modal .form-select {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(236, 72, 153, 0.2);
+  color: #831843;
+  border-radius: 8px;
+}
+
+.soft-theme .add-movie-modal .form-control:focus,
+.soft-theme .add-movie-modal .form-select:focus {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #ec4899;
+  box-shadow: 0 0 0 0.2rem rgba(236, 72, 153, 0.1);
+  color: #831843;
+}
+
+.soft-theme .add-movie-modal .form-control::placeholder {
+  color: rgba(131, 24, 67, 0.5);
+}
+
+/* Luxury Theme */
+.luxury-theme .add-movie-modal .modal-content {
+  background: linear-gradient(135deg, #9d174d, #be185d);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.luxury-theme .add-movie-modal .modal-header {
+  background: linear-gradient(135deg, rgba(157, 23, 77, 0.9), rgba(190, 24, 93, 0.9));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.luxury-theme .add-movie-modal .modal-title {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.luxury-theme .add-movie-modal .form-label {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.luxury-theme .add-movie-modal .form-control,
+.luxury-theme .add-movie-modal .form-select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  border-radius: 8px;
+}
+
+.luxury-theme .add-movie-modal .form-control:focus,
+.luxury-theme .add-movie-modal .form-select:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #ffffff;
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.luxury-theme .add-movie-modal .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Buttons */
+.soft-theme .add-movie-modal .btn-primary {
+  background: linear-gradient(135deg, #ec4899, #f472b6);
+  border-color: #ec4899;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.soft-theme .add-movie-modal .btn-primary:hover {
+  background: linear-gradient(135deg, #db2777, #ec4899);
+  border-color: #db2777;
+}
+
+.soft-theme .add-movie-modal .btn-secondary {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(236, 72, 153, 0.3);
+  color: #831843;
+  border-radius: 8px;
+}
+
+.soft-theme .add-movie-modal .btn-secondary:hover {
+  background: rgba(236, 72, 153, 0.1);
+  border-color: #ec4899;
+  color: #831843;
+}
+
+.luxury-theme .add-movie-modal .btn-primary {
+  background: linear-gradient(135deg, #ffffff, #fbcfe8);
+  border-color: #ffffff;
+  color: #9d174d;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.luxury-theme .add-movie-modal .btn-primary:hover {
+  background: linear-gradient(135deg, #fbcfe8, #ffffff);
+  border-color: #ffffff;
+  color: #9d174d;
+}
+
+.luxury-theme .add-movie-modal .btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  border-radius: 8px;
+}
+
+.luxury-theme .add-movie-modal .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+/* Form Actions */
+.form-actions {
+  padding-top: 1.5rem;
+  border-top: 1px solid;
+}
+
+.soft-theme .form-actions {
+  border-color: rgba(236, 72, 153, 0.1);
+}
+
+.luxury-theme .form-actions {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Close Button */
+.luxury-theme .add-movie-modal .btn-close {
+  filter: invert(1);
+}

@@ -1,0 +1,633 @@
+/* Prachi_Diary.css - Fixed for Both Themes */
+.diary-app {
+  min-height: 100vh;
+  font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', cursive !important;
+  overflow-x: hidden;
+}
+
+/* Fix Navbar Overlap */
+.diary-navbar {
+  padding: 0.8rem 0;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+  z-index: 1030;
+}
+
+.diary-container {
+  padding-top: 80px;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Background Elements */
+.diary-background-elements {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.floating-element {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.6;
+}
+
+.element-1 {
+  top: 15%;
+  left: 5%;
+}
+
+.element-2 {
+  top: 25%;
+  right: 8%;
+}
+
+.element-3 {
+  bottom: 20%;
+  left: 10%;
+}
+
+/* Confetti */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+  opacity: 0.7;
+}
+
+/* Main Content */
+.diary-content-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* Header Section */
+.diary-header-section {
+  margin-bottom: 3rem !important;
+}
+
+.main-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+}
+
+.diary-main-title {
+  font-size: 3.5rem !important;
+  font-weight: bold !important;
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease infinite;
+  margin-bottom: 0.5rem !important;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.diary-subtitle {
+  font-size: 1.4rem !important;
+  font-weight: 500;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Year Selection */
+.year-selection-section {
+  margin-bottom: 2rem;
+}
+
+.year-buttons-wrapper {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.year-select-btn {
+  border: 3px solid #fff !important;
+  border-radius: 20px !important;
+  padding: 1rem 2rem !important;
+  font-size: 1.3rem !important;
+  font-weight: bold !important;
+  color: white !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Comic Sans MS', cursive !important;
+}
+
+.year-select-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.5s;
+}
+
+.year-select-btn:hover::before {
+  left: 100%;
+}
+
+.year-select-btn.active {
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4) !important;
+  transform: translateY(-2px);
+}
+
+.year-select-btn.future {
+  color: #666 !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+}
+
+.badge {
+  background: rgba(255,255,255,0.9) !important;
+  color: #666 !important;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  margin-left: 0.5rem;
+}
+
+/* Diary Paper */
+.diary-paper-container {
+  perspective: 1000px;
+  margin-bottom: 3rem;
+}
+
+.diary-paper {
+  border-radius: 15px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.diary-paper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+/* Paper Header */
+.paper-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px double;
+}
+
+.paper-title {
+  flex: 1;
+}
+
+.paper-title h2 {
+  font-size: 2.2rem !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pen-icon {
+  font-size: 1.8rem;
+}
+
+.paper-date {
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 0.3rem 1rem;
+  border-radius: 15px;
+  display: inline-block;
+  border: 1px dashed;
+}
+
+.decoration-icons {
+  font-size: 2.5rem;
+  opacity: 0.8;
+}
+
+/* Lined Paper */
+.lined-paper {
+  display: flex;
+  min-height: 400px;
+  position: relative;
+  margin: 0 -1rem;
+  padding: 0 1rem;
+}
+
+.paper-margin {
+  width: 40px;
+  padding-right: 15px;
+  border-right: 2px solid;
+  position: relative;
+}
+
+.margin-line {
+  height: 100%;
+  border-right: 1px dashed;
+  opacity: 0.5;
+}
+
+.paper-content {
+  flex: 1;
+  padding-left: 20px;
+  padding-top: 5px;
+}
+
+.text-line {
+  display: flex;
+  align-items: flex-start;
+  min-height: 29px;
+  margin-bottom: 2px;
+  font-size: 1.15rem;
+  line-height: 1.6;
+}
+
+.line-number {
+  width: 25px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-align: right;
+  padding-right: 10px;
+  opacity: 0.7;
+}
+
+.sentence-text {
+  flex: 1;
+  padding-right: 10px;
+}
+
+.inline-emoji {
+  margin-left: 0.3rem;
+}
+
+/* Paper Footer */
+.paper-footer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px dotted;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-icons {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-icon {
+  font-size: 1.8rem;
+}
+
+.signature {
+  font-size: 1.3rem;
+  font-weight: bold;
+  font-style: italic;
+}
+
+/* Celebration Footer */
+.celebration-message {
+  font-size: 1.4rem !important;
+  font-weight: bold;
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease infinite;
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* ===== SOFT THEME ===== */
+body[data-theme="soft"] .diary-app {
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%) !important;
+  color: var(--soft-text);
+}
+
+body[data-theme="soft"] .main-icon {
+  color: #ec4899;
+}
+
+body[data-theme="soft"] .diary-main-title {
+  background: linear-gradient(45deg, #ec4899, #f472b6, #f9a8d4, #fbcfe8);
+}
+
+body[data-theme="soft"] .diary-subtitle {
+  color: #831843;
+}
+
+body[data-theme="soft"] .year-select-btn {
+  background: linear-gradient(135deg, #ec4899, #f472b6) !important;
+}
+
+body[data-theme="soft"] .year-select-btn.active {
+  background: linear-gradient(135deg, #db2777, #ec4899) !important;
+}
+
+body[data-theme="soft"] .year-select-btn.future {
+  background: linear-gradient(135deg, #CCCCCC, #999999) !important;
+}
+
+body[data-theme="soft"] .diary-paper {
+  background: linear-gradient(135deg, #fff9f9 0%, #fff 100%) !important;
+  box-shadow: 
+    0 10px 40px rgba(236, 72, 153, 0.1),
+    0 0 0 1px #ec4899,
+    0 0 0 3px #fff,
+    0 0 0 5px #f472b6 !important;
+}
+
+body[data-theme="soft"] .diary-paper::before {
+  background: linear-gradient(90deg, #ec4899, #f472b6, #f9a8d4, #fbcfe8);
+}
+
+body[data-theme="soft"] .paper-header {
+  border-bottom-color: #ec4899;
+}
+
+body[data-theme="soft"] .paper-title h2 {
+  color: #ec4899;
+}
+
+body[data-theme="soft"] .pen-icon {
+  color: #f472b6;
+}
+
+body[data-theme="soft"] .paper-date {
+  color: #831843;
+  background: #fdf2f8;
+  border-color: #ec4899;
+}
+
+body[data-theme="soft"] .decoration-icons {
+  color: #f472b6;
+}
+
+body[data-theme="soft"] .lined-paper {
+  background: 
+    repeating-linear-gradient(
+      transparent,
+      transparent 28px,
+      rgba(236, 72, 153, 0.1) 28px,
+      rgba(236, 72, 153, 0.1) 29px
+    );
+}
+
+body[data-theme="soft"] .paper-margin {
+  border-right-color: #ec4899;
+}
+
+body[data-theme="soft"] .margin-line {
+  border-right-color: #ec4899;
+}
+
+body[data-theme="soft"] .text-line,
+body[data-theme="soft"] .sentence-text {
+  color: #831843;
+}
+
+body[data-theme="soft"] .line-number {
+  color: #ec4899;
+}
+
+body[data-theme="soft"] .paper-footer {
+  border-top-color: #f472b6;
+}
+
+body[data-theme="soft"] .footer-icon.heart { color: #ec4899; }
+body[data-theme="soft"] .footer-icon.cake { color: #f472b6; }
+body[data-theme="soft"] .footer-icon.star { color: #f9a8d4; }
+body[data-theme="soft"] .footer-icon.laugh { color: #db2777; }
+body[data-theme="soft"] .footer-icon.gift { color: #be185d; }
+
+body[data-theme="soft"] .signature {
+  color: #ec4899;
+}
+
+body[data-theme="soft"] .celebration-message {
+  background: linear-gradient(45deg, #ec4899, #f472b6, #f9a8d4);
+}
+
+/* ===== LUXURY THEME ===== */
+body[data-theme="luxury"] .diary-app {
+  background: linear-gradient(135deg, #9d174d 0%, #be185d 50%, #db2777 100%) !important;
+  color: var(--luxury-text);
+}
+
+body[data-theme="luxury"] .main-icon {
+  color: #ffffff;
+}
+
+body[data-theme="luxury"] .diary-main-title {
+  background: linear-gradient(45deg, #ffffff, #fbcfe8, #f472b6, #ec4899);
+}
+
+body[data-theme="luxury"] .diary-subtitle {
+  color: #fbcfe8;
+}
+
+body[data-theme="luxury"] .year-select-btn {
+  background: linear-gradient(135deg, #ffffff, #fbcfe8) !important;
+  color: #9d174d !important;
+}
+
+body[data-theme="luxury"] .year-select-btn.active {
+  background: linear-gradient(135deg, #fbcfe8, #f472b6) !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="luxury"] .year-select-btn.future {
+  background: linear-gradient(135deg, #a8a8a8, #888888) !important;
+  color: #cccccc !important;
+}
+
+body[data-theme="luxury"] .diary-paper {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%) !important;
+  box-shadow: 
+    0 10px 40px rgba(255, 255, 255, 0.2),
+    0 0 0 1px #ffffff,
+    0 0 0 3px #fbcfe8,
+    0 0 0 5px #f472b6 !important;
+}
+
+body[data-theme="luxury"] .diary-paper::before {
+  background: linear-gradient(90deg, #ffffff, #fbcfe8, #f472b6, #ec4899);
+}
+
+body[data-theme="luxury"] .paper-header {
+  border-bottom-color: #ffffff;
+}
+
+body[data-theme="luxury"] .paper-title h2 {
+  color: #9d174d;
+}
+
+body[data-theme="luxury"] .pen-icon {
+  color: #be185d;
+}
+
+body[data-theme="luxury"] .paper-date {
+  color: #9d174d;
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #f472b6;
+}
+
+body[data-theme="luxury"] .decoration-icons {
+  color: #be185d;
+}
+
+body[data-theme="luxury"] .lined-paper {
+  background: 
+    repeating-linear-gradient(
+      transparent,
+      transparent 28px,
+      rgba(157, 23, 77, 0.1) 28px,
+      rgba(157, 23, 77, 0.1) 29px
+    );
+}
+
+body[data-theme="luxury"] .paper-margin {
+  border-right-color: #9d174d;
+}
+
+body[data-theme="luxury"] .margin-line {
+  border-right-color: #9d174d;
+}
+
+body[data-theme="luxury"] .text-line,
+body[data-theme="luxury"] .sentence-text {
+  color: #9d174d;
+}
+
+body[data-theme="luxury"] .line-number {
+  color: #be185d;
+}
+
+body[data-theme="luxury"] .paper-footer {
+  border-top-color: #be185d;
+}
+
+body[data-theme="luxury"] .footer-icon.heart { color: #9d174d; }
+body[data-theme="luxury"] .footer-icon.cake { color: #be185d; }
+body[data-theme="luxury"] .footer-icon.star { color: #db2777; }
+body[data-theme="luxury"] .footer-icon.laugh { color: #ec4899; }
+body[data-theme="luxury"] .footer-icon.gift { color: #f472b6; }
+
+body[data-theme="luxury"] .signature {
+  color: #9d174d;
+}
+
+body[data-theme="luxury"] .celebration-message {
+  background: linear-gradient(45deg, #9d174d, #be185d, #db2777);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .diary-container {
+    padding-top: 70px;
+  }
+
+  .diary-main-title {
+    font-size: 2.5rem !important;
+  }
+
+  .diary-paper {
+    padding: 1.5rem;
+  }
+
+  .paper-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .paper-title h2 {
+    font-size: 1.8rem !important;
+    justify-content: center;
+  }
+
+  .year-buttons-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .year-select-btn {
+    width: 200px;
+  }
+
+  .footer-icons {
+    gap: 1rem;
+  }
+
+  .footer-icon {
+    font-size: 1.5rem;
+  }
+
+  .lined-paper {
+    margin: 0 -0.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .text-line {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .diary-content-wrapper {
+    padding: 1rem 0.5rem;
+  }
+
+  .diary-paper {
+    padding: 1rem;
+  }
+
+  .paper-margin {
+    width: 30px;
+  }
+
+  .line-number {
+    width: 20px;
+    font-size: 0.8rem;
+  }
+}

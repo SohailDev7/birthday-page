@@ -1,0 +1,44 @@
+/* CSS-only version - Add to FloatingElements.css */
+.floating-element-css {
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  left: var(--left);
+  opacity: var(--opacity);
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(244, 114, 182, 0.2));
+  box-shadow: 
+    0 0 12px rgba(236, 72, 153, 0.15),
+    inset 0 0 6px rgba(255, 255, 182, 0.25);
+  filter: blur(0.5px);
+  
+  /* Performance optimizations */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000;
+  will-change: transform;
+  contain: layout style;
+  
+  /* CSS animations - better performance than Framer Motion for simple animations */
+  animation: float-css var(--duration) var(--delay) infinite ease-in-out;
+}
+
+@keyframes float-css {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate3d(var(--x-range), calc(var(--y-range) * -0.66), 0) rotate(120deg);
+  }
+  66% {
+    transform: translate3d(calc(var(--x-range) * 0.5), calc(var(--y-range) * -1), 0) rotate(240deg);
+  }
+}
+
+/* Theme support for CSS version */
+body[data-theme="luxury"] .floating-element-css {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(251, 207, 232, 0.1));
+  box-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.15),
+    inset 0 0 5px rgba(255, 255, 255, 0.2);
+}
