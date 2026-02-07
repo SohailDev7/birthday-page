@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, RotateCcw, Sparkles, Zap, Crown, Skull } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import './css/Prachi_TicTacToe.css';
+import './css/Prachi_Tictactoe.css';
 
 const TicTacToe = () => {
   const { currentTheme } = useTheme();
