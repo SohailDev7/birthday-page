@@ -1,4 +1,5 @@
-/* components/PinkSVGBackground.css */
+/* PinkSVGBackground.css - Ultra Kawaii 120 FPS Animations */
+
 .pink-svg-background {
   position: fixed;
   top: 0;
@@ -6,99 +7,156 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
   overflow: hidden;
-  contain: layout style paint;
+  background: linear-gradient(135deg,
+      rgba(255, 240, 245, 0.3) 0%,
+      rgba(255, 228, 240, 0.2) 50%,
+      rgba(255, 240, 250, 0.3) 100%);
 }
 
-.svg-element {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  /* Performance optimizations */
+.kawaii-background {
+  /* Performance optimizations for 120 FPS */
   transform: translateZ(0);
   backface-visibility: hidden;
-  perspective: 1000;
+  perspective: 1000px;
+  will-change: transform;
+}
+
+.kawaii-element {
+  pointer-events: none;
+  filter: drop-shadow(0 4px 12px rgba(255, 105, 180, 0.25));
+  transition: filter 0.3s ease;
+
+  /* GPU acceleration for smooth 120 FPS */
+  transform: translateZ(0);
   will-change: transform, opacity;
-  contain: layout style;
 }
 
-.svg-element svg {
-  width: 100%;
-  height: 100%;
-  filter: none; /* No blur for crisp SVG rendering */
+.kawaii-element:hover {
+  filter: drop-shadow(0 6px 16px rgba(255, 105, 180, 0.4));
 }
 
-/* Theme-specific colors */
-body[data-theme="soft"] .svg-element {
-  color: rgba(236, 72, 153, 0.4); /* Soft pink */
+/* Individual shape styling */
+.kawaii-heart {
+  animation: heartbeat 2s ease-in-out infinite;
 }
 
-body[data-theme="luxury"] .svg-element {
-  color: rgba(255, 255, 255, 0.3); /* Soft white */
+.kawaii-bow {
+  filter: drop-shadow(0 4px 12px rgba(255, 20, 147, 0.3));
 }
 
-/* Individual element styling */
-.svg-flower {
-  /* Flowers are slightly more opaque */
-  opacity: 0.5 !important;
+.kawaii-star {
+  filter: drop-shadow(0 4px 12px rgba(255, 215, 0, 0.4));
+  animation: twinkle 1.5s ease-in-out infinite;
 }
 
-.svg-heart {
-  /* Hearts have subtle scale variation */
-  animation: gentlePulse 8s ease-in-out infinite;
+.kawaii-flower {
+  animation: bloom 3s ease-in-out infinite;
 }
 
-.svg-sparkle {
-  /* Sparkles have extra rotation */
-  animation: gentleSpin 15s linear infinite;
+.kawaii-cloud {
+  filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.5));
 }
 
-@keyframes gentlePulse {
-  0%, 100% { transform: scale(1) translateZ(0); }
-  50% { transform: scale(1.05) translateZ(0); }
+.kawaii-butterfly {
+  animation: flutter 2s ease-in-out infinite;
 }
 
-@keyframes gentleSpin {
-  from { transform: rotate(0deg) translateZ(0); }
-  to { transform: rotate(360deg) translateZ(0); }
+/* Adorable animations */
+@keyframes heartbeat {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
-/* Mobile optimizations */
-@media (max-width: 768px) {
-  .pink-svg-background {
+@keyframes twinkle {
+
+  0%,
+  100% {
     opacity: 0.8;
   }
-  
-  .svg-element {
-    /* Smaller movements on mobile */
-    transform: translateZ(0) scale(0.8);
+
+  50% {
+    opacity: 1;
   }
 }
 
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  .svg-element {
-    animation: none !important;
+@keyframes bloom {
+
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
   }
-  
-  .motion-div {
-    animation: none !important;
+
+  50% {
+    transform: scale(1.08) rotate(5deg);
   }
 }
 
-/* High-DPI screen optimizations */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .svg-element svg {
-    shape-rendering: geometricPrecision;
+@keyframes flutter {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-3deg);
+  }
+
+  75% {
+    transform: rotate(3deg);
   }
 }
 
-/* Performance optimizations for lower-end devices */
+/* Soft glow effect */
+.kawaii-element svg {
+  filter: drop-shadow(0 0 8px rgba(255, 182, 193, 0.3));
+}
+
+/* Theme support */
+body[data-theme="luxury"] .pink-svg-background {
+  background: linear-gradient(135deg,
+      rgba(157, 23, 77, 0.15) 0%,
+      rgba(190, 24, 93, 0.1) 50%,
+      rgba(219, 39, 119, 0.15) 100%);
+}
+
+body[data-theme="luxury"] .kawaii-element {
+  filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.2));
+}
+
+/* Responsive - reduce on smaller screens for performance */
+@media (max-width: 768px) {
+  .kawaii-element:nth-child(n+16) {
+    display: none;
+    /* Show only 15 elements on mobile */
+  }
+}
+
 @media (max-width: 480px) {
-  .pink-svg-background {
-    display: none; /* Hide on very small screens for performance */
+  .kawaii-element:nth-child(n+11) {
+    display: none;
+    /* Show only 10 elements on very small screens */
   }
+}
+
+/* Ensure no interference with page content */
+.pink-svg-background * {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Smooth rendering */
+.kawaii-element svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }

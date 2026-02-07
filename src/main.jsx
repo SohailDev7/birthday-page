@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
+import './index.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './styles/public.css'
 

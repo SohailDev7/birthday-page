@@ -11,7 +11,6 @@ import AnimatedCounter from '../components/AnimatedCounter';
 import TransportModel from '../components/TransportModel';
 import { Rocket, Sparkles, Gift, Heart, Lock } from 'lucide-react';
 import { calculateAge, isBirthday } from '../utils/dateUtils';
-import './css/Prachi_Home.css';
 
 const Prachi_Home = () => {
   const age = calculateAge();
@@ -30,10 +29,10 @@ const Prachi_Home = () => {
   };
 
   const itemVariants = {
-    hidden: { 
-      y: 50, 
+    hidden: {
+      y: 50,
       opacity: 0,
-      scale: 0.8 
+      scale: 0.8
     },
     visible: {
       y: 0,
@@ -84,17 +83,17 @@ const Prachi_Home = () => {
   return (
     <>
       <PinkSVGBackground />
-      
-      <motion.div 
+
+      <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="prachi-home-page pt-5"
+        className="pt-5"
       >
         <Container className="mt-5 pt-5">
           {/* Hero Section */}
-          <motion.section 
-            className="hero-section text-center py-5 my-5 position-relative"
+          <motion.section
+            className="text-center py-5 my-5 relative"
             variants={itemVariants}
           >
             <motion.div
@@ -106,12 +105,12 @@ const Prachi_Home = () => {
 
             <Row className="justify-content-center">
               <Col lg={10}>
-                <motion.h1 
-                  className="display-2 fw-bold mb-4 luxury-font"
+                <motion.h1
+                  className="text-6xl md:text-7xl font-bold mb-4 luxury-font"
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  transition={{ 
-                    duration: 1, 
+                  transition={{
+                    duration: 1,
                     type: "spring",
                     stiffness: 100
                   }}
@@ -126,23 +125,23 @@ const Prachi_Home = () => {
                     </>
                   )}
                 </motion.h1>
-                
-                <motion.p 
-                  className="lead mb-4 fs-3 elegant-font" 
+
+                <motion.p
+                  className="text-2xl mb-4 elegant-font"
                   variants={itemVariants}
                 >
                   Every year, this page updates with something new for you. Don't forget to check back!
                 </motion.p>
 
                 {!birthday && (
-                  <motion.div 
-                    className="d-flex justify-content-center"
+                  <motion.div
+                    className="flex justify-center"
                     variants={itemVariants}
                   >
-                    <AnimatedCounter 
-                      value={age} 
-                      duration={3} 
-                      label="Years of Elegance" 
+                    <AnimatedCounter
+                      value={age}
+                      duration={3}
+                      label="Years of Elegance"
                     />
                   </motion.div>
                 )}
@@ -152,7 +151,7 @@ const Prachi_Home = () => {
             {/* Birthday Confetti Effect */}
             {birthday && (
               <motion.div
-                className="birthday-confetti"
+                className="fixed inset-0 pointer-events-none z-50"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1 }}
@@ -160,7 +159,7 @@ const Prachi_Home = () => {
                 {[...Array(20)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className="confetti"
+                    className="absolute text-4xl"
                     style={{
                       left: `${Math.random() * 100}%`,
                       animationDelay: `${Math.random() * 3}s`
@@ -187,32 +186,32 @@ const Prachi_Home = () => {
           <BirthdayCountdown />
 
           {/* Archives Section */}
-          <motion.section 
-            className="archives-section py-5"
+          <motion.section
+            className="py-5"
             variants={itemVariants}
           >
             <Row className="justify-content-center">
               <Col lg={8}>
-                <motion.h2 
-                  className="text-center display-4 fw-bold mb-5 luxury-font"
+                <motion.h2
+                  className="text-center text-5xl font-bold mb-5 luxury-font"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1 }}
                 >
-                  <Gift className="me-3" />
+                  <Gift className="me-3 inline" />
                   Memory Archives
-                  <Gift className="ms-3" />
+                  <Gift className="ms-3 inline" />
                 </motion.h2>
-                
+
                 <motion.div
                   initial={{ opacity: 0, x: -50 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 1.2 }}
                 >
-                  <Card className="archive-item mb-4 border-0">
+                  <Card className="mb-4 border-0 bg-[var(--soft-card)] backdrop-blur-[10px] rounded-3xl border border-pink-500/10 shadow-lg hover:shadow-pink-500/20 transition-all hover:-translate-y-1">
                     <Card.Body className="p-4">
-                      <Badge bg="primary" className="mb-3 fs-6">2024</Badge>
-                      <Card.Text className="fs-5 mb-0 elegant-font">
+                      <Badge bg="primary" className="mb-3 text-lg px-3 py-2">2024</Badge>
+                      <Card.Text className="text-xl mb-0 elegant-font flex items-center">
                         <Heart className="me-2" size={20} />
                         Wish we got close earlier
                       </Card.Text>
@@ -225,13 +224,13 @@ const Prachi_Home = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 1.4 }}
                 >
-                  <Card className="archive-item mb-4 border-0">
+                  <Card className="mb-4 border-0 bg-[var(--soft-card)] backdrop-blur-[10px] rounded-3xl border border-pink-500/10 shadow-lg hover:shadow-pink-500/20 transition-all hover:-translate-y-1">
                     <Card.Body className="p-4">
-                      <Badge bg="primary" className="mb-3 fs-6">2025</Badge>
+                      <Badge bg="primary" className="mb-3 text-lg px-3 py-2">2025</Badge>
                       {birthday ? (
-                        <Card.Link 
+                        <Card.Link
                           href="https://drive.google.com/drive/folders/12vdV4VylQwi0pp87myVLsCjSifptWX61"
-                          className="archive-link display-6 d-flex align-items-center"
+                          className="text-3xl flex items-center no-underline hover:underline"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -239,8 +238,7 @@ const Prachi_Home = () => {
                           Prachi's Archive 2025
                         </Card.Link>
                       ) : (
-                        <Card.Text className="fs-5 text-muted mb-0 elegant-font d-flex align-items-center">
-                          {/* Fixed Lock icon usage */}
+                        <Card.Text className="text-xl text-gray-500 mb-0 elegant-font flex items-center">
                           <Lock className="me-2" size={20} />
                           2025 Prachi's Archive (Locked until birthday)
                         </Card.Text>
@@ -254,10 +252,10 @@ const Prachi_Home = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 1.6 }}
                 >
-                  <Card className="archive-item border-0">
+                  <Card className="border-0 bg-[var(--soft-card)] backdrop-blur-[10px] rounded-3xl border border-pink-500/10 shadow-lg hover:shadow-pink-500/20 transition-all hover:-translate-y-1">
                     <Card.Body className="p-4">
-                      <Badge bg="primary" className="mb-3 fs-6">2026</Badge>
-                      <Card.Text className="fs-5 mb-0 elegant-font d-flex align-items-center">
+                      <Badge bg="primary" className="mb-3 text-lg px-3 py-2">2026</Badge>
+                      <Card.Text className="text-xl mb-0 elegant-font flex items-center">
                         <Sparkles className="me-2" />
                         Check Next Year
                       </Card.Text>
@@ -269,51 +267,50 @@ const Prachi_Home = () => {
           </motion.section>
 
           {/* Secret Codes Section */}
-          <motion.section 
-            className="secret-codes-section py-5 text-center"
+          <motion.section
+            className="py-5 text-center"
             variants={itemVariants}
           >
             <Row className="justify-content-center">
               <Col lg={8}>
-                <motion.h2 
-                  className="display-4 fw-bold mb-4 luxury-font"
+                <motion.h2
+                  className="text-5xl font-bold mb-4 luxury-font"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", delay: 1.8 }}
                 >
-                  <Rocket className="me-3" />
+                  <Rocket className="me-3 inline" />
                   Secret Transport Codes
-                  <Rocket className="ms-3" />
+                  <Rocket className="ms-3 inline" />
                 </motion.h2>
-                
-                <motion.p 
-                  className="lead mb-4 fs-4 elegant-font"
+
+                <motion.p
+                  className="text-2xl mb-4 elegant-font"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 2 }}
                 >
                   Unlock hidden features with secret codes! Try them in the transport model.
                 </motion.p>
-                
-                <div className="d-flex flex-wrap justify-content-center gap-3 mb-5">
+
+                <div className="flex flex-wrap justify-center gap-3 mb-5">
                   {['Canyouwinme', 'Prachisachor', 'SoilChor', 'Prachi0614', 'PringlesxBJCLM'].map((code, index) => (
-                    <motion.span 
+                    <motion.span
                       key={code}
-                      className="code-badge"
                       initial={{ scale: 0, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
-                      transition={{ 
-                        type: "spring", 
+                      transition={{
+                        type: "spring",
                         stiffness: 100,
-                        delay: index * 0.2 + 2.2 
+                        delay: index * 0.2 + 2.2
                       }}
-                      whileHover={{ 
-                        scale: 1.1, 
+                      whileHover={{
+                        scale: 1.1,
                         rotate: 5,
                         y: -5
                       }}
                     >
-                      <Badge bg="light" text="dark" className="fs-5 p-3 luxury-font">
+                      <Badge bg="light" text="dark" className="text-xl px-4 py-3 luxury-font cursor-pointer">
                         {code}
                       </Badge>
                     </motion.span>
@@ -322,12 +319,12 @@ const Prachi_Home = () => {
 
                 {/* Transport Model Button */}
                 <motion.button
-                  className="transport-activate-btn"
+                  className="px-10 py-4 text-xl font-semibold border-0 rounded-full cursor-pointer inline-flex items-center transition-all duration-500 shadow-lg backdrop-blur-[10px] bg-gradient-to-br from-pink-500/90 to-pink-400/80 text-white border-2 border-white/30 hover:from-pink-600/95 hover:to-pink-500/90 hover:shadow-2xl hover:shadow-pink-500/50 hover:border-white/40"
                   onClick={() => setIsTransportOpen(true)}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 2.5 }}
-                  whileHover={{ 
+                  whileHover={{
                     scale: 1.05,
                     y: -2
                   }}
@@ -342,14 +339,14 @@ const Prachi_Home = () => {
           </motion.section>
 
           {/* Footer */}
-          <motion.footer 
+          <motion.footer
             className="text-center py-5 mt-4"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 3.2 }}
           >
-            <motion.p 
-              className="display-6 luxury-font mb-3"
+            <motion.p
+              className="text-3xl luxury-font mb-3"
               animate={{
                 scale: [1, 1.05, 1],
               }}
@@ -361,7 +358,7 @@ const Prachi_Home = () => {
             >
               Save this link and visit again next year! 🎀
             </motion.p>
-            <p className="text-muted elegant-font">
+            <p className="text-gray-500 elegant-font">
               Made with 💖 for Prachi - Your digital sanctuary
             </p>
           </motion.footer>
@@ -369,12 +366,12 @@ const Prachi_Home = () => {
 
         {/* Transport Model Button (Floating) */}
         <motion.button
-          className="transport-floating-btn"
+          className="fixed bottom-8 right-8 w-[70px] h-[70px] rounded-full border-0 cursor-pointer flex items-center justify-center text-3xl z-[1000] shadow-2xl transition-all duration-500 backdrop-blur-[10px] bg-gradient-to-br from-pink-500/90 to-pink-400/80 text-white border-2 border-white/30 hover:from-pink-600/95 hover:to-pink-500/90 hover:shadow-pink-500/40"
           onClick={() => setIsTransportOpen(true)}
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 4 }}
-          whileHover={{ 
+          whileHover={{
             scale: 1.1,
             rotate: [0, -5, 5, 0]
           }}
@@ -384,7 +381,7 @@ const Prachi_Home = () => {
         </motion.button>
 
         {/* Transport Model Component */}
-        <TransportModel 
+        <TransportModel
           isOpen={isTransportOpen}
           onClose={() => setIsTransportOpen(false)}
         />

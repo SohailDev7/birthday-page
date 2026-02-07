@@ -1,111 +1,198 @@
-// components/PinkSVGBackground.jsx
+// components/PinkSVGBackground.jsx - Ultra Cute Kawaii 120 FPS Background
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { useSpring, animated, config } from 'react-spring';
+import { useTrail } from 'react-spring';
 import './PinkSVGBackground.css';
 
-const PinkSVGBackground = () => {
-  const createFloatingElements = useMemo(() => {
-    const createElements = (count, type) => {
-      return Array.from({ length: count }, (_, i) => ({
-        id: `${type}-${i}`,
-        type,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: Math.random() * 24 + 16, // Smaller, more elegant sizes
-        delay: Math.random() * 3,
-        duration: Math.random() * 8 + 15, // Slower, more graceful
-        rotation: Math.random() * 360,
-        opacity: Math.random() * 0.3 + 0.1, // Subtle opacity
-        yRange: Math.random() * 25 + 15, // Reduced movement
-        xRange: Math.random() * 8 - 4 // Minimal horizontal drift
-      }));
-    };
+// Adorable Kawaii SVG Shapes
+const KawaiiHeart = ({ size }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+    <path
+      d="M50 85C30 70 10 50 10 30C10 15 20 5 35 5C42 5 47 8 50 13C53 8 58 5 65 5C80 5 90 15 90 30C90 50 70 70 50 85Z"
+      fill="url(#heart-gradient)"
+      stroke="#FF1493"
+      strokeWidth="2"
+    />
+    <defs>
+      <linearGradient id="heart-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FF69B4" />
+        <stop offset="100%" stopColor="#FF1493" />
+      </linearGradient>
+    </defs>
+    {/* Cute shine */}
+    <ellipse cx="35" cy="25" rx="8" ry="12" fill="rgba(255,255,255,0.4)" />
+  </svg>
+);
 
-    return [
-      ...createElements(6, 'flower'),
-      ...createElements(6, 'heart'),
-      ...createElements(7, 'sparkle')
-    ];
-  }, []);
+const KawaiiBow = ({ size }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+    <g>
+      {/* Left bow */}
+      <ellipse cx="30" cy="50" rx="20" ry="25" fill="url(#bow-gradient)" stroke="#FF1493" strokeWidth="2" />
+      {/* Right bow */}
+      <ellipse cx="70" cy="50" rx="20" ry="25" fill="url(#bow-gradient)" stroke="#FF1493" strokeWidth="2" />
+      {/* Center knot */}
+      <circle cx="50" cy="50" r="12" fill="#FFB6C1" stroke="#FF1493" strokeWidth="2" />
+      {/* Ribbons */}
+      <path d="M45 60 L35 85" stroke="#FF1493" strokeWidth="3" strokeLinecap="round" />
+      <path d="M55 60 L65 85" stroke="#FF1493" strokeWidth="3" strokeLinecap="round" />
+    </g>
+    <defs>
+      <linearGradient id="bow-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FFB6C1" />
+        <stop offset="100%" stopColor="#FF69B4" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
 
-  const getSVGShape = (type, size) => {
-    const baseSize = size;
-    
-    switch(type) {
-      case 'flower':
-        return (
-          <svg width={baseSize} height={baseSize} viewBox="0 0 24 24">
-            <path
-              d="M12 3C8.5 3 5 5.5 5 9c0 3.5 3 7 7 9 4-2 7-5.5 7-9 0-3.5-3.5-6-7-6zm0 2c2.5 0 5 2 5 5 0 2-2 4.5-5 6-3-1.5-5-4-5-6 0-3 2.5-5 5-5z"
-              fill="currentColor"
-            />
-            <circle cx="12" cy="9" r="2" fill="currentColor" />
-          </svg>
-        );
-      
-      case 'heart':
-        return (
-          <svg width={baseSize} height={baseSize} viewBox="0 0 24 24">
-            <path
-              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-              fill="currentColor"
-            />
-          </svg>
-        );
-      
-      case 'sparkle':
-        return (
-          <svg width={baseSize} height={baseSize} viewBox="0 0 24 24">
-            <path
-              d="M12 2L9 12 2 12l7 8 2-10 2 10 7-8-7-2z"
-              fill="currentColor"
-            />
-            <circle cx="18" cy="6" r="1.5" fill="currentColor" />
-            <circle cx="6" cy="18" r="1.5" fill="currentColor" />
-          </svg>
-        );
-      
-      default:
-        return (
-          <svg width={baseSize} height={baseSize} viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" fill="currentColor" />
-          </svg>
-        );
-    }
+const KawaiiStar = ({ size }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+    <path
+      d="M50 10 L60 40 L90 45 L65 65 L72 95 L50 80 L28 95 L35 65 L10 45 L40 40 Z"
+      fill="url(#star-gradient)"
+      stroke="#FFD700"
+      strokeWidth="2"
+    />
+    <defs>
+      <linearGradient id="star-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FFD700" />
+        <stop offset="100%" stopColor="#FFA500" />
+      </linearGradient>
+    </defs>
+    {/* Cute sparkles */}
+    <circle cx="30" cy="25" r="3" fill="white" opacity="0.8" />
+    <circle cx="70" cy="30" r="2" fill="white" opacity="0.8" />
+  </svg>
+);
+
+const KawaiiFlower = ({ size }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+    {/* Petals */}
+    <circle cx="50" cy="25" r="15" fill="#FFB6C1" />
+    <circle cx="75" cy="50" r="15" fill="#FFC0CB" />
+    <circle cx="50" cy="75" r="15" fill="#FFB6C1" />
+    <circle cx="25" cy="50" r="15" fill="#FFC0CB" />
+    {/* Center */}
+    <circle cx="50" cy="50" r="18" fill="#FFD700" stroke="#FFA500" strokeWidth="2" />
+    {/* Cute face */}
+    <circle cx="43" cy="47" r="2" fill="#000" />
+    <circle cx="57" cy="47" r="2" fill="#000" />
+    <path d="M43 55 Q50 58 57 55" stroke="#000" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+  </svg>
+);
+
+const KawaiiCloud = ({ size }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+    <ellipse cx="30" cy="60" rx="20" ry="18" fill="white" opacity="0.9" />
+    <ellipse cx="50" cy="55" rx="22" ry="20" fill="white" opacity="0.9" />
+    <ellipse cx="70" cy="60" rx="20" ry="18" fill="white" opacity="0.9" />
+    {/* Cute face */}
+    <circle cx="42" cy="55" r="2" fill="#FF69B4" />
+    <circle cx="58" cy="55" r="2" fill="#FF69B4" />
+    <ellipse cx="50" cy="62" rx="3" ry="2" fill="#FFB6C1" />
+  </svg>
+);
+
+const KawaiiButterfly = ({ size }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+    {/* Left wings */}
+    <ellipse cx="35" cy="40" rx="18" ry="25" fill="url(#butterfly-gradient)" stroke="#FF1493" strokeWidth="1.5" />
+    <ellipse cx="30" cy="60" rx="12" ry="18" fill="url(#butterfly-gradient2)" stroke="#FF1493" strokeWidth="1.5" />
+    {/* Right wings */}
+    <ellipse cx="65" cy="40" rx="18" ry="25" fill="url(#butterfly-gradient)" stroke="#FF1493" strokeWidth="1.5" />
+    <ellipse cx="70" cy="60" rx="12" ry="18" fill="url(#butterfly-gradient2)" stroke="#FF1493" strokeWidth="1.5" />
+    {/* Body */}
+    <ellipse cx="50" cy="50" rx="4" ry="20" fill="#FFB6C1" stroke="#FF1493" strokeWidth="1" />
+    {/* Antennae */}
+    <path d="M48 32 Q45 25 42 20" stroke="#FF1493" strokeWidth="1.5" fill="none" />
+    <path d="M52 32 Q55 25 58 20" stroke="#FF1493" strokeWidth="1.5" fill="none" />
+    <circle cx="42" cy="20" r="2" fill="#FF69B4" />
+    <circle cx="58" cy="20" r="2" fill="#FF69B4" />
+    <defs>
+      <linearGradient id="butterfly-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FFB6C1" />
+        <stop offset="100%" stopColor="#FF69B4" />
+      </linearGradient>
+      <linearGradient id="butterfly-gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FFC0CB" />
+        <stop offset="100%" stopColor="#FFB6C1" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+// Animated element with react-spring for 120 FPS
+const FloatingElement = ({ element, index }) => {
+  const shapes = {
+    heart: KawaiiHeart,
+    bow: KawaiiBow,
+    star: KawaiiStar,
+    flower: KawaiiFlower,
+    cloud: KawaiiCloud,
+    butterfly: KawaiiButterfly,
   };
 
+  const ShapeComponent = shapes[element.type];
+
+  // Ultra smooth spring animations - 120 FPS
+  const springProps = useSpring({
+    from: {
+      transform: `translate(0px, 0px) rotate(0deg) scale(1)`,
+      opacity: element.opacity
+    },
+    to: async (next) => {
+      while (true) {
+        await next({
+          transform: `translate(${element.xRange}px, ${-element.yRange}px) rotate(${element.rotation}deg) scale(1.15)`,
+          opacity: element.opacity * 1.3
+        });
+        await next({
+          transform: `translate(0px, 0px) rotate(${element.rotation * 2}deg) scale(1)`,
+          opacity: element.opacity
+        });
+      }
+    },
+    config: { ...config.molasses, tension: 50, friction: 25 }, // Smooth like butter
+    delay: element.delay * 1000,
+  });
+
   return (
-    <div className="pink-svg-background">
-      {createFloatingElements.map((element) => (
-        <motion.div
-          key={element.id}
-          className={`svg-element svg-${element.type}`}
-          style={{
-            left: `${element.x}%`,
-            top: `${element.y}%`,
-            width: `${element.size}px`,
-            height: `${element.size}px`,
-            opacity: element.opacity,
-            rotate: element.rotation,
-            color: 'currentColor'
-          }}
-          animate={{
-            y: [0, -element.yRange, 0],
-            x: [0, element.xRange, 0],
-            rotate: [element.rotation, element.rotation + 180, element.rotation + 360],
-            scale: [1, 1.1, 1]
-          }}
-          transition={{
-            duration: element.duration,
-            delay: element.delay,
-            repeat: Infinity,
-            ease: "easeInOut",
-            type: "tween"
-          }}
-          initial={false}
-        >
-          {getSVGShape(element.type, element.size)}
-        </motion.div>
+    <animated.div
+      className={`kawaii-element kawaii-${element.type}`}
+      style={{
+        position: 'absolute',
+        left: `${element.x}%`,
+        top: `${element.y}%`,
+        ...springProps,
+      }}
+    >
+      <ShapeComponent size={element.size} />
+    </animated.div>
+  );
+};
+
+const PinkSVGBackground = () => {
+  const elements = useMemo(() => {
+    const types = ['heart', 'bow', 'star', 'flower', 'cloud', 'butterfly'];
+    return Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      type: types[i % types.length],
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 40 + 30, // 30-70px
+      delay: Math.random() * 3,
+      rotation: Math.random() * 360,
+      opacity: Math.random() * 0.4 + 0.2, // 0.2-0.6
+      yRange: Math.random() * 60 + 40, // 40-100px movement
+      xRange: Math.random() * 40 - 20, // -20 to 20px
+    }));
+  }, []);
+
+  return (
+    <div className="pink-svg-background kawaii-background">
+      {elements.map((element, index) => (
+        <FloatingElement key={element.id} element={element} index={index} />
       ))}
     </div>
   );

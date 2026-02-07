@@ -48,16 +48,75 @@ const ScrollProgressBar = () => {
   );
 };
 
+// Page transition wrapper with 3D effects
+const PageTransition = ({ children }) => {
+  return (
+    <motion.div
+      initial={{
+        opacity: 0,
+        rotateY: 90,
+        scale: 0.8,
+        z: -100
+      }}
+      animate={{
+        opacity: 1,
+        rotateY: 0,
+        scale: 1,
+        z: 0
+      }}
+      exit={{
+        opacity: 0,
+        rotateY: -90,
+        scale: 0.8,
+        z: -100
+      }}
+      transition={{
+        duration: 0.6,
+        ease: [0.43, 0.13, 0.23, 0.96]
+      }}
+      style={{
+        transformStyle: 'preserve-3d',
+        perspective: 1000,
+        transformOrigin: 'center center'
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+// Wrapper for animated routes
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* Routes will be defined in the parent */}
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
 const SimpleLayout = ({ children }) => (
   <div className="app">
     <FloatingElements />
     <ScrollProgressBar />
     <main>{children}</main>
-    <NowPlayingOverlay />
   </div>
 );
 
 const NavLayout = ({ children }) => (
+  <div className="app">
+    <FloatingElements />
+    <ScrollProgressBar />
+    <Navigation />
+    <main>{children}</main>
+  </div>
+);
+
+// Prachi Layout - includes NowPlayingOverlay only for Prachi pages
+const PrachiLayout = ({ children }) => (
   <div className="app">
     <FloatingElements />
     <ScrollProgressBar />
@@ -74,10 +133,10 @@ const ProtectedRoute = ({ children }) => {
   // Show loading spinner or nothing while checking authentication
   if (isLoading) {
     return (
-      <div className="loading-container" style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
+      <div className="loading-container" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         height: '100vh',
         fontSize: '1.2rem',
         color: 'var(--text-color)'
@@ -102,10 +161,10 @@ const PublicRoute = ({ children }) => {
   // Show loading spinner or nothing while checking authentication
   if (isLoading) {
     return (
-      <div className="loading-container" style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
+      <div className="loading-container" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         height: '100vh',
         fontSize: '1.2rem',
         color: 'var(--text-color)'
@@ -123,6 +182,7 @@ const PublicRoute = ({ children }) => {
   // If not authenticated, render the public component
   return children;
 };
+
 
 function App() {
   const { theme } = useTheme();
@@ -149,81 +209,81 @@ function App() {
           {/* Protected routes */}
           <Route path="/prachi/home" element={
             <ProtectedRoute>
-              <NavLayout>
+              <PrachiLayout>
                 <Prachi_Home />
-              </NavLayout>
+              </PrachiLayout>
             </ProtectedRoute>
           } />
 
           <Route path="/prachi/about" element={
             <ProtectedRoute>
-              <NavLayout>
+              <PrachiLayout>
                 <Prachi_About />
-              </NavLayout>
+              </PrachiLayout>
             </ProtectedRoute>
           } />
 
           <Route path="/prachi/tictactoe" element={
             <ProtectedRoute>
-              <NavLayout>
+              <PrachiLayout>
                 <Prachi_Tictactoe />
-              </NavLayout>
+              </PrachiLayout>
             </ProtectedRoute>
           } />
 
           <Route path="/prachi/diary" element={
             <ProtectedRoute>
-              <NavLayout>
+              <PrachiLayout>
                 <Prachi_Diary />
-              </NavLayout>
+              </PrachiLayout>
             </ProtectedRoute>
           } />
 
           <Route path="/prachi/poems" element={
             <ProtectedRoute>
-              <NavLayout>
+              <PrachiLayout>
                 <Prachi_Poem />
-              </NavLayout>
+              </PrachiLayout>
             </ProtectedRoute>
           } />
 
           <Route path="/prachi/chor" element={
             <ProtectedRoute>
-              <NavLayout>
+              <PrachiLayout>
                 <Prachi_Chor />
-              </NavLayout>
+              </PrachiLayout>
             </ProtectedRoute>
           } />
 
           <Route path="/prachi/games" element={
             <ProtectedRoute>
-              <NavLayout>
+              <PrachiLayout>
                 <Prachi_PinkParadise />
-              </NavLayout>
+              </PrachiLayout>
             </ProtectedRoute>
           } />
 
           <Route path="/prachi/lietruth" element={
             <ProtectedRoute>
-              <NavLayout>
+              <PrachiLayout>
                 <Prachi_LieTruth />
-              </NavLayout>
+              </PrachiLayout>
             </ProtectedRoute>
           } />
 
           <Route path="/prachi/reviews" element={
             <ProtectedRoute>
-              <NavLayout>
+              <PrachiLayout>
                 <Prachi_Reviews />
-              </NavLayout>
+              </PrachiLayout>
             </ProtectedRoute>
           } />
 
           <Route path="/prachi/watchlist" element={
             <ProtectedRoute>
-              <NavLayout>
+              <PrachiLayout>
                 <Prachi_List />
-              </NavLayout>
+              </PrachiLayout>
             </ProtectedRoute>
           } />
 

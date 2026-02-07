@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Container, Row, Col, Card, Badge, ProgressBar } from 'react-bootstrap';
+import { Container, Row, Col, Card } from 'react-bootstrap';
 import { useTheme } from '../context/ThemeContext';
 import PinkSVGBackground from '../components/PinkSVGBackground';
 import { calculateAge, isBirthday } from '../utils/dateUtils';
-import './css/Prachi_About.css';
 import image3 from '../assets/images/image3.jpg';
 
 const Prachi_About = () => {
@@ -13,7 +12,7 @@ const Prachi_About = () => {
   const birthday = isBirthday();
   const [animatedValues, setAnimatedValues] = useState({});
 
-  
+
   const personalityTraits = [
     { name: 'Dumbness Level', value: 130, color: 'var(--soft-primary)' },
     { name: 'Pretty Level', value: 101, color: 'var(--soft-secondary)' },
@@ -89,7 +88,7 @@ const Prachi_About = () => {
   ];
 
   useEffect(() => {
-    
+
     personalityTraits.forEach((trait, index) => {
       setTimeout(() => {
         setAnimatedValues(prev => ({
@@ -136,54 +135,52 @@ const Prachi_About = () => {
   return (
     <>
       <PinkSVGBackground />
-      
+
       <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="about-page pt-5"
+        className="min-h-screen pt-5"
       >
         <Container className="mt-5 pt-5">
-          {}
-
-          {}
-          <motion.section 
+          {/* Profile Section */}
+          <motion.section
             variants={itemVariants}
-            className="profile-section py-5"
+            className="py-5"
           >
-            <Row className="align-items-center justify-content-center">
+            <Row className="items-center justify-center">
               <Col md={4} className="text-center mb-4">
                 <motion.div
-                  className="profile-image-container position-relative"
+                  className="relative"
                   variants={floatingVariants}
                   animate="float"
                 >
-                  {}
+                  {/* Profile Frame */}
                   <motion.div
-                    className="profile-frame position-relative mx-auto"
+                    className="relative mx-auto w-[280px] h-[280px]"
                     whileHover={{ scale: 1.05, rotate: 5 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
-                    <div className="frame-layer frame-1"></div>
-                    <div className="frame-layer frame-2"></div>
-                    <div className="profile-image-wrapper">
-                      <img 
+                    <div className="absolute top-0 left-0 w-full h-full rounded-full bg-white/30 backdrop-blur-[10px] transition-all duration-300 rotate-6"></div>
+                    <div className="absolute top-0 left-0 w-full h-full rounded-full bg-white/30 backdrop-blur-[10px] transition-all duration-300 -rotate-6"></div>
+                    <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white/50 shadow-lg shadow-pink-500/30">
+                      <img
                         src={image3}
-                        alt="Prachi" 
-                        className="profile-image"
+                        alt="Prachi"
+                        className="w-full h-full object-cover"
                         onError={(e) => {
                           e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'block';
+                          e.target.nextSibling.style.display = 'flex';
                         }}
                       />
-                      <div className="profile-emoji fallback display-1">
+                      <div className="hidden w-full h-full bg-gradient-to-br from-pink-500 to-pink-400 items-center justify-center text-6xl">
                         🎀
                       </div>
                     </div>
 
-                    {}
+                    {/* Floating Hearts */}
                     <motion.div
-                      className="floating-heart heart-1"
+                      className="absolute -top-5 -left-5 text-4xl z-10"
                       animate={{
                         y: [0, -30, 0],
                         x: [0, 10, 0],
@@ -194,7 +191,7 @@ const Prachi_About = () => {
                       ❤️
                     </motion.div>
                     <motion.div
-                      className="floating-heart heart-2"
+                      className="absolute -bottom-5 -right-5 text-4xl z-10"
                       animate={{
                         y: [0, -40, 0],
                         x: [0, -15, 0],
@@ -210,21 +207,22 @@ const Prachi_About = () => {
 
               <Col md={6}>
                 <motion.div
-                  className="basic-info-card glass-card p-4"
+                  className="glass-card p-4"
                   whileHover={{ y: -5 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <h2 className="display-5 fw-bold mb-4 luxury-font text-pink">
+                  <h2 className="text-4xl font-bold mb-4 luxury-font text-[var(--soft-primary)]">
                     <motion.span
+                      className="inline-block"
                       animate={{ rotate: [0, 10, -10, 0] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
                       👤
                     </motion.span>
-                    Basic Info
+                    {' '}Basic Info
                   </h2>
-                  
-                  <div className="info-list">
+
+                  <div>
                     {[
                       { icon: '🏷️', label: 'Name', value: 'Prachi Shahi' },
                       { icon: '🎂', label: 'Age', value: `${age} years young` },
@@ -233,15 +231,15 @@ const Prachi_About = () => {
                     ].map((item, index) => (
                       <motion.div
                         key={item.label}
-                        className="info-item d-flex align-items-center mb-3"
+                        className="flex items-center mb-3 p-4 rounded-xl bg-white/50 transition-all hover:bg-white/80 hover:translate-x-2"
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.2 + 0.5 }}
                       >
-                        <span className="info-icon me-3 display-6">{item.icon}</span>
+                        <span className="mr-3 text-5xl drop-shadow-sm">{item.icon}</span>
                         <div>
-                          <strong className="d-block info-label">{item.label}:</strong>
-                          <span className="info-value">{item.value}</span>
+                          <strong className="block text-sm text-[var(--soft-text)]">{item.label}:</strong>
+                          <span className="text-[var(--soft-primary)] font-semibold text-lg">{item.value}</span>
                         </div>
                       </motion.div>
                     ))}
@@ -251,17 +249,17 @@ const Prachi_About = () => {
             </Row>
           </motion.section>
 
-          {}
-          <motion.section 
+          {/* Personality Section */}
+          <motion.section
             variants={itemVariants}
-            className="personality-section py-5"
+            className="py-5"
           >
             <motion.div
               className="glass-card p-5"
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="display-4 fw-bold mb-5 luxury-font text-center text-pink">
+              <h2 className="text-5xl font-bold mb-5 luxury-font text-center text-[var(--soft-primary)]">
                 💫 Personality Traits
               </h2>
 
@@ -273,10 +271,10 @@ const Prachi_About = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 + 0.5 }}
                     >
-                      <div className="d-flex justify-content-between align-items-center mb-2">
-                        <span className="trait-name fw-medium">{trait.name}</span>
-                        <motion.span 
-                          className="trait-value fw-bold"
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-medium text-[var(--soft-text)]">{trait.name}</span>
+                        <motion.span
+                          className="font-bold text-[var(--soft-primary)]"
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           transition={{ delay: index * 0.1 + 1 }}
@@ -284,18 +282,20 @@ const Prachi_About = () => {
                           {animatedValues[trait.name] || 0}%
                         </motion.span>
                       </div>
-                      <div className="personality-bar-container">
+                      <div className="h-6 bg-white/30 rounded-xl overflow-hidden relative">
                         <motion.div
-                          className="personality-bar"
+                          className="h-full rounded-xl relative overflow-hidden"
                           initial={{ width: 0 }}
                           animate={{ width: `${trait.value}%` }}
-                          transition={{ 
-                            duration: 1.5, 
+                          transition={{
+                            duration: 1.5,
                             delay: index * 0.1 + 0.5,
                             ease: "easeOut"
                           }}
                           style={{ backgroundColor: trait.color }}
-                        />
+                        >
+                          <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shine"></div>
+                        </motion.div>
                       </div>
                     </motion.div>
                   </Col>
@@ -308,24 +308,24 @@ const Prachi_About = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.5 }}
               >
-                <p className="personality-quote elegant-font fs-4">
+                <p className="text-[var(--soft-primary)] italic elegant-font text-2xl">
                   "A perfect blend of dumbness and charm - that's Prachi"
                 </p>
               </motion.div>
             </motion.div>
           </motion.section>
 
-          {}
-          <motion.section 
+          {/* Favorite Things Section */}
+          <motion.section
             variants={itemVariants}
-            className="favorites-section py-5"
+            className="py-5"
           >
             <motion.div
               className="glass-card p-5"
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="display-4 fw-bold mb-5 luxury-font text-center text-pink">
+              <h2 className="text-5xl font-bold mb-5 luxury-font text-center text-[var(--soft-primary)]">
                 ❤️ Favorite Things
               </h2>
 
@@ -333,24 +333,24 @@ const Prachi_About = () => {
                 {favoriteThings.map((item, index) => (
                   <Col key={item.title} md={6}>
                     <motion.div
-                      className="favorite-card glass-card p-4 h-100"
+                      className="glass-card p-4 h-full transition-all border border-white/20 hover:shadow-lg hover:shadow-pink-500/20"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.2 + 0.5 }}
-                      whileHover={{ 
+                      whileHover={{
                         scale: 1.05,
                         rotate: Math.random() > 0.5 ? 2 : -2
                       }}
                     >
-                      <div className="d-flex align-items-start">
-                        <motion.span 
-                          className="favorite-icon display-4 me-4"
-                          animate={{ 
+                      <div className="flex items-start">
+                        <motion.span
+                          className="text-6xl mr-4 drop-shadow-sm"
+                          animate={{
                             scale: [1, 1.2, 1],
                             rotate: [0, 10, -10, 0]
                           }}
-                          transition={{ 
-                            duration: 3, 
+                          transition={{
+                            duration: 3,
                             repeat: Infinity,
                             delay: index * 0.5
                           }}
@@ -358,7 +358,7 @@ const Prachi_About = () => {
                           {item.icon}
                         </motion.span>
                         <div>
-                          <h4 className="fw-bold mb-2">{item.title}</h4>
+                          <h4 className="font-bold mb-2">{item.title}</h4>
                           <p className="mb-0">{item.description}</p>
                         </div>
                       </div>
@@ -369,17 +369,17 @@ const Prachi_About = () => {
             </motion.div>
           </motion.section>
 
-          {}
-          <motion.section 
+          {/* Fun Facts Section */}
+          <motion.section
             variants={itemVariants}
-            className="fun-facts-section py-5"
+            className="py-5"
           >
             <motion.div
               className="glass-card p-5"
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="display-4 fw-bold mb-5 luxury-font text-center text-pink">
+              <h2 className="text-5xl font-bold mb-5 luxury-font text-center text-[var(--soft-primary)]">
                 💡 Fun Facts
               </h2>
 
@@ -387,27 +387,27 @@ const Prachi_About = () => {
                 {funFacts.map((fact, index) => (
                   <Col key={fact} md={6}>
                     <motion.div
-                      className="fun-fact-card glass-card p-3"
+                      className="glass-card p-3 bg-white/70 border-l-4 border-[var(--soft-primary)] transition-all hover:translate-x-2 hover:bg-white/90"
                       initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 + 0.5 }}
                       whileHover={{ scale: 1.02 }}
                     >
-                      <div className="d-flex align-items-center">
+                      <div className="flex items-center">
                         <motion.span
-                          className="fact-icon me-3"
-                          animate={{ 
+                          className="text-xl mr-3 drop-shadow-sm"
+                          animate={{
                             scale: [1, 1.3, 1],
                           }}
-                          transition={{ 
-                            duration: 2, 
+                          transition={{
+                            duration: 2,
                             repeat: Infinity,
                             delay: index * 0.2
                           }}
                         >
                           ✅
                         </motion.span>
-                        <span className="fact-text">{fact}</span>
+                        <span className="text-[var(--soft-text)] font-medium">{fact}</span>
                       </div>
                     </motion.div>
                   </Col>
@@ -416,36 +416,38 @@ const Prachi_About = () => {
             </motion.div>
           </motion.section>
 
-          {}
-          <motion.section 
+          {/* Friendship Level Section */}
+          <motion.section
             variants={itemVariants}
-            className="friendship-section py-5"
+            className="py-5"
           >
             <motion.div
               className="glass-card p-5"
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="display-4 fw-bold mb-5 luxury-font text-center text-pink">
+              <h2 className="text-5xl font-bold mb-5 luxury-font text-center text-[var(--soft-primary)]">
                 🤝 Friendship Level
               </h2>
 
-              <div className="friendship-meter-container position-relative">
-                <div className="friendship-track">
+              <div className="max-w-2xl mx-auto relative">
+                <div className="h-10 bg-white/30 rounded-2xl overflow-hidden relative">
                   <motion.div
-                    className="friendship-progress"
+                    className="h-full bg-gradient-to-r from-[var(--soft-primary)] to-[var(--soft-secondary)] rounded-2xl relative overflow-hidden"
                     initial={{ width: 0 }}
                     animate={{ width: '94%' }}
                     transition={{ duration: 2, delay: 0.5 }}
-                  />
+                  >
+                    <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-r from-transparent via-white/60 to-transparent animate-shine"></div>
+                  </motion.div>
                 </div>
                 <motion.div
-                  className="friendship-label text-center mt-3"
+                  className="text-center mt-3 text-[var(--soft-primary)]"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 2.5 }}
                 >
-                  <span className="fw-bold fs-3">94% - Chor Besties Forever!</span>
+                  <span className="font-bold text-3xl">94% - Chor Besties Forever!</span>
                 </motion.div>
               </div>
 
@@ -455,24 +457,24 @@ const Prachi_About = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 3 }}
               >
-                <p className="friendship-quote elegant-font fs-4">
+                <p className="text-[var(--soft-primary)] italic elegant-font text-2xl">
                   "A friend like Prachi is worth more than 16 strawberries... maybe even 17!"
                 </p>
               </motion.div>
             </motion.div>
           </motion.section>
 
-          {}
-          <motion.section 
+          {/* Daily Routine Section */}
+          <motion.section
             variants={itemVariants}
-            className="routine-section py-5"
+            className="py-5"
           >
             <motion.div
               className="glass-card p-5"
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="display-4 fw-bold mb-5 luxury-font text-center text-pink">
+              <h2 className="text-5xl font-bold mb-5 luxury-font text-center text-[var(--soft-primary)]">
                 ⏰ Daily Routine
               </h2>
 
@@ -480,23 +482,23 @@ const Prachi_About = () => {
                 {Object.entries(dailyRoutine).map(([time, activities], index) => (
                   <Col key={time} md={6} lg={3}>
                     <motion.div
-                      className="routine-card glass-card p-4 h-100"
+                      className="glass-card p-4 h-full bg-white/80 border border-white/30 transition-all hover:bg-white/95 hover:shadow-lg hover:shadow-pink-500/15"
                       initial={{ opacity: 0, y: 50 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.2 + 0.5 }}
                       whileHover={{ scale: 1.05 }}
                     >
-                      <h4 className="fw-bold mb-3 text-capitalize">{time}</h4>
-                      <ul className="list-unstyled">
+                      <h4 className="font-bold mb-3 capitalize">{time}</h4>
+                      <ul className="list-none p-0">
                         {activities.map((activity, activityIndex) => (
                           <motion.li
                             key={activity}
-                            className="mb-2 d-flex align-items-start"
+                            className="mb-2 flex items-start"
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.2 + activityIndex * 0.1 + 0.7 }}
                           >
-                            <span className="routine-bullet me-2">•</span>
+                            <span className="text-[var(--soft-primary)] font-bold mr-2">•</span>
                             {activity}
                           </motion.li>
                         ))}
@@ -508,21 +510,21 @@ const Prachi_About = () => {
             </motion.div>
           </motion.section>
 
-          {}
-          <motion.section 
+          {/* IQ Graph Section */}
+          <motion.section
             variants={itemVariants}
-            className="iq-section py-5"
+            className="py-5"
           >
             <IQGraph />
           </motion.section>
 
-          {}
+          {/* Footer */}
           <motion.footer
             variants={itemVariants}
             className="text-center py-5 mt-5"
           >
             <motion.p
-              className="display-6 luxury-font mb-3"
+              className="text-3xl luxury-font mb-3"
               animate={{
                 scale: [1, 1.05, 1],
               }}
@@ -534,7 +536,7 @@ const Prachi_About = () => {
             >
               Made with ❤️ for Prachi
             </motion.p>
-            <p className="text-muted">
+            <p className="text-gray-500">
               © {new Date().getFullYear()} - Worth exactly 16 strawberries
             </p>
           </motion.footer>
@@ -571,41 +573,41 @@ const IQGraph = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 1 }}
     >
-      <h2 className="display-4 fw-bold mb-2 luxury-font text-center text-pink">
+      <h2 className="text-5xl font-bold mb-2 luxury-font text-center text-[var(--soft-primary)]">
         📉 Prachi's IQ Development
       </h2>
-      <p className="text-center mb-4 fs-5">(According to highly scientific research)</p>
+      <p className="text-center mb-4 text-xl">(According to highly scientific research)</p>
 
-      <div className="graph-container position-relative h-200">
-        <div className="graph-area">
-          {}
-          <div className="y-axis">
-            <span className="y-label top">200 IQ</span>
-            <span className="y-label bottom">0 IQ</span>
+      <div className="max-w-3xl mx-auto relative h-[200px]">
+        <div className="relative h-full bg-white/10 rounded-2xl p-5">
+          {/* Y-Axis */}
+          <div className="absolute left-0 top-0 bottom-0 w-10 border-r-2 border-[var(--soft-primary)] flex flex-col justify-between py-2.5 px-1">
+            <span className="text-xs text-[var(--soft-text)] font-semibold">200 IQ</span>
+            <span className="text-xs text-[var(--soft-text)] font-semibold">0 IQ</span>
           </div>
 
-          {}
-          <div className="x-axis">
+          {/* X-Axis */}
+          <div className="absolute bottom-0 left-10 right-0 h-[30px] border-t-2 border-[var(--soft-primary)]">
             {[2010, 2015, 2020, 2023].map((year, index) => (
-              <div key={year} className="x-tick" style={{ left: `${index * 25}%` }}>
-                <span className="x-label">{year}</span>
+              <div key={year} className="absolute -top-5" style={{ left: `${index * 25}%`, transform: 'translateX(-50%)' }}>
+                <span className="text-xs text-[var(--soft-text)] font-semibold">{year}</span>
               </div>
             ))}
           </div>
 
-          {}
+          {/* IQ Line */}
           <motion.div
-            className="iq-line"
+            className="absolute bottom-[30px] left-10 right-0 h-0.5 bg-red-500 origin-left"
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 1.5 }}
           />
 
-          {}
+          {/* Error Message */}
           <AnimatePresence>
             {showError && (
               <motion.div
-                className="error-message"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-red-500 font-bold text-2xl text-center drop-shadow-sm"
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0 }}
@@ -617,7 +619,7 @@ const IQGraph = () => {
         </div>
 
         <motion.button
-          className="reset-iq-btn"
+          className="absolute bottom-2.5 right-2.5 bg-[var(--soft-primary)] text-white border-0 px-4 py-2 rounded-2xl text-sm cursor-pointer transition-all hover:bg-[var(--soft-secondary)]"
           onClick={handleResetIQ}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -632,7 +634,7 @@ const IQGraph = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 2 }}
       >
-        <p className="iq-quote elegant-font fs-4">
+        <p className="text-[var(--soft-text)] italic elegant-font text-2xl">
           "Consistently dumb since 2007"
         </p>
       </motion.div>

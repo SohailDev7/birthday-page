@@ -568,11 +568,6 @@ main {
   --navbar-height: 80px; /* Default height, will be updated by JS */
 }
 
-/* Ensure content doesn't go under fixed navbar */
-body {
-  padding-top: var(--navbar-height) !important;
-}
-
 /* Alternative method using pseudo-element */
 .fixed-navbar-wrapper {
   position: fixed;

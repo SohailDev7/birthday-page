@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Navbar, Nav, Container } from 'react-bootstrap';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
@@ -10,116 +9,177 @@ const Navigation = () => {
   const location = useLocation();
   const { currentTheme, toggleTheme, isTransitioning } = useTheme();
   const { logout, isAuthenticated } = useAuth();
-  const [navbarHeight, setNavbarHeight] = useState(80);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const navItems = [
+    { path: '/prachi/home', label: 'Home' },
+    { path: '/prachi/games', label: 'Games' },
+    { path: '/prachi/about', label: 'About' }
+  ];
 
   useEffect(() => {
-    // Update CSS variable with navbar height
-    const navbar = document.querySelector('.custom-navbar');
-    if (navbar) {
-      const height = navbar.offsetHeight;
-      setNavbarHeight(height);
-      document.documentElement.style.setProperty('--navbar-height', `${height}px`);
-    }
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const isPinkTheme = currentTheme === 'soft';
 
   return (
     <>
+      {/* Theme Transition Overlay */}
       <AnimatePresence>
         {isTransitioning && (
           <motion.div
-            className="theme-transition-overlay active"
+            className="fixed inset-0 z-[9999] pointer-events-none bg-pink-500/20 backdrop-blur-sm"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.3 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           />
         )}
       </AnimatePresence>
 
-      <motion.div
+      {/* Navigation Bar */}
+      <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, type: "spring" }}
-        className="fixed-navbar-wrapper"
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className={`
+          fixed top-0 left-0 right-0 z-[1030]
+          transition-all duration-500
+          ${isScrolled ? 'py-3' : 'py-4'}
+        `}
+        style={{
+          background: isPinkTheme
+            ? 'rgba(253, 242, 248, 0.9)'
+            : 'rgba(157, 23, 77, 0.9)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: isPinkTheme
+            ? '1px solid rgba(236, 72, 153, 0.1)'
+            : '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: isScrolled
+            ? '0 10px 30px rgba(236, 72, 153, 0.15)'
+            : '0 4px 15px rgba(236, 72, 153, 0.08)'
+        }}
       >
-        <Navbar expand="lg" className="custom-navbar" fixed="top">
-          <Container>
-            <Navbar.Brand as={Link} to="/prachi/home" className="navbar-brand-custom luxury-font">
-              <motion.span
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link
+              to="/prachi/home"
+              className="flex items-center gap-2 group"
+              style={{ textDecoration: 'none' }}
+            >
+              <motion.div
+                animate={{
+                  rotate: [0, 10, -10, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
               >
-                <Sparkles className="me-2" size={20} />
-              </motion.span>
-              Prachi's Portal
-            </Navbar.Brand>
-            
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            
-            <Navbar.Collapse id="basic-navbar-nav">
-              <Nav className="ms-auto align-items-center">
-                <Nav.Link 
-                  as={Link} 
-                  to="/prachi/home" 
-                  className={location.pathname === '/prachi/home' ? 'nav-link-active' : ''}
-                >
-                  Home
-                </Nav.Link>
-                <Nav.Link 
-                  as={Link} 
-                  to="/prachi/games" 
-                  className={location.pathname === '/prachi/games' ? 'nav-link-active' : ''}
-                >
-                  Games
-                </Nav.Link>
-                <Nav.Link 
-                  as={Link} 
-                  to="/prachi/about"
-                  className={location.pathname === '/prachi/about' ? 'nav-link-active' : ''}
-                >
-                  About
-                </Nav.Link>
-                
-                {/* Theme Toggle */}
-                <motion.div
-                  whileHover={{ scale: 1.1, rotate: 180 }}
-                  whileTap={{ scale: 0.9 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                >
-                  <Nav.Link 
-                    onClick={toggleTheme}
-                    className="theme-toggle"
-                    style={{ cursor: 'pointer' }}
+                <Sparkles
+                  className={isPinkTheme ? 'text-pink-500' : 'text-pink-200'}
+                  size={24}
+                />
+              </motion.div>
+              <span
+                className={`
+                  text-xl md:text-2xl font-bold luxury-font
+                  ${isPinkTheme ? 'text-pink-600' : 'text-white'}
+                  transition-colors duration-300
+                `}
+              >
+                Prachi's Portal
+              </span>
+            </Link>
+
+            {/* Nav Items */}
+            <div className="flex items-center gap-2">
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.path;
+
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className="relative"
+                    style={{ textDecoration: 'none' }}
                   >
                     <motion.div
-                      animate={{ rotate: currentTheme === 'luxury' ? 180 : 0 }}
-                      transition={{ duration: 0.5 }}
+                      className={`
+                        px-4 md:px-6 py-2 rounded-full
+                        font-medium elegant-font
+                        transition-all duration-300
+                        ${isActive
+                          ? isPinkTheme
+                            ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/30'
+                            : 'bg-white/20 text-white shadow-lg shadow-white/10'
+                          : isPinkTheme
+                            ? 'text-pink-700 hover:bg-pink-100'
+                            : 'text-pink-100 hover:bg-white/10'
+                        }
+                      `}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                     >
-                      <Palette size={20} />
+                      {item.label}
                     </motion.div>
-                  </Nav.Link>
-                </motion.div>
+                  </Link>
+                );
+              })}
 
-                {/* Logout Button */}
-                {isAuthenticated && (
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <Nav.Link 
-                      onClick={logout}
-                      className="logout-toggle"
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <LogOut size={20} />
-                    </Nav.Link>
-                  </motion.div>
-                )}
-              </Nav>
-            </Navbar.Collapse>
-          </Container>
-        </Navbar>
-      </motion.div>
+              {/* Theme Toggle */}
+              <motion.button
+                onClick={toggleTheme}
+                className={`
+                  p-2.5 rounded-full
+                  transition-all duration-300
+                  ${isPinkTheme
+                    ? 'bg-pink-100 text-pink-600 hover:bg-pink-200'
+                    : 'bg-white/10 text-pink-100 hover:bg-white/20'
+                  }
+                `}
+                whileHover={{ scale: 1.1, rotate: 180 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              >
+                <Palette size={20} />
+              </motion.button>
+
+              {/* Logout */}
+              {isAuthenticated && (
+                <motion.button
+                  onClick={logout}
+                  className={`
+                    p-2.5 rounded-full
+                    transition-all duration-300
+                    ${isPinkTheme
+                      ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                      : 'bg-white/10 text-red-100 hover:bg-white/20'
+                    }
+                  `}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <LogOut size={20} />
+                </motion.button>
+              )}
+            </div>
+          </div>
+        </div>
+      </motion.nav>
+
+      {/* Spacer */}
+      <div className="h-20" />
     </>
   );
 };

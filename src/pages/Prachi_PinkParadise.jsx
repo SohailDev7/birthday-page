@@ -5,6 +5,7 @@ import { Heart, Star, Sparkles, Home, GamepadIcon, User, Lock, Play } from 'luci
 import { useTheme } from '../context/ThemeContext';
 import { Nav } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import PinkSVGBackground from '../components/PinkSVGBackground';
 import './css/Prachi_PinkParadise.css';
 
 const Prachi_PinkParadise = () => {
@@ -35,61 +36,61 @@ const Prachi_PinkParadise = () => {
 
   // Properly distributed floating elements with exact positions
   const floatingElements = [
-    { 
-      icon: Heart, 
+    {
+      icon: Heart,
       position: { top: '5%', left: '5%' },
-      animation: "heartBeat", 
+      animation: "heartBeat",
       delay: 0,
-      size: 56 
+      size: 56
     },
-    { 
-      icon: Star, 
+    {
+      icon: Star,
       position: { top: '8%', right: '8%' },
-      animation: "float", 
+      animation: "float",
       delay: 1,
-      size: 48 
+      size: 48
     },
-    { 
-      icon: Sparkles, 
+    {
+      icon: Sparkles,
       position: { bottom: '15%', left: '10%' },
-      animation: "bounce", 
+      animation: "bounce",
       delay: 2,
-      size: 52 
+      size: 52
     },
-    { 
-      icon: Star, 
+    {
+      icon: Star,
       position: { bottom: '12%', right: '12%' },
-      animation: "spin", 
+      animation: "spin",
       delay: 3,
-      size: 44 
+      size: 44
     },
-    { 
-      icon: Heart, 
+    {
+      icon: Heart,
       position: { top: '35%', left: '3%' },
-      animation: "float", 
+      animation: "float",
       delay: 0.5,
-      size: 40 
+      size: 40
     },
-    { 
-      icon: Sparkles, 
+    {
+      icon: Sparkles,
       position: { top: '25%', right: '5%' },
-      animation: "bounce", 
+      animation: "bounce",
       delay: 1.5,
-      size: 36 
+      size: 36
     },
-    { 
-      icon: Star, 
+    {
+      icon: Star,
       position: { top: '60%', left: '7%' },
-      animation: "spin", 
+      animation: "spin",
       delay: 2.5,
-      size: 42 
+      size: 42
     },
-    { 
-      icon: Heart, 
+    {
+      icon: Heart,
       position: { bottom: '25%', right: '4%' },
-      animation: "heartBeat", 
+      animation: "heartBeat",
       delay: 3.5,
-      size: 38 
+      size: 38
     }
   ];
 
@@ -137,50 +138,9 @@ const Prachi_PinkParadise = () => {
 
   return (
     <div className="pink-paradise-page">
-      {/* Floating Background Elements - Properly distributed */}
-      {floatingElements.map((element, index) => {
-        const IconComponent = element.icon;
-        return (
-          <motion.div
-            key={index}
-            className="floating-element"
-            style={element.position}
-            animate={{
-              y: [0, -30, 0],
-              rotate: [0, 10, -10, 0],
-              scale: [1, 1.15, 1]
-            }}
-            transition={{
-              duration: 5 + index,
-              delay: element.delay,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          >
-            <IconComponent size={element.size} />
-          </motion.div>
-        );
-      })}
+      {/* Ultra Kawaii Pink SVG Background with 120 FPS Animations */}
+      <PinkSVGBackground />
 
-      {/* Sparkle Decorations - Properly distributed */}
-      {sparklePositions.map((position, index) => (
-        <motion.div
-          key={index}
-          className="sparkle"
-          style={position}
-          animate={{
-            scale: [0, 1.4, 0],
-            opacity: [0, 1, 0],
-            rotate: [0, 180, 360]
-          }}
-          transition={{
-            duration: 4 + Math.random() * 2,
-            delay: index * 0.8,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-      ))}
 
       {/* Main Content with proper spacing */}
       <motion.div
@@ -190,7 +150,7 @@ const Prachi_PinkParadise = () => {
         variants={containerVariants}
       >
         {/* Header with proper spacing */}
-        <motion.div 
+        <motion.div
           className="paradise-header"
           variants={itemVariants}
         >
@@ -230,7 +190,7 @@ const Prachi_PinkParadise = () => {
         </motion.div>
 
         {/* Games Grid */}
-        <motion.div 
+        <motion.div
           className="games-grid"
           variants={containerVariants}
         >
@@ -284,7 +244,7 @@ const Prachi_PinkParadise = () => {
               {/* Action Button */}
               <div className="game-action">
                 {game.available ? (
-                  <Nav.Link 
+                  <Nav.Link
                     as="button"
                     className="play-button"
                     onClick={(e) => {
@@ -378,31 +338,6 @@ const Prachi_PinkParadise = () => {
           </motion.p>
         </motion.div>
       </motion.div>
-
-      {/* Background Particles - Properly distributed */}
-      <div className="particles-container">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="particle"
-            animate={{
-              y: [0, -150, 0],
-              x: [0, Math.sin(i) * 100, 0],
-              opacity: [0, 0.8, 0],
-              scale: [0, 1.2, 0]
-            }}
-            transition={{
-              duration: 5 + Math.random() * 3,
-              delay: Math.random() * 4,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            style={{
-              left: `${5 + Math.random() * 90}%`,
-            }}
-          />
-        ))}
-      </div>
     </div>
   );
 };

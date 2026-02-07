@@ -1,5 +1,5 @@
 // components/ProfilePicture.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw } from 'lucide-react';
 import './ProfilePicture.css';
@@ -14,16 +14,44 @@ import image5 from '../assets/images/image5.jpg';
 const ProfilePicture = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const [isRotating, setIsRotating] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
 
   // Array of imported images and emojis
   const profileImages = [
-    image1, 
+    image1,
     image2,
     image3,
     image4,
     image5,
-    '🦋', 
+    '🦋',
   ];
+
+  // Preload all images on component mount for instant switching
+  useEffect(() => {
+    const preloadImages = async () => {
+      const imagePromises = profileImages
+        .filter(item => typeof item === 'string' && item.startsWith('/') || item.includes('.jpg') || item.includes('.png'))
+        .map(src => {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = src;
+          });
+        });
+
+      try {
+        await Promise.all(imagePromises);
+        setImagesLoaded(true);
+        console.log('✅ All profile images preloaded successfully!');
+      } catch (error) {
+        console.warn('⚠️ Some images failed to preload:', error);
+        setImagesLoaded(true); // Still set to true to show component
+      }
+    };
+
+    preloadImages();
+  }, []); // Empty dependency array - run once on mount
 
   const changeProfilePicture = () => {
     setIsRotating(true);
@@ -38,7 +66,7 @@ const ProfilePicture = () => {
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="profile-picture-container text-center mb-4"
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
@@ -50,12 +78,12 @@ const ProfilePicture = () => {
       >
         <motion.div
           className="profile-display display-1"
-          animate={{ 
+          animate={{
             rotate: isRotating ? 360 : 0,
             scale: isRotating ? 0.8 : 1
           }}
           transition={{ duration: 0.3 }}
-          style={{ 
+          style={{
             cursor: 'pointer',
             background: 'linear-gradient(135deg, var(--soft-primary), var(--soft-secondary))',
             borderRadius: '50%',
@@ -85,9 +113,9 @@ const ProfilePicture = () => {
                   {profileImages[currentImage]}
                 </span>
               ) : (
-                <img 
-                  src={profileImages[currentImage]} 
-                  alt="Profile" 
+                <img
+                  src={profileImages[currentImage]}
+                  alt="Profile"
                   className="w-100 h-100 object-fit-cover"
                   style={{ borderRadius: '50%' }}
                 />
@@ -95,7 +123,7 @@ const ProfilePicture = () => {
             </motion.div>
           </AnimatePresence>
         </motion.div>
-        
+
         <motion.div
           className="change-icon position-absolute"
           style={{
@@ -114,8 +142,8 @@ const ProfilePicture = () => {
           <RefreshCw size={16} />
         </motion.div>
       </motion.div>
-      
-      <motion.p 
+
+      <motion.p
         className="mt-2 text-muted small"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

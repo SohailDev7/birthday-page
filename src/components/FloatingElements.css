@@ -1,44 +1,93 @@
-/* CSS-only version - Add to FloatingElements.css */
-.floating-element-css {
+/* FloatingElements.css - Hello Kitty Kawaii Style */
+
+.floating-elements {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.floating-element {
   position: absolute;
-  width: var(--size);
-  height: var(--size);
-  left: var(--left);
-  opacity: var(--opacity);
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(244, 114, 182, 0.2));
-  box-shadow: 
-    0 0 12px rgba(236, 72, 153, 0.15),
-    inset 0 0 6px rgba(255, 255, 182, 0.25);
-  filter: blur(0.5px);
-  
+  pointer-events: none;
+
   /* Performance optimizations */
   transform: translateZ(0);
   backface-visibility: hidden;
-  perspective: 1000;
+  perspective: 1000px;
   will-change: transform;
   contain: layout style;
-  
-  /* CSS animations - better performance than Framer Motion for simple animations */
-  animation: float-css var(--duration) var(--delay) infinite ease-in-out;
 }
 
-@keyframes float-css {
-  0%, 100% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
+.cute-element {
+  /* Add a subtle glow effect */
+  filter: drop-shadow(0 4px 8px rgba(255, 105, 180, 0.2));
+  transition: filter 0.3s ease;
+}
+
+.cute-element:hover {
+  filter: drop-shadow(0 6px 12px rgba(255, 105, 180, 0.4));
+}
+
+/* Kawaii sparkle effect */
+@keyframes sparkle {
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
   }
-  33% {
-    transform: translate3d(var(--x-range), calc(var(--y-range) * -0.66), 0) rotate(120deg);
-  }
-  66% {
-    transform: translate3d(calc(var(--x-range) * 0.5), calc(var(--y-range) * -1), 0) rotate(240deg);
+
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
   }
 }
 
-/* Theme support for CSS version */
-body[data-theme="luxury"] .floating-element-css {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(251, 207, 232, 0.1));
-  box-shadow: 
-    0 0 10px rgba(255, 255, 255, 0.15),
-    inset 0 0 5px rgba(255, 255, 255, 0.2);
+/* Soft bounce effect */
+@keyframes soft-bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Add subtle pulse to SVG elements */
+.floating-element svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .floating-element {
+    display: none;
+    /* Hide on mobile for performance */
+  }
+}
+
+/* Theme support */
+body[data-theme="luxury"] .cute-element {
+  filter: drop-shadow(0 4px 8px rgba(255, 255, 255, 0.25));
+}
+
+body[data-theme="luxury"] .cute-element:hover {
+  filter: drop-shadow(0 6px 12px rgba(255, 255, 255, 0.4));
+}
+
+/* Ensure elements don't interfere with page interaction */
+.floating-elements * {
+  pointer-events: none;
+  user-select: none;
 }
