@@ -26,11 +26,16 @@ const ProfilePicture = () => {
     '🦋',
   ];
 
+  // Helper function to check if item is emoji
+  const isEmoji = (item) => {
+    return typeof item === 'string' && item.length <= 3;
+  };
+
   // Preload all images on component mount for instant switching
   useEffect(() => {
     const preloadImages = async () => {
       const imagePromises = profileImages
-        .filter(item => typeof item === 'string' && item.startsWith('/') || item.includes('.jpg') || item.includes('.png'))
+        .filter(item => !isEmoji(item)) // Filter out emojis, keep only images
         .map(src => {
           return new Promise((resolve, reject) => {
             const img = new Image();
@@ -51,7 +56,8 @@ const ProfilePicture = () => {
     };
 
     preloadImages();
-  }, []); // Empty dependency array - run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount
 
   const changeProfilePicture = () => {
     setIsRotating(true);
@@ -59,10 +65,6 @@ const ProfilePicture = () => {
       setCurrentImage((prev) => (prev + 1) % profileImages.length);
       setIsRotating(false);
     }, 300);
-  };
-
-  const isEmoji = (item) => {
-    return typeof item === 'string' && item.length <= 3;
   };
 
   return (
