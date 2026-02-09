@@ -12,7 +12,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null); // specific user key (e.g., 'prachi', 'yuzence')
   const [isLoading, setIsLoading] = useState(true);
   const [checkedInitialAuth, setCheckedInitialAuth] = useState(false);
 
@@ -30,22 +30,26 @@ export const AuthProvider = ({ children }) => {
     return null;
   };
 
-  const clearAuthCookies = () => {
-    document.cookie = 'prachi_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    document.cookie = 'prachi_auth_expiry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  const removeCookie = (name) => {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
   };
 
-  const validateAuth = () => {
-    const authCookie = getCookie('prachi_auth');
-    const authExpiry = getCookie('prachi_auth_expiry');
-    
+  // Check if a specific user has a valid session
+  const checkUserSession = (userKey) => {
+    // Sohail must verify his divinity every single time he logs in
+    if (userKey === 'sohail') return false;
+
+    const authCookie = getCookie(`${userKey}_auth`);
+    const authExpiry = getCookie(`${userKey}_auth_expiry`);
+
     if (authCookie && authExpiry) {
       const now = new Date().getTime();
       if (now < parseInt(authExpiry)) {
         return true;
       } else {
-        // Token expired, clear cookies
-        clearAuthCookies();
+        // Token expired, clear specific cookies logic could go here, 
+        // but we normally handle cleanup on failed validation or logout
+        return false;
       }
     }
     return false;
@@ -53,34 +57,48 @@ export const AuthProvider = ({ children }) => {
 
   // Check for existing authentication on mount
   useEffect(() => {
-    const checkAuthStatus = () => {
-      const isValid = validateAuth();
-      setIsAuthenticated(isValid);
+    const initAuth = () => {
+      // Check who was last logged in
+      const lastUser = getCookie('portal_last_user');
+
+      if (lastUser && checkUserSession(lastUser)) {
+        setUser(lastUser);
+      }
+
       setCheckedInitialAuth(true);
       setIsLoading(false);
     };
 
-    checkAuthStatus();
+    initAuth();
   }, []);
 
-  const login = () => {
-    setIsAuthenticated(true);
-    
+  const login = (userKey) => {
+    setUser(userKey);
+
+    // Skip cookie persistence for Sohail - He must verify his divinity every time
+    if (userKey === 'sohail') return;
+
     // Set auth cookie that expires in 30 days
     const expiryTime = new Date().getTime() + (30 * 24 * 60 * 60 * 1000);
-    setCookie('prachi_auth', 'true', 30);
-    setCookie('prachi_auth_expiry', expiryTime.toString(), 30);
+    setCookie(`${userKey}_auth`, 'true', 30);
+    setCookie(`${userKey}_auth_expiry`, expiryTime.toString(), 30);
+    setCookie('portal_last_user', userKey, 30);
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
-    clearAuthCookies();
+    if (user) {
+      removeCookie(`${user}_auth`);
+      removeCookie(`${user}_auth_expiry`);
+    }
+    removeCookie('portal_last_user');
+    setUser(null);
   };
 
   const value = {
-    isAuthenticated,
+    user,
+    isAuthenticated: !!user,
     isLoading: isLoading || !checkedInitialAuth,
-    checkedInitialAuth,
+    checkUserSession,
     login,
     logout
   };

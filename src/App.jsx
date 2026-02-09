@@ -2,21 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { useTheme } from './context/ThemeContext';
+import { motion, AnimatePresence } from 'framer-motion';
 import Home from './pages/Home';
-import Navigation from './components/Navigation';
 import FloatingElements from './components/FloatingElements';
 import NowPlayingOverlay from './components/NowPlayingOverlay';
-import Prachi_Home from './pages/Prachi_Home';
-import Prachi_PortalLogin from './pages/Prachi_PortalLogin';
-import Prachi_About from './pages/Prachi_About';
-import Prachi_Tictactoe from './pages/Prachi_Tictactoe';
-import Prachi_Diary from './pages/Prachi_Diary';
-import Prachi_Poem from './pages/Prachi_Poem';
-import Prachi_Chor from './pages/Prachi_Chor.jsx';
-import Prachi_PinkParadise from './pages/Prachi_PinkParadise';
-import Prachi_LieTruth from './pages/Prachi_LieTruth';
-import Prachi_Reviews from './pages/Prachi_Reviews';
-import Prachi_List from './pages/Prachi_List';
+import Navigation from './components/Navigation';
+import Prachi_Home from './pages/prachi/Prachi_Home.jsx';
+
+import Prachi_About from './pages/prachi/Prachi_About.jsx';
+import Prachi_Tictactoe from './pages/prachi/Prachi_Tictactoe.jsx';
+import Prachi_Diary from './pages/prachi/Prachi_Diary.jsx';
+import Prachi_Poem from './pages/prachi/Prachi_Poem.jsx';
+import Prachi_Chor from './pages/prachi/Prachi_Chor.jsx';
+import Prachi_PinkParadise from './pages/prachi/Prachi_PinkParadise.jsx';
+import Prachi_LieTruth from './pages/prachi/Prachi_LieTruth.jsx';
+import Prachi_Reviews from './pages/prachi/Prachi_Reviews.jsx';
+import Prachi_List from './pages/prachi/Prachi_List.jsx';
+import Yuzence_Home from './pages/Yuzence_Home';
+import MemoriesPage from './pages/MemoriesPage';
 import './App.css';
 
 const useScrollProgress = () => {
@@ -148,7 +151,7 @@ const ProtectedRoute = ({ children }) => {
 
   // If not authenticated, redirect to login with return url
   if (!isAuthenticated) {
-    return <Navigate to="/prachi/login" state={{ from: location }} replace />;
+    return <Navigate to="/pookie/home" state={{ from: location }} replace />;
   }
 
   // If authenticated, render the protected component
@@ -191,19 +194,11 @@ function App() {
     <Router>
       <div className={`app-container ${theme}`}>
         <Routes>
-          {/* Public routes */}
+
           <Route path="/" element={
             <SimpleLayout>
               <Home />
             </SimpleLayout>
-          } />
-
-          <Route path="/prachi/login" element={
-            <PublicRoute>
-              <SimpleLayout>
-                <Prachi_PortalLogin />
-              </SimpleLayout>
-            </PublicRoute>
           } />
 
           {/* Protected routes */}
@@ -284,6 +279,19 @@ function App() {
               <PrachiLayout>
                 <Prachi_List />
               </PrachiLayout>
+            </ProtectedRoute>
+          } />
+
+          {/* Yuzence Routes */}
+          <Route path="/yuzence/home" element={
+            <ProtectedRoute>
+              <Yuzence_Home />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/yuzence/memories" element={
+            <ProtectedRoute>
+              <MemoriesPage />
             </ProtectedRoute>
           } />
 
