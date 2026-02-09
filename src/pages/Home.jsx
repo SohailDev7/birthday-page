@@ -195,10 +195,12 @@ const Home = () => {
   const [hasPlayedIntro, setHasPlayedIntro] = useState(false);
   const [isGeneratingWorld, setIsGeneratingWorld] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingText, setLoadingText] = useState('GENERATING TERRAIN...');
 
   // Background music state
   const [isMuted, setIsMuted] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(0);
+  const [showCards, setShowCards] = useState(true); // New state for toggling cards
   const audioRef = React.useRef(null);
 
   // Handle initial hydration/mount to prevent flash
@@ -262,10 +264,43 @@ const Home = () => {
   useEffect(() => {
     setIsMounted(true);
 
-    // Simulate world generation progress
+    let audioPreloaded = false;
+
+    // Async Audio Preloading
+    const preloadAudio = async () => {
+      try {
+        for (const track of musicTracks) {
+          setLoadingText(`LOADING AUDIO: ${track.name.toUpperCase()}...`);
+          await new Promise((resolve) => {
+            const audio = new Audio();
+            audio.src = track.url;
+            audio.oncanplaythrough = () => resolve();
+            audio.onerror = () => {
+              console.warn(`Failed to preload ${track.name}`);
+              resolve();
+            };
+            audio.load();
+          });
+        }
+        audioPreloaded = true;
+        setLoadingText('FINALIZING WORLD...');
+      } catch (e) {
+        console.error("Audio loading error", e);
+        audioPreloaded = true;
+      }
+    };
+
+    preloadAudio();
+
+    // Simulator for Chunks + Wait for Audio
     const interval = setInterval(() => {
       setLoadingProgress(prev => {
-        if (prev >= 100) {
+        // If audio not ready yet, hold at 95%
+        if (!audioPreloaded && prev >= 95) {
+          return 95;
+        }
+
+        if (prev >= 100 && audioPreloaded) {
           clearInterval(interval);
           // When 100%, reveal world and start firecracker + music
           setTimeout(() => {
@@ -294,12 +329,15 @@ const Home = () => {
           }, 500);
           return 100;
         }
-        return prev + Math.random() * 15;
+
+        // Progress speed: Random normally, faster if audio is done
+        return prev + (audioPreloaded ? 5 : Math.random() * 10);
       });
     }, 100);
 
     return () => clearInterval(interval);
   }, []);
+
 
   // GSAP Entrance Animations when world is ready (delay to account for firecrackers)
   useEffect(() => {
@@ -489,13 +527,13 @@ const Home = () => {
 
             <div className="relative z-10 flex flex-col items-center">
               <h2
-                className="text-2xl md:text-3xl text-[#55FF55] mb-8 text-center px-4"
+                className="text-xl md:text-2xl text-[#55FF55] mb-8 text-center px-4 leading-relaxed"
                 style={{
                   fontFamily: "'Press Start 2P', monospace",
                   textShadow: '4px 4px 0 #000'
                 }}
               >
-                GENERATING WORLD...
+                {loadingText}
               </h2>
 
               {/* Minecraft Progress Bar */}
@@ -520,21 +558,22 @@ const Home = () => {
                 className="mt-6 text-white text-[10px] uppercase font-mono tracking-widest opacity-60"
                 style={{ fontFamily: "'Press Start 2P', monospace" }}
               >
-                Loading Chunks: {Math.floor(loadingProgress)}%
+                Progress: {Math.floor(loadingProgress)}%
               </p>
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
+        )
+        }
+      </AnimatePresence >
 
       {/* Global Interactive FX */}
-      <PixelCursorTrail />
+      < PixelCursorTrail />
 
       {/* Global Interactive FX */}
-      <PixelCursorTrail />
+      < PixelCursorTrail />
 
       {/* Screen Shader Overlay */}
-      <ShaderOverlay timeOfDay={currentTimeOfDay} />
+      < ShaderOverlay timeOfDay={currentTimeOfDay} />
 
       <motion.div
         className="relative min-h-screen"
@@ -920,149 +959,235 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Pixelated Mute Button - Top Right - BLOCKY */}
-        <motion.button
-          className="fixed top-4 right-4 z-50"
-          onClick={toggleMute}
-          initial={{ x: 50, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          style={{
-            width: '80px',
-            height: '80px',
-            background: isMuted
-              ? 'linear-gradient(180deg, #FF4444 0%, #CC0000 100%)'
-              : 'linear-gradient(180deg, #4CAF50 0%, #2E7D32 100%)',
-            border: '6px solid #000',
-            boxShadow: `
-            6px 0 0 #000,
-            -6px 0 0 #000,
-            0 6px 0 #000,
-            0 -6px 0 #000,
-            6px 6px 0 #000,
-            -6px 6px 0 #000,
-            6px -6px 0 #000,
-            -6px -6px 0 #000,
-            inset 4px 4px 0 rgba(255, 255, 255, 0.3),
-            inset -4px -4px 0 rgba(0, 0, 0, 0.3)
-          `,
-            cursor: 'pointer',
-            imageRendering: 'pixelated',
-            clipPath: `polygon(
-            12px 0, calc(100% - 12px) 0,
-            100% 12px, 100% calc(100% - 12px),
-            calc(100% - 12px) 100%, 12px 100%,
-            0 calc(100% - 12px), 0 12px
-          )`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '32px',
-            transition: 'none',
-            filter: 'contrast(1.1) saturate(1.2)',
-            padding: '12px'
-          }}
-          aria-label={isMuted ? 'Unmute' : 'Mute'}
-        >
-          {/* Blocky Pixelated Speaker Icon */}
-          <div style={{
-            position: 'relative',
-            width: '40px',
-            height: '40px',
-            imageRendering: 'pixelated'
-          }}>
-            {/* Speaker body */}
-            <div style={{
-              position: 'absolute',
-              left: '0px',
-              top: '12px',
-              width: '12px',
-              height: '16px',
-              background: '#FFF',
-              boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-            }} />
-            {/* Speaker cone */}
-            <div style={{
-              position: 'absolute',
-              left: '12px',
-              top: '8px',
-              width: '8px',
-              height: '8px',
-              background: '#FFF',
-              boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-            }} />
-            <div style={{
-              position: 'absolute',
-              left: '12px',
-              top: '24px',
-              width: '8px',
-              height: '8px',
-              background: '#FFF',
-              boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-            }} />
+        {/* Top Right Control Buttons Container */}
+        <div className="fixed top-4 right-4 z-50 flex gap-4">
+          {/* Pixelated Eye Button - Toggle Visibility */}
+          <motion.button
+            onClick={() => setShowCards(!showCards)}
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              width: '80px',
+              height: '80px',
+              background: !showCards
+                ? 'linear-gradient(180deg, #FF4444 0%, #CC0000 100%)' // Red when hidden
+                : 'linear-gradient(180deg, #4CAF50 0%, #2E7D32 100%)', // Green when visible
+              border: '6px solid #000',
+              boxShadow: `
+              6px 0 0 #000,
+              -6px 0 0 #000,
+              0 6px 0 #000,
+              0 -6px 0 #000,
+              6px 6px 0 #000,
+              -6px 6px 0 #000,
+              6px -6px 0 #000,
+              -6px -6px 0 #000,
+              inset 4px 4px 0 rgba(255, 255, 255, 0.3),
+              inset -4px -4px 0 rgba(0, 0, 0, 0.3)
+            `,
+              cursor: 'pointer',
+              imageRendering: 'pixelated',
+              clipPath: `polygon(
+              12px 0, calc(100% - 12px) 0,
+              100% 12px, 100% calc(100% - 12px),
+              calc(100% - 12px) 100%, 12px 100%,
+              0 calc(100% - 12px), 0 12px
+            )`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '12px'
+            }}
+          >
+            {/* Blocky Eye Icon */}
+            <div style={{ position: 'relative', width: '40px', height: '40px' }}>
+              {/* Eye White */}
+              <div style={{
+                position: 'absolute',
+                left: '4px', top: '12px',
+                width: '32px', height: '16px',
+                background: '#FFF',
+                boxShadow: '4px 4px 0 rgba(0,0,0,0.2)'
+              }} />
+              {/* Pupil */}
+              <div style={{
+                position: 'absolute',
+                left: !showCards ? '18px' : '14px', // Shift pupil when closed/hidden
+                top: '12px',
+                width: '12px', height: '16px',
+                background: '#000'
+              }} />
 
-            {isMuted ? (
-              // X mark for muted
-              <>
-                <div style={{
-                  position: 'absolute',
-                  left: '24px',
-                  top: '8px',
-                  width: '4px',
-                  height: '24px',
-                  background: '#FFF',
-                  transform: 'rotate(45deg)',
-                  transformOrigin: 'center',
-                  boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-                }} />
-                <div style={{
-                  position: 'absolute',
-                  left: '24px',
-                  top: '8px',
-                  width: '4px',
-                  height: '24px',
-                  background: '#FFF',
-                  transform: 'rotate(-45deg)',
-                  transformOrigin: 'center',
-                  boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-                }} />
-              </>
-            ) : (
-              // Sound waves for unmuted
-              <>
-                <div style={{
-                  position: 'absolute',
-                  left: '24px',
-                  top: '14px',
-                  width: '4px',
-                  height: '12px',
-                  background: '#FFF',
-                  boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-                }} />
-                <div style={{
-                  position: 'absolute',
-                  left: '30px',
-                  top: '10px',
-                  width: '4px',
-                  height: '20px',
-                  background: '#FFF',
-                  boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-                }} />
-                <div style={{
-                  position: 'absolute',
-                  left: '36px',
-                  top: '6px',
-                  width: '4px',
-                  height: '28px',
-                  background: '#FFF',
-                  boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-                }} />
-              </>
-            )}
-          </div>
-        </motion.button>
+              {!showCards && (
+                /* Red Cross / Slash */
+                <>
+                  <div style={{
+                    position: 'absolute',
+                    left: '18px', top: '4px',
+                    width: '4px', height: '32px',
+                    background: '#FF0000',
+                    transform: 'rotate(45deg)',
+                    border: '1px solid #000'
+                  }} />
+                  <div style={{
+                    position: 'absolute',
+                    left: '18px', top: '4px',
+                    width: '4px', height: '32px',
+                    background: '#FF0000',
+                    transform: 'rotate(-45deg)',
+                    border: '1px solid #000'
+                  }} />
+                </>
+              )}
+            </div>
+          </motion.button>
+
+          {/* Pixelated Mute Button */}
+          <motion.button
+            onClick={toggleMute}
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              width: '80px',
+              height: '80px',
+              background: isMuted
+                ? 'linear-gradient(180deg, #FF4444 0%, #CC0000 100%)'
+                : 'linear-gradient(180deg, #4CAF50 0%, #2E7D32 100%)',
+              border: '6px solid #000',
+              boxShadow: `
+              6px 0 0 #000,
+              -6px 0 0 #000,
+              0 6px 0 #000,
+              0 -6px 0 #000,
+              6px 6px 0 #000,
+              -6px 6px 0 #000,
+              6px -6px 0 #000,
+              -6px -6px 0 #000,
+              inset 4px 4px 0 rgba(255, 255, 255, 0.3),
+              inset -4px -4px 0 rgba(0, 0, 0, 0.3)
+            `,
+              cursor: 'pointer',
+              imageRendering: 'pixelated',
+              clipPath: `polygon(
+              12px 0, calc(100% - 12px) 0,
+              100% 12px, 100% calc(100% - 12px),
+              calc(100% - 12px) 100%, 12px 100%,
+              0 calc(100% - 12px), 0 12px
+            )`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '32px',
+              transition: 'none',
+              filter: 'contrast(1.1) saturate(1.2)',
+              padding: '12px'
+            }}
+            aria-label={isMuted ? 'Unmute' : 'Mute'}
+          >
+            {/* Blocky Pixelated Speaker Icon */}
+            <div style={{
+              position: 'relative',
+              width: '40px',
+              height: '40px',
+              imageRendering: 'pixelated'
+            }}>
+              {/* Speaker body */}
+              <div style={{
+                position: 'absolute',
+                left: '0px',
+                top: '12px',
+                width: '12px',
+                height: '16px',
+                background: '#FFF',
+                boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
+              }} />
+              {/* Speaker cone */}
+              <div style={{
+                position: 'absolute',
+                left: '12px',
+                top: '8px',
+                width: '8px',
+                height: '8px',
+                background: '#FFF',
+                boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
+              }} />
+              <div style={{
+                position: 'absolute',
+                left: '12px',
+                top: '24px',
+                width: '8px',
+                height: '8px',
+                background: '#FFF',
+                boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
+              }} />
+
+              {isMuted ? (
+                // X mark for muted
+                <>
+                  <div style={{
+                    position: 'absolute',
+                    left: '24px',
+                    top: '8px',
+                    width: '4px',
+                    height: '24px',
+                    background: '#FFF',
+                    transform: 'rotate(45deg)',
+                    transformOrigin: 'center',
+                    boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
+                  }} />
+                  <div style={{
+                    position: 'absolute',
+                    left: '24px',
+                    top: '8px',
+                    width: '4px',
+                    height: '24px',
+                    background: '#FFF',
+                    transform: 'rotate(-45deg)',
+                    transformOrigin: 'center',
+                    boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
+                  }} />
+                </>
+              ) : (
+                // Sound waves for unmuted
+                <>
+                  <div style={{
+                    position: 'absolute',
+                    left: '24px',
+                    top: '14px',
+                    width: '4px',
+                    height: '12px',
+                    background: '#FFF',
+                    boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
+                  }} />
+                  <div style={{
+                    position: 'absolute',
+                    left: '30px',
+                    top: '10px',
+                    width: '4px',
+                    height: '20px',
+                    background: '#FFF',
+                    boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
+                  }} />
+                  <div style={{
+                    position: 'absolute',
+                    left: '36px',
+                    top: '6px',
+                    width: '4px',
+                    height: '28px',
+                    background: '#FFF',
+                    boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
+                  }} />
+                </>
+              )}
+            </div>
+          </motion.button>
+        </div>
 
         {/* Stars (fade in for night/twilight) */}
         <AnimatePresence>
@@ -1239,390 +1364,398 @@ const Home = () => {
             <PixelCloud delay={5} yPosition="20%" size={1} speed={48} timeOfDay={currentTimeOfDay} />
           </div>
 
-          {/* Main Content - Increased z-index to prevent animal overlap */}
-          <div className="relative z-30 flex flex-col items-center justify-center min-h-screen px-4 py-8">
-            {/* Minecraft-style Title */}
-            <motion.div
-              initial={{ y: -100, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{
-                duration: 0.8,
-                delay: 0.3,
-                type: 'spring',
-                stiffness: 100
-              }}
-              className="mb-16 text-center main-title"
-            >
-              <TypeAnimation
-                sequence={[
-                  'SELECT A CHOR',
-                  2000,
-                  'CHOOSE YOUR HERO',
-                  2000,
-                  'START ADVENTURE',
-                  2000,
-                  'PICK YOUR AVATAR',
-                  2000
-                ]}
-                wrapper="h1"
-                speed={50}
-                repeat={Infinity}
-                className="text-2xl sm:text-4xl md:text-6xl mb-4 text-white px-4 block"
-                style={{
-                  fontFamily: "'Press Start 2P', monospace",
-                  textShadow: '4px 4px 0 #000, 8px 8px 0 rgba(0,0,0,0.3)',
-                  letterSpacing: '2px',
-                  imageRendering: 'pixelated'
-                }}
-              />
-            </motion.div>
-
-            {/* User Selection Carousel with Arrows */}
-            <div className="relative w-full max-w-7xl mb-12">
-              {/* Left Arrow - Minecraft Stone Button Style */}
-              {currentPage > 0 && (
-                <motion.button
-                  onClick={prevPage}
-                  whileHover={{ scale: 1.1, x: -8 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="absolute left-1 sm:left-2 md:left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center"
-                  style={{
-                    background: 'linear-gradient(135deg, #999 0%, #666 100%)',
-                    border: '5px solid #000',
-                    boxShadow: '0 8px 0 #444, 0 12px 0 #000, inset 0 2px 0 rgba(255,255,255,0.3)',
-                    imageRendering: 'pixelated',
-                    clipPath: `polygon(
-                      8px 0, calc(100% - 8px) 0,
-                      100% 8px, 100% calc(100% - 8px),
-                      calc(100% - 8px) 100%, 8px 100%,
-                      0 calc(100% - 8px), 0 8px
-                    )`
+          {/* Main Content - Toggleable Visibility */}
+          <AnimatePresence>
+            {showCards && (
+              <motion.div
+                className="relative z-30 flex flex-col items-center justify-center min-h-screen px-4 py-8"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
+                transition={{ duration: 0.5 }}
+              >
+                {/* Minecraft-style Title */}
+                <motion.div
+                  initial={{ y: -100, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{
+                    duration: 0.8,
+                    delay: 0.3,
+                    type: 'spring',
+                    stiffness: 100
                   }}
+                  className="mb-16 text-center main-title"
                 >
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(2px 2px 0 #000)' }}>
-                    <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={4} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </motion.button>
-              )}
-
-              {/* Right Arrow - Minecraft Stone Button Style */}
-              {currentPage < totalPages - 1 && (
-                <motion.button
-                  onClick={nextPage}
-                  whileHover={{ scale: 1.1, x: 8 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="absolute right-1 sm:right-2 md:right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center"
-                  style={{
-                    background: 'linear-gradient(135deg, #999 0%, #666 100%)',
-                    border: '5px solid #000',
-                    boxShadow: '0 8px 0 #444, 0 12px 0 #000, inset 0 2px 0 rgba(255,255,255,0.3)',
-                    imageRendering: 'pixelated',
-                    clipPath: `polygon(
-                      8px 0, calc(100% - 8px) 0,
-                      100% 8px, 100% calc(100% - 8px),
-                      calc(100% - 8px) 100%, 8px 100%,
-                      0 calc(100% - 8px), 0 8px
-                    )`
-                  }}
-                >
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(2px 2px 0 #000)' }}>
-                    <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={4} d="M9 5l7 7-7 7" />
-                  </svg>
-                </motion.button>
-              )}
-
-              {/* User Cards - Minecraft Wooden Panel Style - Mobile Responsive */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 px-4 sm:px-12 md:px-24 carousel-container">
-                <AnimatePresence>
-                  {currentUsers.map(([userKey, userData], index) => (
-                    <motion.div
-                      key={`${userKey}-${currentPage}`}
-                      initial={{ opacity: 0, y: 30, scale: 0.8 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -30, scale: 0.8 }}
-                      transition={{
-                        delay: isGeneratingWorld ? 0.8 + index * 0.1 : index * 0.05,
-                        duration: 0.4,
-                        type: "spring",
-                        stiffness: 100,
-                        damping: 15
-                      }}
-                      whileHover={{ y: -12, scale: 1.05 }}
-                      onClick={() => handleUserSelect(userKey)}
-                      onMouseEnter={() => setHoveredUser(userKey)}
-                      onMouseLeave={() => setHoveredUser(null)}
-                      className="cursor-pointer"
-                      style={{
-                        zIndex: selectedUser === userKey ? 10 : 1,
-                        willChange: 'transform, opacity',
-                        opacity: hoveredUser && hoveredUser !== userKey && selectedUser !== userKey ? 0.6 : 1,
-                        filter: hoveredUser && hoveredUser !== userKey && selectedUser !== userKey ? 'grayscale(80%)' : 'none',
-                        transition: 'opacity 0.3s ease, filter 0.3s ease'
-                      }}
-                    >
-                      <Tilt
-                        tiltMaxAngleX={15}
-                        tiltMaxAngleY={15}
-                        perspective={1000}
-                        scale={1.05}
-                        transitionSpeed={1500}
-                        glareEnable={true}
-                        glareMaxOpacity={0.45}
-                        glareColor={selectedUser === userKey ? userData.accent : "#ffffff"}
-                        glarePosition="all"
-                        glareBorderRadius="0px" // Square corners for Minecraft style
-                        className="h-full"
-                      >
-                        <div
-                          className="p-6 relative h-full"
-                          style={{
-                            backgroundColor: userData.isSpecial ? '#1D1D1F' : '#8B7355',
-                            background: userData.isSpecial
-                              ? `url("https://www.transparenttextures.com/patterns/dark-matter.png"), radial-gradient(circle at center, ${userData.color}33 0%, #000 100%)`
-                              : selectedUser === userKey
-                                ? `linear-gradient(135deg, ${userData.color}, ${userData.accent})`
-                                : 'repeating-linear-gradient(0deg, #8B7355, #8B7355 4px, #A0826D 4px, #A0826D 8px)',
-                            border: userData.isSpecial ? `6px solid ${userData.color}` : '6px solid #000',
-                            boxShadow: userData.isSpecial
-                              ? `0 0 40px ${userData.color}66, inset 0 0 20px ${userData.color}33`
-                              : selectedUser === userKey
-                                ? `0 8px 0 ${userData.accent}, 0 12px 0 #000, inset 0 4px 0 rgba(255,255,255,0.3), 0 0 30px ${userData.color}`
-                                : '0 8px 0 #6B5A45, 0 12px 0 #000, inset 0 4px 0 rgba(255,255,255,0.2)',
-                            transition: 'all 0.3s ease',
-                            imageRendering: 'pixelated',
-                            opacity: 1
-                          }}
-                        >
-                          {/* Character Aura - Glow Effect */}
-                          {userData.isSpecial && (
-                            <motion.div
-                              className="absolute inset-0 pointer-events-none"
-                              style={{
-                                boxShadow: `0 0 60px ${userData.color}44`,
-                                borderRadius: '0px'
-                              }}
-                              animate={{
-                                opacity: [0.4, 0.8, 0.4],
-                                scale: [1, 1.05, 1]
-                              }}
-                              transition={{
-                                duration: 3,
-                                repeat: Infinity,
-                                ease: "easeInOut"
-                              }}
-                            />
-                          )}
-
-                          {/* Floating Aura Particles for special users */}
-                          {userData.isSpecial && [...Array(12)].map((_, i) => (
-                            <motion.div
-                              key={`aura-${i}`}
-                              className="absolute w-1.5 h-1.5 pointer-events-none"
-                              style={{
-                                background: userData.color,
-                                left: '50%',
-                                top: '50%',
-                                boxShadow: `0 0 8px ${userData.color}`
-                              }}
-                              animate={{
-                                x: [
-                                  Math.cos(i * 30 * Math.PI / 180) * 80,
-                                  Math.cos((i * 30 + 180) * Math.PI / 180) * 100,
-                                  Math.cos(i * 30 * Math.PI / 180) * 80
-                                ],
-                                y: [
-                                  Math.sin(i * 30 * Math.PI / 180) * 120,
-                                  Math.sin((i * 30 + 180) * Math.PI / 180) * 140,
-                                  Math.sin(i * 30 * Math.PI / 180) * 120
-                                ],
-                                opacity: [0, 0.6, 0]
-                              }}
-                              transition={{
-                                duration: 4 + Math.random() * 2,
-                                repeat: Infinity,
-                                delay: i * 0.3
-                              }}
-                            />
-                          ))}
-
-                          {/* Special Label */}
-                          {userData.specialText && (
-                            <div
-                              className="absolute top-4 left-4 z-10 px-2 py-1 text-[8px] text-white font-bold"
-                              style={{
-                                fontFamily: "'Press Start 2P', cursive",
-                                background: userData.color,
-                                border: '2px solid #000',
-                                boxShadow: '2px 2px 0 #000'
-                              }}
-                            >
-                              {userData.specialText}
-                            </div>
-                          )}
-                          {/* Character Full Body */}
-                          <div
-                            className="mb-4 mx-auto w-full h-48 relative pointer-events-none"
-                            style={userData.isSpecial ? { transform: 'translateY(0px)' } : {}}
-                          >
-                            <FullBodyCharacter
-                              userKey={userKey}
-                              userData={userData}
-                              isSelected={selectedUser === userKey}
-                              animationState={selectedUser === userKey && userData.isSpecial ? 'levitate' : (selectedUser === userKey ? 'wave' : 'idle')}
-                            />
-                          </div>
-
-                          {/* Name - Minecraft Font Style */}
-                          <div
-                            className="text-center text-white text-sm mb-2 uppercase pointer-events-none"
-                            style={{
-                              fontFamily: "'Press Start 2P', monospace",
-                              textShadow: '3px 3px 0 #000',
-                              letterSpacing: '1px',
-                              imageRendering: 'pixelated'
-                            }}
-                          >
-                            {userData.displayName}
-                          </div>
-
-                          {/* Selection Indicator - Minecraft Checkmark */}
-                          {selectedUser === userKey && (
-                            <>
-                              <motion.div
-                                className="absolute -top-3 -right-3 w-12 h-12 flex items-center justify-center pointer-events-none"
-                                style={{
-                                  background: 'linear-gradient(135deg, #55FF55 0%, #00AA00 100%)',
-                                  border: '4px solid #000',
-                                  boxShadow: '0 4px 0 #006600, 0 6px 0 #000, inset 0 2px 0 rgba(255,255,255,0.4)',
-                                  imageRendering: 'pixelated'
-                                }}
-                                initial={{ scale: 0, rotate: -180 }}
-                                animate={{ scale: 1, rotate: 0 }}
-                              >
-                                <span className="text-white text-2xl font-bold" style={{ textShadow: '2px 2px 0 #000' }}>✓</span>
-                              </motion.div>
-
-                              {/* Minecraft Particle Effects */}
-                              {[...Array(8)].map((_, i) => (
-                                <motion.div
-                                  key={i}
-                                  className="absolute w-2 h-2 pointer-events-none"
-                                  style={{
-                                    background: userData.color,
-                                    border: '1px solid #000',
-                                    imageRendering: 'pixelated',
-                                    left: `${20 + (i % 4) * 20}%`,
-                                    top: `${20 + Math.floor(i / 4) * 60}%`
-                                  }}
-                                  animate={{
-                                    y: [-10, -30, -10],
-                                    x: [0, (i % 2 === 0 ? 10 : -10), 0],
-                                    opacity: [0, 1, 0],
-                                    scale: [1, 1.5, 1]
-                                  }}
-                                  transition={{
-                                    duration: 2,
-                                    repeat: Infinity,
-                                    delay: i * 0.2,
-                                    ease: 'linear'
-                                  }}
-                                />
-                              ))}
-                              <PixelBurst color={userData.color} />
-                              {/* Enchanted Item Glint Overlay */}
-                              <EnchantedGlint />
-                            </>
-                          )}
-                        </div>
-                      </Tilt>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
-
-              {/* Page Indicators - Minecraft Style */}
-              <div className="flex justify-center gap-4 mt-10 relative z-50">
-                {[...Array(totalPages)].map((_, i) => (
-                  <div
-                    key={i}
+                  <TypeAnimation
+                    sequence={[
+                      'SELECT A CHOR',
+                      2000,
+                      'CHOOSE YOUR HERO',
+                      2000,
+                      'START ADVENTURE',
+                      2000,
+                      'PICK YOUR AVATAR',
+                      2000
+                    ]}
+                    wrapper="h1"
+                    speed={50}
+                    repeat={Infinity}
+                    className="text-2xl sm:text-4xl md:text-6xl mb-4 text-white px-4 block"
                     style={{
-                      width: '16px',
-                      height: '16px',
-                      background: currentPage === i ? '#55FF55' : '#666',
-                      border: '3px solid #000',
-                      boxShadow: currentPage === i
-                        ? '0 3px 0 #00AA00, 0 5px 0 #000'
-                        : '0 3px 0 #333, 0 5px 0 #000',
+                      fontFamily: "'Press Start 2P', monospace",
+                      textShadow: '4px 4px 0 #000, 8px 8px 0 rgba(0,0,0,0.3)',
+                      letterSpacing: '2px',
                       imageRendering: 'pixelated'
                     }}
                   />
-                ))}
-              </div>
-            </div>
-
-            {/* Minecraft-style Action Buttons - Mobile Responsive */}
-            <AnimatePresence>
-              {selectedUser && (
-                <motion.div
-                  initial={{ y: 50, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 50, opacity: 0 }}
-                  className="flex flex-col sm:flex-row gap-4 sm:gap-6 px-4 action-button items-center justify-center"
-                >
-                  {/* Cancel Button - Magnetic & Minecraft Red Stone Style */}
-                  <MagneticButton
-                    onClick={handleCancel}
-                    className="cursor-pointer"
-                  >
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95, boxShadow: '0 2px 0 #660000, 0 4px 0 #000' }}
-                      className="px-6 sm:px-10 py-3 sm:py-5 text-white uppercase text-xs sm:text-sm"
-                      style={{
-                        fontFamily: "'Press Start 2P', monospace",
-                        background: 'linear-gradient(135deg, #CC0000 0%, #990000 100%)',
-                        border: '4px solid #000',
-                        boxShadow: '0 6px 0 #660000, 0 10px 0 #000, inset 0 2px 0 rgba(255,255,255,0.3)',
-                        letterSpacing: '2px',
-                        imageRendering: 'pixelated'
-                      }}
-                      disabled={isLoading}
-                    >
-                      CANCEL
-                    </motion.button>
-                  </MagneticButton>
-
-                  {/* Login Button - Magnetic & Minecraft Diamond Style */}
-                  <MagneticButton
-                    onClick={handleLogin}
-                    className="cursor-pointer"
-                  >
-                    <motion.button
-                      disabled={isLoading}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95, boxShadow: '0 2px 0 #0066AA, 0 4px 0 #000' }}
-                      className="px-6 sm:px-10 py-3 sm:py-5 text-white uppercase text-xs sm:text-sm"
-                      style={{
-                        fontFamily: "'Press Start 2P', monospace",
-                        background: isLoading
-                          ? 'linear-gradient(135deg, #666 0%, #444 100%)'
-                          : 'linear-gradient(135deg, #00AAFF 0%, #0088CC 100%)',
-                        border: '4px solid #000',
-                        boxShadow: isLoading
-                          ? '0 6px 0 #333, 0 10px 0 #000'
-                          : '0 6px 0 #0066AA, 0 10px 0 #000, inset 0 2px 0 rgba(255,255,255,0.3)',
-                        letterSpacing: '2px',
-                        imageRendering: 'pixelated'
-                      }}
-                    >
-                      {isLoading ? 'LOADING...' : 'LOGIN'}
-                    </motion.button>
-                  </MagneticButton>
                 </motion.div>
-              )}
-            </AnimatePresence>
 
-          </div>
+                {/* User Selection Carousel with Arrows */}
+                <div className="relative w-full max-w-7xl mb-12">
+                  {/* Left Arrow - Minecraft Stone Button Style */}
+                  {currentPage > 0 && (
+                    <motion.button
+                      onClick={prevPage}
+                      whileHover={{ scale: 1.1, x: -8 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="absolute left-1 sm:left-2 md:left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center"
+                      style={{
+                        background: 'linear-gradient(135deg, #999 0%, #666 100%)',
+                        border: '5px solid #000',
+                        boxShadow: '0 8px 0 #444, 0 12px 0 #000, inset 0 2px 0 rgba(255,255,255,0.3)',
+                        imageRendering: 'pixelated',
+                        clipPath: `polygon(
+                      8px 0, calc(100% - 8px) 0,
+                      100% 8px, 100% calc(100% - 8px),
+                      calc(100% - 8px) 100%, 8px 100%,
+                      0 calc(100% - 8px), 0 8px
+                    )`
+                      }}
+                    >
+                      <svg className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(2px 2px 0 #000)' }}>
+                        <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={4} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </motion.button>
+                  )}
+
+                  {/* Right Arrow - Minecraft Stone Button Style */}
+                  {currentPage < totalPages - 1 && (
+                    <motion.button
+                      onClick={nextPage}
+                      whileHover={{ scale: 1.1, x: 8 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="absolute right-1 sm:right-2 md:right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center"
+                      style={{
+                        background: 'linear-gradient(135deg, #999 0%, #666 100%)',
+                        border: '5px solid #000',
+                        boxShadow: '0 8px 0 #444, 0 12px 0 #000, inset 0 2px 0 rgba(255,255,255,0.3)',
+                        imageRendering: 'pixelated',
+                        clipPath: `polygon(
+                      8px 0, calc(100% - 8px) 0,
+                      100% 8px, 100% calc(100% - 8px),
+                      calc(100% - 8px) 100%, 8px 100%,
+                      0 calc(100% - 8px), 0 8px
+                    )`
+                      }}
+                    >
+                      <svg className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(2px 2px 0 #000)' }}>
+                        <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={4} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </motion.button>
+                  )}
+
+                  {/* User Cards - Minecraft Wooden Panel Style - Mobile Responsive */}
+                  <div className="overflow-hidden w-full px-4 sm:px-12 md:px-24 mb-8 carousel-container">
+                    <motion.div
+                      className="flex"
+                      animate={{ x: `-${currentPage * 100}%` }}
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    >
+                      {userEntries.map(([userKey, userData], index) => (
+                        <motion.div
+                          key={userKey}
+                          className="flex-shrink-0 px-2 sm:px-3 box-border"
+                          style={{
+                            width: `${100 / usersPerPage}%`,
+                            zIndex: selectedUser === userKey ? 10 : 1,
+                            willChange: 'transform, opacity',
+                            opacity: hoveredUser && hoveredUser !== userKey && selectedUser !== userKey ? 0.6 : 1,
+                            filter: hoveredUser && hoveredUser !== userKey && selectedUser !== userKey ? 'grayscale(80%)' : 'none',
+                            transition: 'opacity 0.3s ease, filter 0.3s ease'
+                          }}
+                          initial={{ opacity: 0, y: 30 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.1 * index }}
+                          whileHover={{ y: -12, scale: 1.05 }}
+                          onClick={() => handleUserSelect(userKey)}
+                          onMouseEnter={() => setHoveredUser(userKey)}
+                          onMouseLeave={() => setHoveredUser(null)}
+                        >
+                          <Tilt
+                            tiltMaxAngleX={15}
+                            tiltMaxAngleY={15}
+                            perspective={1000}
+                            scale={1.05}
+                            transitionSpeed={1500}
+                            glareEnable={true}
+                            glareMaxOpacity={0.45}
+                            glareColor={selectedUser === userKey ? userData.accent : "#ffffff"}
+                            glarePosition="all"
+                            glareBorderRadius="0px" // Square corners for Minecraft style
+                            className="h-full"
+                          >
+                            <div
+                              className="p-6 relative h-full"
+                              style={{
+                                backgroundColor: userData.isSpecial ? '#1D1D1F' : '#8B7355',
+                                background: userData.isSpecial
+                                  ? `url("https://www.transparenttextures.com/patterns/dark-matter.png"), radial-gradient(circle at center, ${userData.color}33 0%, #000 100%)`
+                                  : selectedUser === userKey
+                                    ? `linear-gradient(135deg, ${userData.color}, ${userData.accent})`
+                                    : 'repeating-linear-gradient(0deg, #8B7355, #8B7355 4px, #A0826D 4px, #A0826D 8px)',
+                                border: userData.isSpecial ? `6px solid ${userData.color}` : '6px solid #000',
+                                boxShadow: userData.isSpecial
+                                  ? `0 0 40px ${userData.color}66, inset 0 0 20px ${userData.color}33`
+                                  : selectedUser === userKey
+                                    ? `0 8px 0 ${userData.accent}, 0 12px 0 #000, inset 0 4px 0 rgba(255,255,255,0.3), 0 0 30px ${userData.color}`
+                                    : '0 8px 0 #6B5A45, 0 12px 0 #000, inset 0 4px 0 rgba(255,255,255,0.2)',
+                                transition: 'all 0.3s ease',
+                                imageRendering: 'pixelated',
+                                opacity: 1
+                              }}
+                            >
+                              {/* Character Aura - Glow Effect */}
+                              {userData.isSpecial && (
+                                <motion.div
+                                  className="absolute inset-0 pointer-events-none"
+                                  style={{
+                                    boxShadow: `0 0 60px ${userData.color}44`,
+                                    borderRadius: '0px'
+                                  }}
+                                  animate={{
+                                    opacity: [0.4, 0.8, 0.4],
+                                    scale: [1, 1.05, 1]
+                                  }}
+                                  transition={{
+                                    duration: 3,
+                                    repeat: Infinity,
+                                    ease: "easeInOut"
+                                  }}
+                                />
+                              )}
+
+                              {/* Floating Aura Particles for special users */}
+                              {userData.isSpecial && [...Array(12)].map((_, i) => (
+                                <motion.div
+                                  key={`aura-${i}`}
+                                  className="absolute w-1.5 h-1.5 pointer-events-none"
+                                  style={{
+                                    background: userData.color,
+                                    left: '50%',
+                                    top: '50%',
+                                    boxShadow: `0 0 8px ${userData.color}`
+                                  }}
+                                  animate={{
+                                    x: [
+                                      Math.cos(i * 30 * Math.PI / 180) * 80,
+                                      Math.cos((i * 30 + 180) * Math.PI / 180) * 100,
+                                      Math.cos(i * 30 * Math.PI / 180) * 80
+                                    ],
+                                    y: [
+                                      Math.sin(i * 30 * Math.PI / 180) * 120,
+                                      Math.sin((i * 30 + 180) * Math.PI / 180) * 140,
+                                      Math.sin(i * 30 * Math.PI / 180) * 120
+                                    ],
+                                    opacity: [0, 0.6, 0]
+                                  }}
+                                  transition={{
+                                    duration: 4 + Math.random() * 2,
+                                    repeat: Infinity,
+                                    delay: i * 0.3
+                                  }}
+                                />
+                              ))}
+
+                              {/* Special Label */}
+                              {userData.specialText && (
+                                <div
+                                  className="absolute top-4 left-4 z-10 px-2 py-1 text-[8px] text-white font-bold"
+                                  style={{
+                                    fontFamily: "'Press Start 2P', cursive",
+                                    background: userData.color,
+                                    border: '2px solid #000',
+                                    boxShadow: '2px 2px 0 #000'
+                                  }}
+                                >
+                                  {userData.specialText}
+                                </div>
+                              )}
+                              {/* Character Full Body */}
+                              <div
+                                className="mb-4 mx-auto w-full h-48 relative pointer-events-none"
+                                style={userData.isSpecial ? { transform: 'translateY(0px)' } : {}}
+                              >
+                                <FullBodyCharacter
+                                  userKey={userKey}
+                                  userData={userData}
+                                  isSelected={selectedUser === userKey}
+                                  animationState={selectedUser === userKey && userData.isSpecial ? 'levitate' : (selectedUser === userKey ? 'wave' : 'idle')}
+                                />
+                              </div>
+
+                              {/* Name - Minecraft Font Style */}
+                              <div
+                                className="text-center text-white text-sm mb-2 uppercase pointer-events-none"
+                                style={{
+                                  fontFamily: "'Press Start 2P', monospace",
+                                  textShadow: '3px 3px 0 #000',
+                                  letterSpacing: '1px',
+                                  imageRendering: 'pixelated'
+                                }}
+                              >
+                                {userData.displayName}
+                              </div>
+
+                              {/* Selection Indicator - Minecraft Checkmark */}
+                              {selectedUser === userKey && (
+                                <>
+                                  <motion.div
+                                    className="absolute -top-3 -right-3 w-12 h-12 flex items-center justify-center pointer-events-none"
+                                    style={{
+                                      background: 'linear-gradient(135deg, #55FF55 0%, #00AA00 100%)',
+                                      border: '4px solid #000',
+                                      boxShadow: '0 4px 0 #006600, 0 6px 0 #000, inset 0 2px 0 rgba(255,255,255,0.4)',
+                                      imageRendering: 'pixelated'
+                                    }}
+                                    initial={{ scale: 0, rotate: -180 }}
+                                    animate={{ scale: 1, rotate: 0 }}
+                                  >
+                                    <span className="text-white text-2xl font-bold" style={{ textShadow: '2px 2px 0 #000' }}>✓</span>
+                                  </motion.div>
+
+                                  {/* Minecraft Particle Effects */}
+                                  {[...Array(8)].map((_, i) => (
+                                    <motion.div
+                                      key={i}
+                                      className="absolute w-2 h-2 pointer-events-none"
+                                      style={{
+                                        background: userData.color,
+                                        border: '1px solid #000',
+                                        imageRendering: 'pixelated',
+                                        left: `${20 + (i % 4) * 20}%`,
+                                        top: `${20 + Math.floor(i / 4) * 60}%`
+                                      }}
+                                      animate={{
+                                        y: [-10, -30, -10],
+                                        x: [0, (i % 2 === 0 ? 10 : -10), 0],
+                                        opacity: [0, 1, 0],
+                                        scale: [1, 1.5, 1]
+                                      }}
+                                      transition={{
+                                        duration: 2,
+                                        repeat: Infinity,
+                                        delay: i * 0.2,
+                                        ease: 'linear'
+                                      }}
+                                    />
+                                  ))}
+                                  <PixelBurst color={userData.color} />
+                                  {/* Enchanted Item Glint Overlay */}
+                                  <EnchantedGlint />
+                                </>
+                              )}
+                            </div>
+                          </Tilt>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  </div>
+
+                  {/* Page Indicators - Minecraft Style */}
+                  <div className="flex justify-center gap-4 mt-10 relative z-50">
+                    {[...Array(totalPages)].map((_, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          background: currentPage === i ? '#55FF55' : '#666',
+                          border: '3px solid #000',
+                          boxShadow: currentPage === i
+                            ? '0 3px 0 #00AA00, 0 5px 0 #000'
+                            : '0 3px 0 #333, 0 5px 0 #000',
+                          imageRendering: 'pixelated'
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Minecraft-style Action Buttons - Mobile Responsive */}
+                <AnimatePresence>
+                  {selectedUser && (
+                    <motion.div
+                      initial={{ y: 50, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: 50, opacity: 0 }}
+                      className="flex flex-col sm:flex-row gap-4 sm:gap-6 px-4 action-button items-center justify-center"
+                    >
+                      {/* Cancel Button - Magnetic & Minecraft Red Stone Style */}
+                      <MagneticButton
+                        onClick={handleCancel}
+                        className="cursor-pointer"
+                      >
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95, boxShadow: '0 2px 0 #660000, 0 4px 0 #000' }}
+                          className="px-6 sm:px-10 py-3 sm:py-5 text-white uppercase text-xs sm:text-sm"
+                          style={{
+                            fontFamily: "'Press Start 2P', monospace",
+                            background: 'linear-gradient(135deg, #CC0000 0%, #990000 100%)',
+                            border: '4px solid #000',
+                            boxShadow: '0 6px 0 #660000, 0 10px 0 #000, inset 0 2px 0 rgba(255,255,255,0.3)',
+                            letterSpacing: '2px',
+                            imageRendering: 'pixelated'
+                          }}
+                          disabled={isLoading}
+                        >
+                          CANCEL
+                        </motion.button>
+                      </MagneticButton>
+
+                      {/* Login Button - Magnetic & Minecraft Diamond Style */}
+                      <MagneticButton
+                        onClick={handleLogin}
+                        className="cursor-pointer"
+                      >
+                        <motion.button
+                          disabled={isLoading}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95, boxShadow: '0 2px 0 #0066AA, 0 4px 0 #000' }}
+                          className="px-6 sm:px-10 py-3 sm:py-5 text-white uppercase text-xs sm:text-sm"
+                          style={{
+                            fontFamily: "'Press Start 2P', monospace",
+                            background: isLoading
+                              ? 'linear-gradient(135deg, #666 0%, #444 100%)'
+                              : 'linear-gradient(135deg, #00AAFF 0%, #0088CC 100%)',
+                            border: '4px solid #000',
+                            boxShadow: isLoading
+                              ? '0 6px 0 #333, 0 10px 0 #000'
+                              : '0 6px 0 #0066AA, 0 10px 0 #000, inset 0 2px 0 rgba(255,255,255,0.3)',
+                            letterSpacing: '2px',
+                            imageRendering: 'pixelated'
+                          }}
+                        >
+                          {isLoading ? 'LOADING...' : 'LOGIN'}
+                        </motion.button>
+                      </MagneticButton>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Pixelated Ground/Grass at bottom */}
           <PixelGrass />
@@ -1644,7 +1777,7 @@ const Home = () => {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
       `}</style>
-    </motion.div>
+    </motion.div >
   );
 };
 
