@@ -201,6 +201,7 @@ const Home = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(0);
   const [showCards, setShowCards] = useState(true); // New state for toggling cards
+  const [waitingForEntry, setWaitingForEntry] = useState(false); // State for explicit user entry
   const audioRef = React.useRef(null);
 
   // Handle initial hydration/mount to prevent flash
@@ -269,19 +270,21 @@ const Home = () => {
     // Async Audio Preloading
     const preloadAudio = async () => {
       try {
-        for (const track of musicTracks) {
-          setLoadingText(`LOADING AUDIO: ${track.name.toUpperCase()}...`);
-          await new Promise((resolve) => {
-            const audio = new Audio();
-            audio.src = track.url;
-            audio.oncanplaythrough = () => resolve();
-            audio.onerror = () => {
-              console.warn(`Failed to preload ${track.name}`);
-              resolve();
-            };
-            audio.load();
-          });
-        }
+        // ONLY PRELOAD THE FIRST TRACK TO SPEED UP
+        const track = musicTracks[currentTrack];
+        setLoadingText(`LOADING AUDIO: ${track.name.toUpperCase()}...`);
+
+        await new Promise((resolve) => {
+          const audio = new Audio();
+          audio.src = track.url;
+          audio.oncanplaythrough = () => resolve();
+          audio.onerror = () => {
+            console.warn(`Failed to preload ${track.name}`);
+            resolve();
+          };
+          audio.load();
+        });
+
         audioPreloaded = true;
         setLoadingText('FINALIZING WORLD...');
       } catch (e) {
@@ -302,31 +305,8 @@ const Home = () => {
 
         if (prev >= 100 && audioPreloaded) {
           clearInterval(interval);
-          // When 100%, reveal world and start firecracker + music
-          setTimeout(() => {
-            setIsGeneratingWorld(false);
-            setShowIntroFirecracker(true);
-
-            // Auto-play music when world is ready
-            if (audioRef.current) {
-              audioRef.current.play().catch(error => {
-                console.warn('⚠️ Transition autoplay blocked:', error.message);
-                // Fallback: Add interaction listener to start music on first click
-                const startOnInteraction = async () => {
-                  try {
-                    if (audioRef.current) {
-                      await audioRef.current.play();
-                      console.log('✅ Audio started after interaction');
-                      document.removeEventListener('click', startOnInteraction);
-                    }
-                  } catch (e) {
-                    console.error('❌ Interaction play failed:', e);
-                  }
-                };
-                document.addEventListener('click', startOnInteraction, { once: true });
-              });
-            }
-          }, 500);
+          setLoadingText('READY TO ENTER');
+          setWaitingForEntry(true); // Wait for user click to start
           return 100;
         }
 
@@ -337,6 +317,20 @@ const Home = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  const handleEnterWorld = async () => {
+    setIsGeneratingWorld(false);
+    setShowIntroFirecracker(true);
+
+    if (audioRef.current) {
+      try {
+        await audioRef.current.play();
+        console.log('✅ Audio started on interactions');
+      } catch (error) {
+        console.error('❌ Play failed:', error);
+      }
+    }
+  };
 
 
   // GSAP Entrance Animations when world is ready (delay to account for firecrackers)
@@ -536,30 +530,54 @@ const Home = () => {
                 {loadingText}
               </h2>
 
-              {/* Minecraft Progress Bar */}
-              <div
-                className="w-64 md:w-96 h-8 bg-[#444] relative"
-                style={{
-                  border: '4px solid #000',
-                  boxShadow: '4px 4px 0 #000'
-                }}
-              >
-                <motion.div
-                  className="h-full bg-[#55FF55]"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${loadingProgress}%` }}
-                  style={{
-                    boxShadow: 'inset 0 4px 0 rgba(255,255,255,0.4)'
-                  }}
-                />
-              </div>
+              {!waitingForEntry ? (
+                <>
+                  {/* Minecraft Progress Bar */}
+                  <div
+                    className="w-64 md:w-96 h-8 bg-[#444] relative"
+                    style={{
+                      border: '4px solid #000',
+                      boxShadow: '4px 4px 0 #000'
+                    }}
+                  >
+                    <motion.div
+                      className="h-full bg-[#55FF55]"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${loadingProgress}%` }}
+                      style={{
+                        boxShadow: 'inset 0 4px 0 rgba(255,255,255,0.4)'
+                      }}
+                    />
+                  </div>
 
-              <p
-                className="mt-6 text-white text-[10px] uppercase font-mono tracking-widest opacity-60"
-                style={{ fontFamily: "'Press Start 2P', monospace" }}
-              >
-                Progress: {Math.floor(loadingProgress)}%
-              </p>
+                  <p
+                    className="mt-6 text-white text-[10px] uppercase font-mono tracking-widest opacity-60"
+                    style={{ fontFamily: "'Press Start 2P', monospace" }}
+                  >
+                    Progress: {Math.floor(loadingProgress)}%
+                  </p>
+                </>
+              ) : (
+                <motion.button
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleEnterWorld}
+                  className="px-8 py-4 text-white text-xl md:text-2xl cursor-pointer"
+                  style={{
+                    fontFamily: "'Press Start 2P', monospace",
+                    background: '#55FF55',
+                    color: '#000',
+                    border: '4px solid #000',
+                    boxShadow: '0 6px 0 #008800, 0 10px 0 #000',
+                    textShadow: 'none',
+                    imageRendering: 'pixelated'
+                  }}
+                >
+                  ENTER WORLD
+                </motion.button>
+              )}
             </div>
           </motion.div>
         )
