@@ -29,6 +29,10 @@ const musicTracks = [
     name: "C418 - WET HANDS",
     url: "/audio/wethands.mp3"
   },
+  {
+    name: "800 Cherries - Through",
+    url: "/audio/800 Cherries - Through.mp3"
+  },
 ];
 
 const MagneticButton = ({ children, className, onClick, ...props }) => {
