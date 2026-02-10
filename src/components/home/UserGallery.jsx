@@ -524,9 +524,8 @@ const GalleryItem = ({ user, userKey, drawingData, onClick }) => {
                 </div>
 
                 {/* Pixel Art Legs - Rendered as a block element below canvas */}
-                {/* -mt-3 pulls it up slightly so it tucks BEHIND the canvas bottom border */}
                 <div className="w-full h-[60px] -mt-3 z-0 flex justify-center pointer-events-none relative">
-                    <svg width="100%" height="100%" viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                    <svg width="100%" height="60px" viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
                         {/* Left Leg */}
                         <path d="M15 0 H25 V10 H24 V20 H23 V30 H22 V40 H21 V50 H20 V60 H15 V60 V50 H16 V40 H17 V30 H18 V20 H19 V10 H20 V0 Z" fill="#5D4037" />
 
@@ -608,17 +607,29 @@ const UserGallery = ({ users }) => {
 
             {/* Horizontal Scroll Container for Canvases placed on ground */}
             {/* pb-32 (128px) ensures legs are fully visible above the 80px grass layer */}
-            <div className="flex flex-row items-end gap-8 md:gap-16 px-6 md:px-12 pb-32 overflow-x-auto w-full pointer-events-auto no-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                <div className="flex flex-row items-end gap-8 md:gap-16 min-w-max mx-auto md:mx-0 md:justify-start">
+            <div className="flex flex-row items-end overflow-x-auto w-full pointer-events-auto no-scrollbar snap-x snap-mandatory scroll-smooth pb-32" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <div className="flex flex-row items-end gap-12 md:gap-32 px-[35vw] md:px-[40vw]">
+                    {/* Start Spacer */}
+                    <div className="w-[5vw] shrink-0" />
+
                     {Object.entries(users).map(([key, user]) => (
-                        <GalleryItem
+                        <motion.div
                             key={key}
-                            userKey={key}
-                            user={user}
-                            drawingData={drawings[key]}
-                            onClick={setSelectedUserKey}
-                        />
+                            className="snap-center"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            <GalleryItem
+                                userKey={key}
+                                user={user}
+                                drawingData={drawings[key]}
+                                onClick={setSelectedUserKey}
+                            />
+                        </motion.div>
                     ))}
+
+                    {/* End Spacer */}
+                    <div className="w-[35vw] shrink-0" />
                 </div>
             </div>
 

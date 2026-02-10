@@ -23,11 +23,11 @@ import { Music } from 'lucide-react';
 // Music tracks - Audio files should be in public/audio/ folder
 const musicTracks = [
   {
-    name: "C418 - Chirp",
+    name: "C418 - CHIRP",
     url: "/audio/chirp.mp3"
   },
   {
-    name: "C418 - Wet Hands",
+    name: "C418 - WET HANDS",
     url: "/audio/wethands.mp3"
   },
 ];
@@ -222,7 +222,7 @@ const Home = () => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
       // Update usersPerPage based on screen width
-      if (window.innerWidth < 640) setUsersPerPage(2);
+      if (window.innerWidth < 640) setUsersPerPage(3);
       else if (window.innerWidth < 1024) setUsersPerPage(3);
       else setUsersPerPage(4);
     };
@@ -1917,7 +1917,7 @@ const Home = () => {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 50, opacity: 0 }}
-                    className="flex flex-col gap-4 sm:gap-6 px-4 action-button items-center justify-center"
+                    className="flex flex-col gap-4 sm:gap-6 px-4 action-button items-center justify-center pb-20 sm:pb-0"
                   >
                     {/* Mobile Music Player - Only shows when character is tapped */}
                     {isMobile && (
