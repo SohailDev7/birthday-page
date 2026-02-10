@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Eraser, Undo, Redo, Lock, Eye, Check, Key, RotateCcw, Database, Download } from 'lucide-react';
+import { FullBodyCharacter } from './Characters';
 
 const PixelPaintbrushIcon = ({ size = 24, className }) => (
     <svg
@@ -24,16 +25,16 @@ const PixelPaintbrushIcon = ({ size = 24, className }) => (
 
 const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     const canvasRef = useRef(null);
-    const previewCanvasRef = useRef(null); 
+    const previewCanvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [color, setColor] = useState('#000000');
     const [brushSize, setBrushSize] = useState(5);
-    const [tool, setTool] = useState('brush'); 
+    const [tool, setTool] = useState('brush');
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [isPanMode, setIsPanMode] = useState(false);
     const lastTapRef = useRef({ time: 0, color: null });
-    const touchStateRef = useRef(null); 
+    const touchStateRef = useRef(null);
 
     const [shadePopup, setShadePopup] = useState({ show: false, color: '', x: 0, y: 0 });
     const [cursorPos, setCursorPos] = useState({ x: 0, y: 0, show: false, canvasX: 0, canvasY: 0 });
@@ -47,12 +48,12 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     const [isSaving, setIsSaving] = useState(false);
     const [paintingTitle, setPaintingTitle] = useState('');
     const [showSaveDialog, setShowSaveDialog] = useState(false);
-    const [saveSlot, setSaveSlot] = useState(0); 
+    const [saveSlot, setSaveSlot] = useState(0);
     const [pendingExportData, setPendingExportData] = useState(null);
     const [hasTouchedCanvas, setHasTouchedCanvas] = useState(false);
-    const [selectedSlotIndex, setSelectedSlotIndex] = useState(null); 
+    const [selectedSlotIndex, setSelectedSlotIndex] = useState(null);
 
-    const [mode, setMode] = useState('view'); 
+    const [mode, setMode] = useState('view');
     const [authInput, setAuthInput] = useState('');
     const [authError, setAuthError] = useState(false);
 
@@ -86,7 +87,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     }, [tool, color, brushSize, zoom, mode, isPanMode]);
 
     const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-    const [pendingExitAction, setPendingExitAction] = useState(null); 
+    const [pendingExitAction, setPendingExitAction] = useState(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -104,7 +105,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         if (initialData) {
             const img = new Image();
             img.onload = () => {
-                
+
                 ctx.drawImage(img, 0, 0, RESOLUTION, RESOLUTION);
                 const dataURL = canvas.toDataURL();
                 setHistory([dataURL]);
@@ -132,7 +133,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
             }
         };
         fetchGallery();
-    }, []); 
+    }, []);
 
     useEffect(() => {
         if (!canvasRef.current) return;
@@ -163,18 +164,9 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         };
 
         const handlePointerUp = () => {
-            const state = drawStateRef.current;
-            if (state.isDrawing) {
-                const lastIdx = state.points.length - 1;
-                const pos = state.points[lastIdx];
-                if (pos) updateMagnifier(pos.x, pos.y);
-
-                state.isDrawing = false;
-                setIsDrawing(false); 
-                setCursorPos(prev => ({ ...prev, show: false }));
-                saveToHistory();
-            }
-            state.isPanMode = false;
+            stopDrawing();
+            drawStateRef.current.isPanMode = false;
+            setIsPanMode(false);
         };
 
         window.addEventListener('pointermove', handlePointerMove, { passive: true });
@@ -184,7 +176,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
             window.removeEventListener('pointermove', handlePointerMove);
             window.removeEventListener('pointerup', handlePointerUp);
         };
-    }, []); 
+    }, []);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -216,7 +208,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
 
     useEffect(() => {
         const handleResize = () => {
-            
+
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -244,7 +236,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(img, 0, 0);
             const source = data || history[index];
-            onSave(source); 
+            onSave(source);
         };
         img.src = data || history[index];
         if (!data) setHistoryIndex(index);
@@ -313,13 +305,13 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         const canvas = canvasRef.current;
         if (!canvas) return { x: 0, y: 0, screenX: 0, screenY: 0 };
 
-        const rect = canvasBoundsRef.current || canvas.getBoundingClientRect();
+        const rect = canvas.getBoundingClientRect();
 
         const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
         const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
 
-        const relativeX = clientX - rect.left;
-        const relativeY = clientY - rect.top;
+        const relativeX = (clientX - rect.left);
+        const relativeY = (clientY - rect.top);
 
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
@@ -328,12 +320,14 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
             x: relativeX * scaleX,
             y: relativeY * scaleY,
             screenX: relativeX,
-            screenY: relativeY
+            screenY: relativeY,
+            clientX,
+            clientY
         };
     };
 
     const floodFill = (ctx, startX, startY, fillColor) => {
-        
+
         const r = parseInt(fillColor.slice(1, 3), 16);
         const g = parseInt(fillColor.slice(3, 5), 16);
         const b = parseInt(fillColor.slice(5, 7), 16);
@@ -401,7 +395,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         drawStateRef.current.points = [{ x, y }];
         drawStateRef.current.lastPoint = { x, y };
 
-        setIsDrawing(true); 
+        setIsDrawing(true);
         setCursorPos(prev => ({ ...prev, show: true }));
 
         const ctx = canvasRef.current.getContext('2d');
@@ -501,10 +495,13 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     };
 
     const stopDrawing = () => {
-        if (isDrawing && mode === 'edit') {
+        const state = drawStateRef.current;
+        if (state.isDrawing) {
+            state.isDrawing = false;
+            setIsDrawing(false);
+            setCursorPos(prev => ({ ...prev, show: false }));
             saveToHistory();
         }
-        setIsDrawing(false);
     };
 
     const clearCanvas = () => {
@@ -546,7 +543,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     displayName: user.displayName,
                     drawingData: pendingExportData,
                     title: paintingTitle,
-                    index: saveSlot 
+                    index: saveSlot
                 })
             });
             const result = await res.json();
@@ -555,8 +552,8 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                 setShowSaveDialog(false);
                 setPendingExportData(null);
                 setPaintingTitle('');
-                onSave(pendingExportData); 
-                setHasTouchedCanvas(false); 
+                onSave(pendingExportData);
+                setHasTouchedCanvas(false);
                 setSaveSuccess(true);
                 setTimeout(() => setSaveSuccess(false), 3000);
             } else {
@@ -579,7 +576,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
             const result = await res.json();
             if (result.success) {
                 setEquippedIndex(index);
-                onSave(gallery[index].drawingData); 
+                onSave(gallery[index].drawingData);
             }
         } catch (e) {
             console.error("Equip failed:", e);
@@ -614,13 +611,13 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     };
 
     const generateShades = (hex) => {
-        
+
         const r = parseInt(hex.slice(1, 3), 16);
         const g = parseInt(hex.slice(3, 5), 16);
         const b = parseInt(hex.slice(5, 7), 16);
 
         const shades = [];
-        const factors = [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8]; 
+        const factors = [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8];
 
         factors.forEach(f => {
             const nr = Math.max(0, Math.min(255, Math.floor(r * f))).toString(16).padStart(2, '0');
@@ -633,10 +630,10 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
 
     const handleColorClick = (c, e) => {
         const now = Date.now();
-        const DOUBLE_TAP_DELAY = 400; 
+        const DOUBLE_TAP_DELAY = 400;
 
         if (lastTapRef.current.color === c && now - lastTapRef.current.time < DOUBLE_TAP_DELAY) {
-            
+
             handleColorLongPress(c, e);
         } else {
             setColor(c);
@@ -692,7 +689,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                 className="bg-[#FFE4C4] border-4 border-[#8B4513] p-2 md:p-4 shadow-[8px_8px_0_rgba(0,0,0,1)] max-w-5xl w-full max-h-[90vh] flex flex-col gap-2 md:gap-4 relative overflow-hidden"
                 style={{ fontFamily: "'Press Start 2P', monospace", imageRendering: 'pixelated' }}
             >
-                {}
+                { }
                 <div className="flex justify-between items-center border-b-4 border-[#8B4513] p-2 md:p-3 bg-[#8B4513]/10 shrink-0 z-50">
                     <div className="flex items-center gap-2 md:gap-4">
                         <div className="w-6 h-6 md:w-8 md:h-8 border-2 border-black shadow-[2px_2px_0_rgba(0,0,0,0.3)]" style={{ background: user.color }} />
@@ -727,7 +724,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     </div>
                 </div>
 
-                {}
+                { }
                 <AnimatePresence>
                     {mode === 'edit' && cursorPos.show && isDrawing && (
                         <motion.div
@@ -740,7 +737,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                 height: '120px',
                                 borderRadius: '8px',
                                 border: '4px solid #8B4513',
-                                transform: 'translateZ(0)' 
+                                transform: 'translateZ(0)'
                             }}
                         >
                             <canvas
@@ -750,7 +747,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                 style={{ imageRendering: 'pixelated', width: '112px', height: '112px' }}
                             />
                             <div className="absolute top-0 right-0 bg-[#8B4513] text-white text-[8px] px-1 py-0.5 font-bold">PREVIEW</div>
-                            {}
+                            { }
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                 <div className="w-full h-px bg-[#8B4513]/30" />
                                 <div className="h-full w-px bg-[#8B4513]/30" />
@@ -759,11 +756,11 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     )}
                 </AnimatePresence>
 
-                {}
+                { }
                 <div className="flex flex-col md:flex-row gap-2 md:gap-3 flex-1 min-h-0 overflow-hidden">
-                    {}
+                    { }
                     <div className="flex-1 flex flex-col gap-2 md:gap-4 min-w-0 overflow-hidden">
-                        {}
+                        { }
                         <div className="relative p-1 md:p-3 bg-[#DEB887] border-4 border-[#5D4037] shadow-inner flex-1 overflow-auto flex flex-col items-center min-h-[200px] md:min-h-[300px]">
                             <div
                                 className="relative bg-white border-4 border-[#8B4513] overflow-hidden m-auto shadow-[4px_4px_0_rgba(0,0,0,0.3)]"
@@ -782,10 +779,13 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     ref={canvasRef}
                                     className={`w-full h-full block image-pixelated ${mode === 'edit' ? (isPanMode ? 'cursor-grabbing' : 'cursor-crosshair') : 'cursor-default'}`}
                                     onContextMenu={(e) => e.preventDefault()}
-                                    onMouseDown={(e) => {
-                                        canvasBoundsRef.current = canvasRef.current.getBoundingClientRect();
-                                        if (mode === 'edit' && (e.button === 2 || e.buttons === 2)) {
-                                            if (zoom > 1) setIsPanMode(true);
+                                    onPointerDown={(e) => {
+                                        if (mode !== 'edit' || isPanMode) return;
+                                        if (e.button === 2 || e.buttons === 2) {
+                                            if (zoom > 1) {
+                                                setIsPanMode(true);
+                                                drawStateRef.current.isPanMode = true;
+                                            }
                                             return;
                                         }
                                         if (tool === 'fill') handleCanvasClick(e);
@@ -820,7 +820,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     }}
                                     onTouchStart={(e) => {
                                         if (e.touches.length === 2) {
-                                            
+
                                             const dist = Math.hypot(
                                                 e.touches[0].clientX - e.touches[1].clientX,
                                                 e.touches[0].clientY - e.touches[1].clientY
@@ -892,7 +892,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     }}
                                 />
 
-                                {}
+                                { }
                                 {!initialData && !hasTouchedCanvas && (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-40">
                                         <PixelPaintbrushIcon size={40} className="text-[#8B4513] mb-4" />
@@ -902,9 +902,9 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     </div>
                                 )}
 
-                                {}
+                                { }
 
-                                {}
+                                { }
                                 {mode === 'edit' && tool !== 'fill' && (
                                     <div
                                         ref={brushPreviewRef}
@@ -920,7 +920,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     />
                                 )}
 
-                                {}
+                                { }
                                 <AnimatePresence>
                                     {saveSuccess && (
                                         <motion.div
@@ -934,7 +934,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     )}
                                 </AnimatePresence>
 
-                                {}
+                                { }
                                 {mode === 'auth' && (
                                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20 backdrop-blur-sm">
                                         <motion.div
@@ -986,10 +986,10 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                             </div>
                         </div>
 
-                        {}
+                        { }
                         {mode === 'edit' && (
                             <div className="flex flex-col gap-2 bg-[#DEB887] p-2 md:p-3 border-2 border-[#8B4513] shadow-[4px_4px_0_rgba(0,0,0,0.2)] shrink-0">
-                                {}
+                                { }
                                 <div className="flex items-center gap-2 bg-[#F5DEB3] p-1 border border-[#8B4513] overflow-x-auto custom-scrollbar-h shrink-0 shadow-inner">
                                     <div className="shrink-0 flex items-center pr-2 border-r border-[#8B4513]/30">
                                         <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-black shadow-sm" style={{ backgroundColor: color }} />
@@ -1006,7 +1006,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     </div>
                                 </div>
 
-                                {}
+                                { }
                                 <div className="flex items-center gap-1 overflow-x-auto pb-1 custom-scrollbar-h shrink-0 py-1 border-b border-[#8B4513]/20">
                                     <div className="flex items-center gap-2 flex-wrap md:flex-nowrap px-1">
                                         <button onClick={() => setTool('brush')} title="Brush (B)" className={`p-2 border-2 transition-all flex items-center gap-1.5 min-w-[60px] md:min-w-[80px] justify-center ${tool === 'brush' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
@@ -1038,9 +1038,9 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     </div>
                                 </div>
 
-                                {}
+                                { }
                                 <div className="flex flex-wrap items-center gap-2 md:gap-4 overflow-x-auto py-1">
-                                    {}
+                                    { }
                                     <div className="flex items-center gap-2 px-2 border-r border-[#8B4513]/30 min-w-0">
                                         <span className="text-[7px] text-[#5D4037] whitespace-nowrap">SIZE</span>
                                         <input
@@ -1054,13 +1054,13 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                         <span className="text-[8px] text-[#5D4037] min-w-[15px]">{brushSize}</span>
                                     </div>
 
-                                    {}
+                                    { }
                                     <div className="flex gap-1 px-2 border-r border-[#8B4513]/30">
                                         <button onClick={handleUndo} disabled={historyIndex <= 0} className="p-1.5 border-2 bg-[#F5DEB3] border-[#8B4513] text-[#5D4037] disabled:opacity-50 hover:bg-[#DEB887] active:scale-95"><Undo size={14} /></button>
                                         <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className="p-1.5 border-2 bg-[#F5DEB3] border-[#8B4513] text-[#5D4037] disabled:opacity-50 hover:bg-[#DEB887] active:scale-95"><Redo size={14} /></button>
                                     </div>
 
-                                    {}
+                                    { }
                                     <div className="flex gap-1 ml-auto">
                                         <button
                                             onClick={() => {
@@ -1084,7 +1084,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                         )}
                     </div>
 
-                    {}
+                    { }
                     {mode === 'edit' && (
                         <div className="w-full md:w-64 bg-[#DEB887] p-1 md:p-3 border-t-4 md:border-l-4 border-[#8B4513] shadow-inner flex flex-col min-h-0 overflow-hidden shrink-0">
                             <h3 className="text-[#5D4037] text-[8px] md:text-[10px] mb-1 md:mb-2 flex items-center gap-2 font-bold bg-[#F5DEB3] p-1 md:p-2 border-2 border-[#8B4513] shrink-0">
@@ -1112,7 +1112,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                                     <div className="flex-1 w-full relative min-h-0 p-1">
                                                         <img src={p.drawingData} className="w-full h-full object-contain image-pixelated" alt={p.title} />
 
-                                                        {}
+                                                        { }
                                                         {isSelected && (
                                                             <div className="absolute top-0 right-0 bg-green-600 text-white p-0.5 border-l border-b border-white shadow-sm z-10">
                                                                 <Check size={8} />
@@ -1120,7 +1120,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                                         )}
                                                     </div>
 
-                                                    {}
+                                                    { }
                                                     <div className="bg-black/70 text-white text-[5px] text-center p-0.5 truncate pointer-events-none font-bold">
                                                         {p.title}
                                                     </div>
@@ -1143,7 +1143,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     )}
                 </div>
 
-                {}
+                { }
                 <AnimatePresence>
                     {showSaveDialog && (
                         <div className="fixed inset-0 z-100000 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -1154,7 +1154,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                             >
                                 <h3 className="text-[#5D4037] text-xs mb-4 text-center">SAVE TO SLOT {saveSlot + 1}</h3>
 
-                                {}
+                                { }
                                 <div className="flex gap-1 justify-center mb-4">
                                     {[...Array(8)].map((_, i) => (
                                         <button
@@ -1170,7 +1170,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     ))}
                                 </div>
 
-                                {}
+                                { }
                                 {pendingExportData && (
                                     <div className="w-full aspect-square border-4 border-[#8B4513] mb-4 bg-white image-pixelated">
                                         <img src={pendingExportData} className="w-full h-full object-contain p-2" alt="Preview" />
@@ -1212,7 +1212,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     )}
                 </AnimatePresence>
 
-                {}
+                { }
                 <AnimatePresence>
                     {selectedSlotIndex !== null && gallery[selectedSlotIndex] && (
                         <div className="fixed inset-0 z-100000 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -1269,7 +1269,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     )}
                 </AnimatePresence>
 
-                {}
+                { }
                 <AnimatePresence>
                     {shadePopup.show && (
                         <div className="fixed inset-0 z-1000000 pointer-events-auto">
@@ -1299,7 +1299,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     )}
                 </AnimatePresence>
 
-                {}
+                { }
                 <AnimatePresence>
                     {showUnsavedWarning && (
                         <div className="fixed inset-0 z-2000000 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
@@ -1346,7 +1346,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     )}
                 </AnimatePresence>
 
-                {}
+                { }
                 {mode === 'view' && (
                     <div className="flex justify-center p-2">
                         <button
@@ -1365,6 +1365,30 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
 };
 
 const GalleryItem = ({ user, userKey, drawingData, onClick }) => {
+    const [animState, setAnimState] = useState('idle');
+    const timeoutRef = useRef(null);
+
+    const handleHover = () => {
+        // Clear any existing sequence
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+        if (userKey === 'sohail') {
+            // Sohail: Levitate continuously until mouse leave
+            setAnimState('levitate');
+        } else {
+            // Others: Wave twice (~1.6s) then return to Idle
+            setAnimState('wave');
+            timeoutRef.current = setTimeout(() => {
+                setAnimState('idle');
+            }, 1600);
+        }
+    };
+
+    const handleLeave = () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        setAnimState('idle');
+    };
+
     return (
         <motion.div
             whileHover={{ y: -5, scale: 1.02 }}
@@ -1374,9 +1398,10 @@ const GalleryItem = ({ user, userKey, drawingData, onClick }) => {
                 e.stopPropagation();
                 onClick(userKey);
             }}
+            onMouseEnter={handleHover}
+            onMouseLeave={handleLeave}
             style={{ pointerEvents: 'auto' }}
         >
-            {}
             <div
                 className="mb-3 px-3 py-1.5 bg-[#8B4513] border-4 border-[#3E2723] shadow-[4px_4px_0_rgba(0,0,0,0.4)] transform rotate-1 group-hover:rotate-0 transition-all origin-center z-30 pointer-events-auto"
                 style={{ imageRendering: 'pixelated' }}
@@ -1384,16 +1409,23 @@ const GalleryItem = ({ user, userKey, drawingData, onClick }) => {
                 <span className="text-white text-[8px] md:text-[10px] font-bold font-['Press_Start_2P'] drop-shadow-md whitespace-nowrap">
                     {user.displayName.toUpperCase()}
                 </span>
-                {}
                 <div className="absolute top-[-8px] left-1/4 w-1 h-2 bg-[#5D4037]" />
                 <div className="absolute top-[-8px] right-1/4 w-1 h-2 bg-[#5D4037]" />
             </div>
 
-            {}
             <div className="relative flex flex-col items-center">
-                {}
+                {/* Character standing beside stand */}
+                <div className="absolute -left-14 bottom-0 w-24 h-24 z-20 pointer-events-none">
+                    <FullBodyCharacter
+                        userKey={userKey}
+                        userData={user}
+                        isSelected={false}
+                        animationState={animState}
+                        direction={0} // Look Front in Gallery
+                    />
+                </div>
+
                 <div className="relative z-10 bg-[#DEB887] p-2 border-l-4 border-t-4 border-r-4 border-b-8 border-[#5D4037] shadow-[6px_6px_0_rgba(0,0,0,0.2)] w-24 h-24 md:w-32 md:h-32">
-                    {}
                     <div className="w-full h-full bg-white border-2 border-[#8B4513] relative overflow-hidden flex items-center justify-center image-pixelated">
                         {drawingData ? (
                             <img src={drawingData} alt="User drawing" className="w-full h-full object-contain image-pixelated" />
@@ -1406,7 +1438,6 @@ const GalleryItem = ({ user, userKey, drawingData, onClick }) => {
                             </div>
                         )}
 
-                        {}
                         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center gap-1 md:gap-2 pointer-events-none p-1">
                             <button
                                 onClick={(e) => { e.stopPropagation(); onClick(userKey); }}
@@ -1418,22 +1449,14 @@ const GalleryItem = ({ user, userKey, drawingData, onClick }) => {
                     </div>
                 </div>
 
-                {}
                 <div className="w-full h-[80px] -mt-2 z-0 flex flex-col items-center pointer-events-none relative">
                     <svg width="100%" height="80px" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-                        {}
                         <ellipse cx="50" cy="75" rx="40" ry="5" fill="rgba(0,0,0,0.2)" />
-                        {}
                         <path d="M15 0 H25 V20 H24 V40 H23 V60 H22 V80 H15 V80 V60 H16 V40 H17 V20 H18 V0 Z" fill="#5D4037" />
-                        {}
                         <path d="M85 0 H75 V20 H76 V40 H77 V60 H78 V80 H85 V80 V60 H84 V40 H83 V60 H82 V40 H81 V20 H80 V0 Z" fill="#5D4037" />
-                        {}
                         <rect x="20" y="5" width="60" height="8" fill="#5D4037" />
-                        {}
                         <path d="M48 0 H52 V70 H48 Z" fill="#3D2723" opacity="0.6" />
                     </svg>
-
-                    {}
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-4 bg-black/40 rounded-[100%] blur-md -z-10" />
                 </div>
             </div>
@@ -1455,7 +1478,7 @@ const UserGallery = ({ users }) => {
                 }
             } catch (e) {
                 console.error("Failed to load drawings from API:", e);
-                
+
                 const saved = localStorage.getItem('pixel_birthday_drawings');
                 if (saved) {
                     setDrawings(JSON.parse(saved));
@@ -1467,7 +1490,7 @@ const UserGallery = ({ users }) => {
     }, []);
 
     const handleSaveDrawing = async (key, dataURL) => {
-        
+
         const newDrawings = { ...drawings, [key]: dataURL };
         setDrawings(newDrawings);
 
@@ -1492,16 +1515,16 @@ const UserGallery = ({ users }) => {
 
     return (
         <div className="absolute bottom-20 left-0 w-full flex flex-col justify-end z-20 pointer-events-none">
-            {}
+            { }
             <h2 className="absolute top-[-40vh] left-0 w-full text-center text-xl md:text-2xl text-[#5D4037] font-['Press_Start_2P'] drop-shadow-[2px_2px_0_#FFF] pointer-events-auto">
                 COMMUNITY GALLERY
             </h2>
 
-            {}
-            {}
+            { }
+            { }
             <div className="flex flex-row items-end overflow-x-auto md:overflow-x-visible w-full pointer-events-auto no-scrollbar snap-x snap-mandatory md:snap-none scroll-smooth pb-14 md:justify-center" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 <div className="flex flex-row items-end gap-8 md:gap-16 px-4 md:px-0 md:justify-center w-full md:w-auto">
-                    {}
+                    { }
                     <div className="w-[35vw] md:hidden shrink-0" />
 
                     {Object.entries(users).map(([key, user]) => (
@@ -1520,7 +1543,7 @@ const UserGallery = ({ users }) => {
                         </motion.div>
                     ))}
 
-                    {}
+                    { }
                     <div className="w-[35vw] md:hidden shrink-0" />
                 </div>
             </div>

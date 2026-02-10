@@ -53,9 +53,9 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
         return configs[key] || {
             correct: "password",
             hints: [
-                "Just guess 'password' 😉",
-                "It's literally 'password'",
-                "p-a-s-s-w-o-r-d"
+                "ask soil' 😉",
+                "no hints for u peasant",
+                "yuh huh huh"
             ]
         };
     };

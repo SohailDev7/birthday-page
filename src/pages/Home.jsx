@@ -10,8 +10,8 @@ import { PixelPig, PixelCow, PixelPanda, PixelDeer, PixelFawn } from '../compone
 import { Stars, PixelTree, PixelGrass, PixelWildflowers, FloatingPollen } from '../components/home/NatureDetails';
 import Tilt from 'react-parallax-tilt';
 import { TypeAnimation } from 'react-type-animation';
-import { PixelCursorTrail, EnchantedGlint } from '../components/home/InteractiveEffects'; 
-import { ShaderOverlay } from '../components/home/ShaderOverlay'; 
+import { PixelCursorTrail, EnchantedGlint } from '../components/home/InteractiveEffects';
+import { ShaderOverlay } from '../components/home/ShaderOverlay';
 import { CharacterHead, FullBodyCharacter } from '../components/home/Characters';
 import gsap from 'gsap';
 import LoginOverlay from '../components/home/LoginOverlay';
@@ -126,7 +126,7 @@ const Home = () => {
       animation: 'tilt',
       timeOfDay: 'night',
       skyGradient: 'linear-gradient(to bottom, #0f1419 0%, #1a2332 50%, #2d3e50 100%)',
-      dob: '2000-07-02'
+      dob: '2007-07-02'
     },
     sameer: {
       color: '#FF9F0A',
@@ -146,7 +146,7 @@ const Home = () => {
       animation: 'jump',
       timeOfDay: 'day',
       skyGradient: 'linear-gradient(to bottom, #10B981 0%, #6EE7B7 50%, #D1FAE5 100%)',
-      dob: '2000-05-13'
+      dob: '2007-05-13'
     },
     sama: {
       color: '#8B5CF6',
@@ -158,6 +158,17 @@ const Home = () => {
       skyGradient: 'linear-gradient(to bottom, #5B21B6 0%, #8B5CF6 50%, #C4B5FD 100%)',
       dob: '2000-01-01'
     },
+    sampada: {
+      color: '#FF0000',
+      displayName: 'Sampada',
+      skinColor: '#F5D0B1',
+      accent: '#8B0000',
+      animation: 'wave',
+      timeOfDay: 'day',
+      skyGradient: 'linear-gradient(to bottom, #FF0000 0%, #CC0000 50%, #8B0000 100%)',
+      dob: '2000-01-01',
+      hasGlasses: true
+    },
     aaditya: {
       color: '#06B6D4',
       displayName: 'Aaditya',
@@ -166,7 +177,7 @@ const Home = () => {
       animation: 'shake',
       timeOfDay: 'day',
       skyGradient: 'linear-gradient(to bottom, #06B6D4 0%, #67E8F9 50%, #CFFAFE 100%)',
-      dob: '2000-03-19'
+      dob: '2007-03-19'
     },
     sohail: {
       color: '#FFD700',
@@ -185,8 +196,8 @@ const Home = () => {
   const [selectedUser, setSelectedUser] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [usersPerPage, setUsersPerPage] = useState(4); 
-  const [hoveredUser, setHoveredUser] = useState(null); 
+  const [usersPerPage, setUsersPerPage] = useState(4);
+  const [hoveredUser, setHoveredUser] = useState(null);
 
   const [isPlayerExpanded, setIsPlayerExpanded] = useState(false);
 
@@ -201,20 +212,20 @@ const Home = () => {
 
   const [isMuted, setIsMuted] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(0);
-  const [showCards, setShowCards] = useState(true); 
-  const [waitingForEntry, setWaitingForEntry] = useState(false); 
-  const [cameraPosition, setCameraPosition] = useState('center'); 
+  const [showCards, setShowCards] = useState(true);
+  const [waitingForEntry, setWaitingForEntry] = useState(false);
+  const [cameraPosition, setCameraPosition] = useState('center');
   const audioRef = React.useRef(null);
-  const audioLoadedRef = useRef(false); 
+  const audioLoadedRef = useRef(false);
 
   const [isMobile, setIsMobile] = useState(false);
-  
+
   useEffect(() => {
     setIsMounted(true);
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
 
-      if (window.innerWidth < 640) setUsersPerPage(4); 
+      if (window.innerWidth < 640) setUsersPerPage(4);
       else if (window.innerWidth < 1024) setUsersPerPage(3);
       else setUsersPerPage(4);
     };
@@ -233,7 +244,7 @@ const Home = () => {
     console.log('🎵 Loading track:', musicTracks[currentTrack].name);
     console.log('🎵 Audio URL:', musicTracks[currentTrack].url);
 
-    audio.volume = 0.5; 
+    audio.volume = 0.5;
 
     const handleTrackEnd = () => {
       console.log('✅ Track ended, playing next...');
@@ -262,7 +273,7 @@ const Home = () => {
 
   useEffect(() => {
     if (isMounted && !isGeneratingWorld && audioRef.current) {
-      
+
       audioRef.current.play().catch(error => {
         console.warn('⚠️ Track change playback blocked:', error.message);
       });
@@ -270,7 +281,7 @@ const Home = () => {
   }, [currentTrack, isGeneratingWorld]);
 
   useEffect(() => {
-    
+
     audioLoadedRef.current = false;
 
     const preloadAudio = async () => {
@@ -288,7 +299,7 @@ const Home = () => {
           new Promise((resolve) => {
             const audio = new Audio();
             audio.src = track.url;
-            
+
             audio.oncanplay = () => resolve();
             audio.oncanplaythrough = () => resolve();
             audio.onerror = (e) => {
@@ -297,14 +308,14 @@ const Home = () => {
             };
             audio.load();
           }),
-          new Promise(resolve => setTimeout(resolve, 3000)) 
+          new Promise(resolve => setTimeout(resolve, 3000))
         ]);
 
         audioLoadedRef.current = true;
         setLoadingText('FINALIZING WORLD...');
       } catch (e) {
         console.error("Audio loading error", e);
-        audioLoadedRef.current = true; 
+        audioLoadedRef.current = true;
       }
     };
 
@@ -327,7 +338,7 @@ const Home = () => {
         }
 
         if (!isAudioReady && prev >= 90) {
-          
+
           return Math.min(prev + 0.5, 95);
         }
 
@@ -341,7 +352,7 @@ const Home = () => {
 
   const handleEnterWorld = async () => {
     setIsGeneratingWorld(false);
-    setShowIntroFirecracker(true); 
+    setShowIntroFirecracker(true);
 
     if (audioRef.current) {
       try {
@@ -385,7 +396,7 @@ const Home = () => {
 
   React.useEffect(() => {
     if (showIntroFirecracker && !hasPlayedIntro) {
-      
+
       const timer = setTimeout(() => {
         setShowIntroFirecracker(false);
         setHasPlayedIntro(true);
@@ -398,11 +409,11 @@ const Home = () => {
   React.useEffect(() => {
     const updateUsersPerPage = () => {
       if (window.innerWidth < 640) {
-        setUsersPerPage(1); 
+        setUsersPerPage(1);
       } else if (window.innerWidth < 1024) {
-        setUsersPerPage(2); 
+        setUsersPerPage(2);
       } else {
-        setUsersPerPage(4); 
+        setUsersPerPage(4);
       }
     };
 
@@ -432,19 +443,19 @@ const Home = () => {
 
   const handleLogin = () => {
     if (selectedUser) {
-      
+
       confetti({
         particleCount: 150,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#FFD700', '#FFA500', '#FFFFFF', users[selectedUser]?.color || '#00FF00'], 
-        shapes: ['square'], 
+        colors: ['#FFD700', '#FFA500', '#FFFFFF', users[selectedUser]?.color || '#00FF00'],
+        shapes: ['square'],
         scalar: 1.2,
         disableForReducedMotion: true
       });
 
       if (checkUserSession(selectedUser)) {
-        
+
         authLogin(selectedUser);
 
         setTimeout(() => {
@@ -453,9 +464,9 @@ const Home = () => {
           } else {
             navigate(`/${selectedUser}/home`);
           }
-        }, 800); 
+        }, 800);
       } else {
-        
+
         setShowLoginOverlay(true);
       }
     }
@@ -471,13 +482,13 @@ const Home = () => {
     if (currentPage < totalPages - 1) {
       const newPage = currentPage + 1;
       setCurrentPage(newPage);
-      
+
       const newUsers = userEntries.slice(
         newPage * usersPerPage,
         (newPage + 1) * usersPerPage
       );
       if (newUsers.length > 0) {
-        setSelectedUser(newUsers[0][0]); 
+        setSelectedUser(newUsers[0][0]);
       }
     }
   };
@@ -486,13 +497,13 @@ const Home = () => {
     if (currentPage > 0) {
       const newPage = currentPage - 1;
       setCurrentPage(newPage);
-      
+
       const newUsers = userEntries.slice(
         newPage * usersPerPage,
         (newPage + 1) * usersPerPage
       );
       if (newUsers.length > 0) {
-        setSelectedUser(newUsers[0][0]); 
+        setSelectedUser(newUsers[0][0]);
       }
     }
   };
@@ -511,7 +522,7 @@ const Home = () => {
         imageRendering: 'pixelated'
       }}
     >
-      {}
+      { }
       <AnimatePresence>
         {isGeneratingWorld && (
           <motion.div
@@ -523,7 +534,7 @@ const Home = () => {
             }}
             style={{ imageRendering: 'pixelated' }}
           >
-            {}
+            { }
             <div
               className="absolute inset-0 opacity-20"
               style={{
@@ -545,7 +556,7 @@ const Home = () => {
 
               {!waitingForEntry ? (
                 <>
-                  {}
+                  { }
                   <div
                     className="w-64 md:w-96 h-8 bg-[#444] relative"
                     style={{
@@ -597,13 +608,13 @@ const Home = () => {
         }
       </AnimatePresence >
 
-      {}
+      { }
       < PixelCursorTrail />
 
-      {}
+      { }
       < PixelCursorTrail />
 
-      {}
+      { }
       < ShaderOverlay timeOfDay={currentTimeOfDay} />
 
       <motion.div
@@ -611,7 +622,7 @@ const Home = () => {
         initial={false}
         animate={{ opacity: 1 }}
       >
-        {}
+        { }
         <audio
           ref={audioRef}
           src={musicTracks[currentTrack].url}
@@ -619,11 +630,11 @@ const Home = () => {
           preload="auto"
         />
 
-        {}
+        { }
         <AnimatePresence>
           {showIntroFirecracker && (
             <>
-              {}
+              { }
               <motion.div
                 className="fixed inset-0 z-100 pointer-events-none"
                 style={{
@@ -646,7 +657,7 @@ const Home = () => {
                 }}
               />
 
-              {}
+              { }
               {[
                 { x: '30%', y: '20%', delay: 0.3, color: '#FFD700' },
                 { x: '50%', y: '25%', delay: 0.6, color: '#FF4500' },
@@ -668,7 +679,7 @@ const Home = () => {
                     times: [0, 0.2, 0.6, 1]
                   }}
                 >
-                  {}
+                  { }
                   {Array.from({ length: 20 }).map((_, i) => {
                     const angle = (i / 20) * Math.PI * 2;
                     const distance = 80 + Math.random() * 80;
@@ -700,7 +711,7 @@ const Home = () => {
                         }}
                         animate={{
                           x: Math.cos(angle) * distance,
-                          y: Math.sin(angle) * distance + 40, 
+                          y: Math.sin(angle) * distance + 40,
                           opacity: [0, 1, 1, 0],
                           scale: [0.5, 1.5, 1, 0.3],
                           rotate: [0, 180, 360]
@@ -713,7 +724,7 @@ const Home = () => {
                     );
                   })}
 
-                  {}
+                  { }
                   <motion.div
                     style={{
                       position: 'absolute',
@@ -738,7 +749,7 @@ const Home = () => {
                     }}
                   />
 
-                  {}
+                  { }
                   {Array.from({ length: 8 }).map((_, i) => {
                     const angle = (i / 8) * Math.PI * 2;
                     const sparkDist = 40 + Math.random() * 30;
@@ -774,7 +785,7 @@ const Home = () => {
                 </motion.div>
               ))}
 
-              {}
+              { }
               {Array.from({ length: 30 }).map((_, i) => (
                 <motion.div
                   key={`star-${i}`}
@@ -804,14 +815,14 @@ const Home = () => {
           )}
         </AnimatePresence>
 
-        {}
+        { }
         <div
           className="fixed top-4 left-4 z-50 group/player"
           onMouseEnter={() => !isMobile && setIsPlayerExpanded(true)}
           onMouseLeave={() => !isMobile && setIsPlayerExpanded(false)}
           onClick={() => isMobile && setIsPlayerExpanded(!isPlayerExpanded)}
         >
-          {}
+          { }
           <motion.div
             className="px-2 md:px-4 py-2 md:py-3 text-white font-bold cursor-pointer select-none relative"
             initial={{ x: -100, opacity: 0 }}
@@ -831,7 +842,7 @@ const Home = () => {
               maxWidth: isMobile ? '160px' : '300px'
             }}
           >
-            {}
+            { }
             <div className="absolute top-0 left-0 w-1 h-1 bg-white/20" />
             <div className="absolute bottom-0 right-0 w-1 h-1 bg-black/40" />
 
@@ -946,9 +957,9 @@ const Home = () => {
           </AnimatePresence>
         </div>
 
-        {}
+        { }
         <div className="fixed top-4 right-4 z-50 flex gap-4 text-white">
-          {}
+          { }
           <motion.button
             onClick={() => setShowCards(!showCards)}
             initial={{ x: 50, opacity: 0 }}
@@ -960,8 +971,8 @@ const Home = () => {
               width: isMobile ? '48px' : '80px',
               height: isMobile ? '48px' : '80px',
               background: !showCards
-                ? 'linear-gradient(180deg, #FF4444 0%, #CC0000 100%)' 
-                : 'linear-gradient(180deg, #4CAF50 0%, #2E7D32 100%)', 
+                ? 'linear-gradient(180deg, #FF4444 0%, #CC0000 100%)'
+                : 'linear-gradient(180deg, #4CAF50 0%, #2E7D32 100%)',
               border: isMobile ? '4px solid #000' : '6px solid #000',
               imageRendering: 'pixelated',
               display: 'flex',
@@ -975,7 +986,7 @@ const Home = () => {
             </div>
           </motion.button>
 
-          {}
+          { }
           <motion.button
             onClick={toggleMute}
             initial={{ x: 50, opacity: 0 }}
@@ -1004,7 +1015,7 @@ const Home = () => {
           </motion.button>
         </div>
 
-        {}
+        { }
         <AnimatePresence>
           {(currentTimeOfDay === 'night' || currentTimeOfDay === 'twilight') && (
             <motion.div
@@ -1019,7 +1030,7 @@ const Home = () => {
           )}
         </AnimatePresence>
 
-        {}
+        { }
         <AnimatePresence mode="wait">
           {(currentTimeOfDay === 'day' || currentTimeOfDay === 'sunset') && (
             <motion.div
@@ -1027,22 +1038,22 @@ const Home = () => {
               className="absolute top-8 left-1/2 -translate-x-1/2"
               initial={{
                 opacity: 0,
-                y: 150,  
+                y: 150,
                 scale: 0.6
               }}
               animate={{
                 opacity: 1,
-                y: 0,  
+                y: 0,
                 scale: 1
               }}
               exit={{
                 opacity: 0,
-                y: 200,  
+                y: 200,
                 scale: 0.8
               }}
               transition={{
                 duration: 4,
-                ease: [0.4, 0.0, 0.2, 1]  
+                ease: [0.4, 0.0, 0.2, 1]
               }}
             >
               <PixelSun />
@@ -1054,12 +1065,12 @@ const Home = () => {
               className="absolute top-8 left-1/2 -translate-x-1/2"
               initial={{
                 opacity: 0,
-                y: -150,  
+                y: -150,
                 scale: 0.6
               }}
               animate={{
                 opacity: 1,
-                y: 0,  
+                y: 0,
                 scale: 1
               }}
               exit={{
@@ -1082,7 +1093,7 @@ const Home = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 1.0, delay: 2.0 }}
         >
-          {}
+          { }
           <motion.div
             className="absolute inset-0 min-h-screen w-full"
             animate={{
@@ -1096,17 +1107,17 @@ const Home = () => {
             }}
           >
 
-            {}
+            { }
             <div className="absolute top-0 left-[-100vw] w-full h-full z-0">
 
-              {}
+              { }
               <div className="absolute inset-0 z-30 pointer-events-auto">
                 <UserGallery users={users} />
               </div>
 
-              {}
+              { }
 
-              {}
+              { }
               <div className="clouds-container pointer-events-none z-10">
                 <PixelCloud delay={2} yPosition="12%" size={1.1} speed={42} timeOfDay={currentTimeOfDay} />
                 <PixelCloud delay={12} yPosition="22%" size={0.95} speed={48} timeOfDay={currentTimeOfDay} />
@@ -1114,8 +1125,8 @@ const Home = () => {
               </div>
             </div>
 
-            {}
-            {}
+            { }
+            { }
             <motion.div
               initial={{ opacity: 0 }}
               animate={{
@@ -1124,7 +1135,7 @@ const Home = () => {
               }}
               transition={{ duration: 2 }}
             >
-              {}
+              { }
               <motion.div
                 animate={{ opacity: (currentTimeOfDay === 'day' || currentTimeOfDay === 'sunset' || currentTimeOfDay === 'twilight') ? 1 : 0 }}
                 transition={{ duration: 2 }}
@@ -1136,7 +1147,7 @@ const Home = () => {
 
                 <Butterflies />
 
-                {}
+                { }
                 <AnimatePresence>
                   {selectedUser === 'sohail' && (
                     <motion.div
@@ -1150,7 +1161,7 @@ const Home = () => {
                 </AnimatePresence>
               </motion.div>
 
-              {}
+              { }
               <div
                 className="animals-container transition-transform duration-500"
                 style={{
@@ -1158,16 +1169,16 @@ const Home = () => {
                   transformOrigin: 'bottom'
                 }}
               >
-                {}
+                { }
                 <PixelPig delay={0} duration={25} startPos="10%" endPos="50%" />
 
-                {}
+                { }
                 <PixelCow delay={5} duration={30} startPos="30%" endPos="70%" />
 
-                {}
+                { }
                 <PixelPanda delay={10} duration={28} startPos="50%" endPos="85%" />
 
-                {}
+                { }
                 <AnimatePresence>
                   {selectedUser === 'prachi' && (
                     <motion.div
@@ -1177,7 +1188,7 @@ const Home = () => {
                       transition={{ duration: 0.8, ease: [0.4, 0.0, 0.2, 1] }}
                     >
                       <PixelDeer delay={3} duration={30} startPos="60%" endPos="95%" />
-                      {}
+                      { }
                       <PixelFawn delay={3.2} duration={30} startPos="64%" endPos="99%" />
                     </motion.div>
                   )}
@@ -1186,16 +1197,16 @@ const Home = () => {
               </div>
             </motion.div>
 
-            {}
+            { }
             <PixelTree />
 
-            {}
+            { }
             <PixelWildflowers />
             <FloatingPollen timeOfDay={currentTimeOfDay} />
 
-            {}
+            { }
 
-            {}
+            { }
             <motion.div
               className="absolute bottom-0 h-20 z-10 pointer-events-none flex"
               style={{
@@ -1203,7 +1214,7 @@ const Home = () => {
                 left: '-110vw'
               }}
               animate={{
-                x: cameraPosition === 'left' ? '5vw' : '-5vw', 
+                x: cameraPosition === 'left' ? '5vw' : '-5vw',
               }}
               transition={{
                 type: "spring",
@@ -1216,7 +1227,7 @@ const Home = () => {
               <div className="w-[110vw] h-full overflow-hidden flex"><PixelGrass /><PixelGrass /></div>
             </motion.div>
 
-            {}
+            { }
             <AnimatePresence>
               {(currentTimeOfDay === 'night' || currentTimeOfDay === 'twilight') && (
                 <motion.div
@@ -1231,7 +1242,7 @@ const Home = () => {
               )}
             </AnimatePresence>
 
-            {}
+            { }
             <div className="clouds-container">
               <PixelCloud delay={0} yPosition="10%" size={1.2} speed={40} timeOfDay={currentTimeOfDay} />
               <PixelCloud delay={10} yPosition="25%" size={0.9} speed={50} timeOfDay={currentTimeOfDay} />
@@ -1240,20 +1251,20 @@ const Home = () => {
               <PixelCloud delay={5} yPosition="20%" size={1} speed={48} timeOfDay={currentTimeOfDay} />
             </div>
 
-            {}
+            { }
             <motion.div
               className="relative z-30 flex flex-col items-center justify-center min-h-screen px-4 py-8 pointer-events-none"
               animate={{
                 opacity: showCards ? 1 : 0,
                 scale: showCards ? 1 : 0.95,
                 pointerEvents: showCards ? 'auto' : 'none',
-                filter: showCards ? 'blur(0px)' : 'blur(0px)' 
+                filter: showCards ? 'blur(0px)' : 'blur(0px)'
               }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
             >
-              {}
+              { }
               <div className="flex flex-col items-center justify-center w-full h-full pointer-events-none *:pointer-events-auto">
-                {}
+                { }
                 <motion.div
                   initial={{ y: -100, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -1289,9 +1300,9 @@ const Home = () => {
                   />
                 </motion.div>
 
-                {}
+                { }
                 <div className="relative w-full max-w-7xl mb-12">
-                  {}
+                  { }
                   {currentPage > 0 && (
                     <motion.button
                       onClick={prevPage}
@@ -1317,7 +1328,7 @@ const Home = () => {
                     </motion.button>
                   )}
 
-                  {}
+                  { }
                   {currentPage < totalPages - 1 && (
                     <motion.button
                       onClick={nextPage}
@@ -1343,7 +1354,7 @@ const Home = () => {
                     </motion.button>
                   )}
 
-                  {}
+                  { }
                   <div className="overflow-hidden w-full px-4 sm:px-12 md:px-24 mb-8 carousel-container">
                     <motion.div
                       className="flex"
@@ -1380,7 +1391,7 @@ const Home = () => {
                             glareMaxOpacity={0.45}
                             glareColor={selectedUser === userKey ? userData.accent : "#ffffff"}
                             glarePosition="all"
-                            glareBorderRadius="0px" 
+                            glareBorderRadius="0px"
                             className="h-full"
                           >
                             <div
@@ -1403,7 +1414,7 @@ const Home = () => {
                                 opacity: 1
                               }}
                             >
-                              {}
+                              { }
                               {userData.isSpecial && (
                                 <motion.div
                                   className="absolute inset-0 pointer-events-none"
@@ -1423,7 +1434,7 @@ const Home = () => {
                                 />
                               )}
 
-                              {}
+                              { }
                               {userData.isSpecial && [...Array(12)].map((_, i) => (
                                 <motion.div
                                   key={`aura-${i}`}
@@ -1455,7 +1466,7 @@ const Home = () => {
                                 />
                               ))}
 
-                              {}
+                              { }
                               {userData.specialText && (
                                 <div
                                   className="absolute top-4 left-4 z-10 px-2 py-1 text-[8px] text-white font-bold"
@@ -1469,7 +1480,7 @@ const Home = () => {
                                   {userData.specialText}
                                 </div>
                               )}
-                              {}
+                              { }
                               <div
                                 className="mb-4 mx-auto w-full h-48 relative pointer-events-none"
                                 style={userData.isSpecial ? { transform: 'translateY(0px)' } : {}}
@@ -1479,10 +1490,11 @@ const Home = () => {
                                   userData={userData}
                                   isSelected={selectedUser === userKey}
                                   animationState={selectedUser === userKey && userData.isSpecial ? 'levitate' : (selectedUser === userKey ? 'wave' : 'idle')}
+                                  direction={1} // Look Right on Card
                                 />
                               </div>
 
-                              {}
+                              { }
                               <div
                                 className="text-center text-white text-sm mb-2 uppercase pointer-events-none"
                                 style={{
@@ -1495,7 +1507,7 @@ const Home = () => {
                                 {userData.displayName}
                               </div>
 
-                              {}
+                              { }
                               {selectedUser === userKey && (
                                 <>
                                   <motion.div
@@ -1512,7 +1524,7 @@ const Home = () => {
                                     <span className="text-white text-2xl font-bold" style={{ textShadow: '2px 2px 0 #000' }}>✓</span>
                                   </motion.div>
 
-                                  {}
+                                  { }
                                   {[...Array(8)].map((_, i) => (
                                     <motion.div
                                       key={i}
@@ -1539,7 +1551,7 @@ const Home = () => {
                                     />
                                   ))}
                                   <PixelBurst color={userData.color} />
-                                  {}
+                                  { }
                                   <EnchantedGlint />
                                 </>
                               )}
@@ -1550,7 +1562,7 @@ const Home = () => {
                     </motion.div>
                   </div>
 
-                  {}
+                  { }
                   <div className="flex justify-center gap-4 mt-10 relative z-50">
                     {[...Array(totalPages)].map((_, i) => (
                       <div
@@ -1570,7 +1582,7 @@ const Home = () => {
                   </div>
                 </div>
 
-                {}
+                { }
                 <AnimatePresence>
                   {selectedUser && (
                     <motion.div
@@ -1579,11 +1591,11 @@ const Home = () => {
                       exit={{ y: 50, opacity: 0 }}
                       className="flex flex-col gap-4 sm:gap-6 px-4 action-button items-center justify-center pb-20 sm:pb-0"
                     >
-                      {}
-                      {}
+                      { }
+                      { }
 
                       <div className="flex flex-row gap-4 sm:gap-6 w-full justify-center">
-                        {}
+                        { }
                         <MagneticButton
                           onClick={handleCancel}
                           className="cursor-pointer"
@@ -1606,7 +1618,7 @@ const Home = () => {
                           </motion.button>
                         </MagneticButton>
 
-                        {}
+                        { }
                         <MagneticButton
                           onClick={handleLogin}
                           className="cursor-pointer"
@@ -1644,9 +1656,9 @@ const Home = () => {
         </motion.div>
       </motion.div>
 
-      {}
+      { }
 
-      {}
+      { }
       <AnimatePresence>
         {showLoginOverlay && selectedUser && (
           <LoginOverlay
@@ -1657,10 +1669,10 @@ const Home = () => {
         )}
       </AnimatePresence>
 
-      {}
+      { }
       {!isGeneratingWorld && (
         <div className="fixed inset-0 pointer-events-none z-9999">
-          {}
+          { }
           <motion.div
             className="absolute bottom-[80px] left-[2%] cursor-pointer group pointer-events-auto"
             onClick={() => {
@@ -1687,7 +1699,7 @@ const Home = () => {
               filter: 'drop-shadow(0 0 15px rgba(255,215,0,0.4))'
             }}
           >
-            {}
+            { }
             <div className="relative">
               <motion.div
                 className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black/80 px-2 py-1 border-2 border-white text-white text-[8px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity"
@@ -1703,7 +1715,7 @@ const Home = () => {
             </div>
           </motion.div>
 
-          {}
+          { }
           <motion.div
             className="absolute bottom-[80px] right-[2%] cursor-pointer group pointer-events-auto"
             onClick={() => setCameraPosition('center')}
@@ -1723,7 +1735,7 @@ const Home = () => {
               filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.5))'
             }}
           >
-            {}
+            { }
             <div className="relative">
               <motion.div
                 className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black/80 px-2 py-1 border-2 border-white text-white text-[8px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity"
