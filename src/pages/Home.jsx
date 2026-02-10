@@ -221,6 +221,7 @@ const Home = () => {
     setIsMounted(true);
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
+
       // Update usersPerPage based on screen width
       if (window.innerWidth < 640) setUsersPerPage(4); // Even smaller on mobile
       else if (window.innerWidth < 1024) setUsersPerPage(3);
@@ -1036,22 +1037,22 @@ const Home = () => {
           </motion.button>
         </div>
 
-{/* Stars (fade in for night/twilight) */ }
-  <AnimatePresence>
-    {(currentTimeOfDay === 'night' || currentTimeOfDay === 'twilight') && (
-      <motion.div
-        key="stars"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 3, ease: 'easeInOut' }}
-      >
-        <Stars />
-      </motion.div>
-    )}
-  </AnimatePresence>
+        {/* Stars (fade in for night/twilight) */}
+        <AnimatePresence>
+          {(currentTimeOfDay === 'night' || currentTimeOfDay === 'twilight') && (
+            <motion.div
+              key="stars"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 3, ease: 'easeInOut' }}
+            >
+              <Stars />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-  {/* Sun or Moon with sunset/moonrise animation */ }
+        {/* Sun or Moon with sunset/moonrise animation */}
         <AnimatePresence mode="wait">
           {(currentTimeOfDay === 'day' || currentTimeOfDay === 'sunset') && (
             <motion.div
@@ -1127,109 +1128,160 @@ const Home = () => {
               mass: 1.2
             }}
           >
-            {/* Pixelated Arrow Sign - Bottom Left */}
+            {/* Pixelated Arrow Sign - Bottom Left (Navigate to GALLERY) */}
             <motion.div
-              className="absolute bottom-[60px] left-[5%] z-40 cursor-pointer group"
+              className="absolute bottom-[80px] left-[2%] z-50 cursor-pointer group pointer-events-auto"
               onClick={() => {
                 setCameraPosition('left');
-                // Trigger confetti
                 confetti({
                   particleCount: 50,
                   spread: 60,
                   origin: { x: 0.1, y: 0.8 }
                 });
               }}
+              initial={{ x: -100, opacity: 0 }}
+              animate={{
+                x: 0,
+                opacity: cameraPosition === 'left' ? 0 : 1
+              }}
+              transition={{
+                delay: 1,
+                opacity: { duration: 0.3 }
+              }}
               whileHover={{ scale: 1.1, rotate: -5 }}
               whileTap={{ scale: 0.9 }}
               style={{
                 imageRendering: 'pixelated',
-                display: cameraPosition === 'left' ? 'none' : 'block'
+                display: cameraPosition === 'left' ? 'none' : 'block',
+                filter: 'drop-shadow(0 0 15px rgba(255,215,0,0.4))'
               }}
             >
+              {/* Floating Label Above Sign */}
+              <motion.div
+                className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black/80 px-2 py-1 border-2 border-white text-white text-[8px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ fontFamily: "'Press Start 2P', cursive" }}
+              >
+                GO TO GALLERY
+              </motion.div>
+
               {/* Wooden Post */}
               <div style={{
-                width: '12px',
-                height: '40px',
+                width: '16px',
+                height: '48px',
                 background: '#5D4037',
                 margin: '0 auto',
-                border: '2px solid #3E2723',
-                boxShadow: '2px 2px 0 rgba(0,0,0,0.4)'
+                border: '3px solid #3E2723',
+                boxShadow: 'inset 2px 2px 0 rgba(255,255,255,0.1), 4px 4px 0 rgba(0,0,0,0.5)'
               }} />
 
-              {/* Arrow Board */}
-              <div style={{
-                position: 'absolute',
-                top: '-20px',
-                left: '-20px',
-                width: '50px',
-                height: '30px',
-                background: '#8D6E63',
-                clipPath: 'polygon(40% 0, 100% 0, 100% 100%, 40% 100%, 0 50%)', // Arrow shape pointing left
-                border: '2px solid #5D4037',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                {/* Text on sign */}
+              {/* Arrow Board - Pointing Left */}
+              <div
+                className="relative"
+                style={{
+                  position: 'absolute',
+                  top: '-35px',
+                  left: '-35px',
+                  width: '95px',
+                  height: '50px',
+                  background: '#8D6E63',
+                  clipPath: 'polygon(30% 0, 100% 0, 100% 100%, 30% 100%, 0 50%)',
+                  border: '4px solid #5D4037',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'inset 4px 4px 0 rgba(255,255,255,0.2), 6px 6px 0 rgba(0,0,0,0.4)'
+                }}
+              >
+                {/* Board Texture Lines */}
+                <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(90deg, transparent 95%, #000 95%)', backgroundSize: '10px 100%' }} />
+
                 <span style={{
                   fontFamily: "'Press Start 2P', monospace",
-                  fontSize: '8px',
-                  color: '#3E2723',
-                  marginLeft: '10px'
+                  fontSize: '9px',
+                  color: '#FFE4C4',
+                  textShadow: '2px 2px 0 #3E2723',
+                  marginLeft: '25px'
                 }}>
-                  MAP
+                  GALLERY
                 </span>
+
+                {/* Pulsing indicator */}
+                <motion.div
+                  className="absolute -right-2 -top-2 w-4 h-4 bg-yellow-400 border-2 border-black"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                />
               </div>
             </motion.div>
 
-            {/* Pixelated Arrow Sign - Bottom Right of the LEFT MAP (Visible only when on LEFT view, to go back) */}
-            <motion.div
-              className="absolute bottom-[60px] left-[-5%] z-40 cursor-pointer group"
-              onClick={() => setCameraPosition('center')}
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.9 }}
-              style={{
-                imageRendering: 'pixelated',
-                display: cameraPosition === 'left' ? 'block' : 'none',
-              }}
-            >
-              {/* Wooden Post */}
-              <div style={{
-                width: '12px',
-                height: '40px',
-                background: '#5D4037',
-                margin: '0 auto',
-                border: '2px solid #3E2723',
-                boxShadow: '2px 2px 0 rgba(0,0,0,0.4)'
-              }} />
-              {/* Arrow Board - Pointing Right */}
-              <div style={{
-                position: 'absolute',
-                top: '-20px',
-                left: '-20px',
-                width: '50px',
-                height: '30px',
-                background: '#8D6E63',
-                clipPath: 'polygon(0 0, 60% 0, 100% 50%, 60% 100%, 0 100%)', // Arrow shape pointing right
-                border: '2px solid #5D4037',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                {/* Text on sign */}
-                <span style={{
-                  fontFamily: "'Press Start 2P', monospace",
-                  fontSize: '8px',
-                  color: '#3E2723',
-                  marginLeft: '4px'
-                }}>
-                  HOME
-                </span>
-              </div>
-            </motion.div>
 
             {/* THE LEFT SIDE OF THE MAP (Hidden by default, shifts into view) */}
             <div className="absolute top-0 left-[-100vw] w-full h-full z-0">
+              {/* Pixelated Arrow Sign - Bottom Right (Return to HOME) */}
+              <motion.div
+                className="absolute bottom-[80px] right-[2%] z-50 cursor-pointer group pointer-events-auto"
+                onClick={() => setCameraPosition('center')}
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: cameraPosition === 'left' ? 1 : 0
+                }}
+                transition={{
+                  opacity: { duration: 0.3 }
+                }}
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                whileTap={{ scale: 0.9 }}
+                style={{
+                  imageRendering: 'pixelated',
+                  display: cameraPosition === 'left' ? 'block' : 'none',
+                  filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.5))'
+                }}
+              >
+                {/* Floating Label */}
+                <motion.div
+                  className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black/80 px-2 py-1 border-2 border-white text-white text-[8px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ fontFamily: "'Press Start 2P', cursive" }}
+                >
+                  GO HOME
+                </motion.div>
+
+                {/* Wooden Post */}
+                <div style={{
+                  width: '16px',
+                  height: '48px',
+                  background: '#5D4037',
+                  margin: '0 auto',
+                  border: '3px solid #3E2723',
+                  boxShadow: 'inset 2px 2px 0 rgba(255,255,255,0.1), 4px 4px 0 rgba(0,0,0,0.5)'
+                }} />
+
+                {/* Arrow Board - Pointing Right */}
+                <div style={{
+                  position: 'absolute',
+                  top: '-35px',
+                  left: '-35px',
+                  width: '90px',
+                  height: '50px',
+                  background: '#8D6E63',
+                  clipPath: 'polygon(0 0, 70% 0, 100% 50%, 70% 100%, 0 100%)',
+                  border: '4px solid #5D4037',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'inset 4px 4px 0 rgba(255,255,255,0.2), 6px 6px 0 rgba(0,0,0,0.4)'
+                }}>
+                  <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(90deg, transparent 95%, #000 95%)', backgroundSize: '10px 100%' }} />
+
+                  <span style={{
+                    fontFamily: "'Press Start 2P', monospace",
+                    fontSize: '11px',
+                    color: '#FFE4C4',
+                    textShadow: '2px 2px 0 #3E2723',
+                    marginRight: '20px'
+                  }}>
+                    HOME
+                  </span>
+                </div>
+              </motion.div>
 
               {/* User Gallery Overlay - Scrollable & Interactive */}
               <div className="absolute inset-0 z-30 pointer-events-auto">
@@ -1766,16 +1818,16 @@ const Home = () => {
         </motion.div>
 
 
-  {/* Login Overlay - Minecraft Style */}
-  <AnimatePresence>
-    {showLoginOverlay && selectedUser && (
-      <LoginOverlay
-        userKey={selectedUser}
-        userData={users[selectedUser]}
-        onClose={() => setShowLoginOverlay(false)}
-      />
-    )}
-  </AnimatePresence>
+        {/* Login Overlay - Minecraft Style */}
+        <AnimatePresence>
+          {showLoginOverlay && selectedUser && (
+            <LoginOverlay
+              userKey={selectedUser}
+              userData={users[selectedUser]}
+              onClose={() => setShowLoginOverlay(false)}
+            />
+          )}
+        </AnimatePresence>
 
 
       </motion.div>

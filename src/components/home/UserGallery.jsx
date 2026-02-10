@@ -29,8 +29,9 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     const [brushSize, setBrushSize] = useState(5);
     const [tool, setTool] = useState('brush'); // brush, eraser, fill, shade
 
-    // Color Shade State
+    // Performance & Preview State
     const [shadePopup, setShadePopup] = useState({ show: false, color: '', x: 0, y: 0 });
+    const [cursorPos, setCursorPos] = useState({ x: 0, y: 0, show: false });
     const longPressTimer = useRef(null);
 
     // History State
@@ -284,12 +285,12 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         const b = parseInt(hex.slice(5, 7), 16);
 
         const shades = [];
-        const factors = [0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6]; // Darker to lighter
+        const factors = [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8]; // More granular shades
 
         factors.forEach(f => {
-            const nr = Math.min(255, Math.floor(r * f)).toString(16).padStart(2, '0');
-            const ng = Math.min(255, Math.floor(g * f)).toString(16).padStart(2, '0');
-            const nb = Math.min(255, Math.floor(b * f)).toString(16).padStart(2, '0');
+            const nr = Math.max(0, Math.min(255, Math.floor(r * f))).toString(16).padStart(2, '0');
+            const ng = Math.max(0, Math.min(255, Math.floor(g * f))).toString(16).padStart(2, '0');
+            const nb = Math.max(0, Math.min(255, Math.floor(b * f))).toString(16).padStart(2, '0');
             shades.push(`#${nr}${ng}${nb}`);
         });
         return shades;
@@ -343,9 +344,15 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                 if (tool === 'fill') handleCanvasClick(e);
                                 else startDrawing(e);
                             }}
-                            onMouseMove={draw}
+                            onMouseMove={(e) => {
+                                draw(e);
+                                setCursorPos({ ...getPos(e), show: true });
+                            }}
                             onMouseUp={stopDrawing}
-                            onMouseLeave={stopDrawing}
+                            onMouseLeave={() => {
+                                stopDrawing();
+                                setCursorPos(prev => ({ ...prev, show: false }));
+                            }}
                             onTouchStart={(e) => {
                                 if (e.cancelable) e.preventDefault();
                                 if (tool === 'fill') handleCanvasClick(e);
@@ -354,10 +361,12 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                             onTouchMove={(e) => {
                                 if (e.cancelable) e.preventDefault();
                                 draw(e);
+                                setCursorPos({ ...getPos(e), show: true });
                             }}
                             onTouchEnd={(e) => {
                                 if (e.cancelable) e.preventDefault();
                                 stopDrawing();
+                                setCursorPos(prev => ({ ...prev, show: false }));
                             }}
                             style={{
                                 imageRendering: 'pixelated',
@@ -366,15 +375,15 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                         />
 
                         {/* Brush Preview Circle */}
-                        {mode === 'edit' && tool !== 'fill' && isDrawing && (
+                        {mode === 'edit' && tool !== 'fill' && cursorPos.show && (
                             <div
-                                className="pointer-events-none absolute border border-black/30 rounded-full"
+                                className="pointer-events-none absolute border-2 border-white/50 mix-blend-difference rounded-full z-5"
                                 style={{
                                     width: brushSize,
                                     height: brushSize,
-                                    left: getPos(isDrawing).x - brushSize / 2, // This logic is slightly flawed for preview but good for simple feedback
-                                    top: getPos(isDrawing).y - brushSize / 2,
-                                    display: 'none' // Hide for now to avoid complexity, focus on color shades
+                                    left: cursorPos.x - brushSize / 2,
+                                    top: cursorPos.y - brushSize / 2,
+                                    boxShadow: '0 0 0 1px black'
                                 }}
                             />
                         )}
@@ -726,21 +735,21 @@ const UserGallery = ({ users }) => {
     return (
         <div className="absolute bottom-20 left-0 w-full flex flex-col justify-end z-20 pointer-events-none">
             {/* Title - Floating in sky */}
-            <h2 className="absolute top-[-50vh] left-0 w-full text-center text-xl md:text-2xl text-[#5D4037] font-['Press_Start_2P'] drop-shadow-[2px_2px_0_#FFF] pointer-events-auto">
+            <h2 className="absolute top-[-40vh] left-0 w-full text-center text-xl md:text-2xl text-[#5D4037] font-['Press_Start_2P'] drop-shadow-[2px_2px_0_#FFF] pointer-events-auto">
                 COMMUNITY GALLERY
             </h2>
 
             {/* Horizontal Scroll Container for Canvases placed on ground */}
             {/* pb-32 (128px) ensures legs are fully visible above the 80px grass layer */}
-            <div className="flex flex-row items-end overflow-x-auto w-full pointer-events-auto no-scrollbar snap-x snap-mandatory scroll-smooth pb-32" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                <div className="flex flex-row items-end gap-8 md:gap-32 px-4 md:px-[30vw]">
-                    {/* Start Spacer for centering first item */}
-                    <div className="w-[35vw] md:w-[10vw] shrink-0" />
+            <div className="flex flex-row items-end overflow-x-auto md:overflow-x-visible w-full pointer-events-auto no-scrollbar snap-x snap-mandatory md:snap-none scroll-smooth pb-32 md:justify-center" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <div className="flex flex-row items-end gap-8 md:gap-16 px-4 md:px-0 md:justify-center w-full md:w-auto">
+                    {/* Start Spacer for centering first item - Mobile Only */}
+                    <div className="w-[35vw] md:hidden shrink-0" />
 
                     {Object.entries(users).map(([key, user]) => (
                         <motion.div
                             key={key}
-                            className="snap-center"
+                            className="snap-center md:snap-align-none"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                         >
@@ -753,8 +762,8 @@ const UserGallery = ({ users }) => {
                         </motion.div>
                     ))}
 
-                    {/* End Spacer for centering last item */}
-                    <div className="w-[35vw] md:w-[30vw] shrink-0" />
+                    {/* End Spacer for centering last item - Mobile Only */}
+                    <div className="w-[35vw] md:hidden shrink-0" />
                 </div>
             </div>
 
