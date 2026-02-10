@@ -151,7 +151,7 @@ const ProtectedRoute = ({ children }) => {
 
   // If not authenticated, redirect to login with return url
   if (!isAuthenticated) {
-    return <Navigate to="/pookie/home" state={{ from: location }} replace />;
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
 
   // If authenticated, render the protected component
