@@ -31,7 +31,7 @@ const musicTracks = [
   },
   {
     name: "800 Cherries - Through",
-    url: "/audio/800 Cherries - Through.mp3"
+    url: "/audio/through.mp3"
   },
 ];
 
