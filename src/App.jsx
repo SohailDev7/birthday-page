@@ -188,7 +188,7 @@ const PublicRoute = ({ children }) => {
 
 
 function App() {
-  const { theme } = useTheme();
+  const { currentTheme: theme } = useTheme();
 
   return (
     <Router>
