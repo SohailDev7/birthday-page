@@ -28,7 +28,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     const [isDrawing, setIsDrawing] = useState(false);
     const [color, setColor] = useState('#000000');
     const [brushSize, setBrushSize] = useState(5);
-    const [tool, setTool] = useState('brush'); // brush, eraser, fill, shade, calligraphy, powder, pattern
+    const [tool, setTool] = useState('brush'); // brush, eraser, fill, shade, calligraphy, powder
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [isPanMode, setIsPanMode] = useState(false);
@@ -60,26 +60,33 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     const [authInput, setAuthInput] = useState('');
     const [authError, setAuthError] = useState(false);
     const [showKeypad, setShowKeypad] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(false);
 
     // Exit Warning State
     const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
     const [pendingExitAction, setPendingExitAction] = useState(null); // { type: 'close' | 'newSlot', index?: number }
 
-    // Initialize canvas & history & Gallery
+    // 1. One-time Canvas & Gallery Initialization
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
         const ctx = canvas.getContext('2d');
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
+
+        // FIXED RESOLUTION: Always 1024x1024 internal pixels
+        // This prevents "stretching" when loading on different devices
+        const RESOLUTION = 1024;
+        canvas.width = RESOLUTION;
+        canvas.height = RESOLUTION;
+
         ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, RESOLUTION, RESOLUTION);
 
         if (initialData) {
             const img = new Image();
             img.onload = () => {
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                // Draw image to fill the fixed resolution canvas
+                ctx.drawImage(img, 0, 0, RESOLUTION, RESOLUTION);
                 const dataURL = canvas.toDataURL();
                 setHistory([dataURL]);
                 setHistoryIndex(0);
@@ -91,7 +98,6 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
             setHistoryIndex(0);
         }
 
-        // Fetch User Gallery
         const fetchGallery = async () => {
             try {
                 const res = await fetch(`/api/paintings/${user.displayName.toLowerCase()}`);
@@ -100,7 +106,6 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     setGallery(result.data.paintings || []);
                     setEquippedIndex(result.data.equippedIndex || 0);
                 } else {
-                    // Safety: ensure it's at least an empty array
                     setGallery([]);
                 }
             } catch (e) {
@@ -108,8 +113,42 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
             }
         };
         fetchGallery();
+    }, []); // Only on mount
 
-        const handleResize = () => { };
+    // 2. Separate Keyboard Shortcuts Effect
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (mode !== 'edit' || showSaveDialog || showKeypad) return;
+
+            const key = e.key.toLowerCase();
+            if (key === 'b') setTool('brush');
+            else if (key === 'p') setTool('powder');
+            else if (key === 'c') setTool('calligraphy');
+            else if (key === 's' && !e.ctrlKey) setTool('shade');
+            else if (key === 'f') setTool('fill');
+            else if (key === 'e') setTool('eraser');
+
+            if (e.ctrlKey) {
+                if (key === 'z') { e.preventDefault(); handleUndo(); }
+                else if (key === 'y') { e.preventDefault(); handleRedo(); }
+                else if (key === 's') {
+                    e.preventDefault();
+                    setPendingExportData(canvasRef.current.toDataURL());
+                    setSaveSlot(equippedIndex);
+                    setShowSaveDialog(true);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [mode, showSaveDialog, showKeypad, equippedIndex, historyIndex, history.length]); // Re-bind only when necessary
+
+    // 3. Resize Effect
+    useEffect(() => {
+        const handleResize = () => {
+            // Optional: Handle resize if needed, but avoid wiping canvas
+        };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
@@ -321,6 +360,21 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
             ctx.lineJoin = 'round';
             ctx.lineTo(x, y);
             ctx.stroke();
+        } else if (tool === 'powder') {
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 1.0;
+
+            // True sparse speckle logic (Star Dust / Sand effect)
+            const particleCount = Math.max(10, Math.floor(brushSize * 1.5));
+            const radius = brushSize * 3.0;
+
+            for (let i = 0; i < particleCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.sqrt(Math.random()) * radius;
+                const offsetX = Math.cos(angle) * dist;
+                const offsetY = Math.sin(angle) * dist;
+                ctx.fillRect(Math.floor(x + offsetX), Math.floor(y + offsetY), 1, 1);
+            }
         } else if (tool === 'shade') {
             ctx.globalCompositeOperation = 'source-over';
             ctx.strokeStyle = color;
@@ -333,35 +387,11 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         } else if (tool === 'calligraphy') {
             ctx.fillStyle = color;
             ctx.globalAlpha = 1.0;
-            // Draw a slanted rectangle connecting points
             const width = brushSize;
             const height = brushSize * 2;
             ctx.translate(x, y);
             ctx.rotate(Math.PI / 4);
             ctx.fillRect(-width / 2, -height / 2, width, height);
-        } else if (tool === 'powder') {
-            ctx.fillStyle = color;
-            ctx.globalAlpha = 0.8;
-
-            // Much Higher density for visible "powder" look
-            const particleCount = Math.max(80, Math.floor(brushSize * 20));
-            const radius = brushSize * 1.2;
-            const pSize = Math.max(2, Math.floor(brushSize / 2));
-
-            for (let i = 0; i < particleCount; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const dist = Math.sqrt(Math.random()) * radius;
-                const offsetX = Math.cos(angle) * dist;
-                const offsetY = Math.sin(angle) * dist;
-                ctx.fillRect(x + offsetX, y + offsetY, pSize, pSize);
-            }
-        } else if (tool === 'pattern') {
-            ctx.fillStyle = color;
-            ctx.globalAlpha = 0.8;
-            const spacing = 4;
-            const px = Math.floor(x / spacing) * spacing;
-            const py = Math.floor(y / spacing) * spacing;
-            ctx.fillRect(px, py, brushSize / 2, brushSize / 2);
         } else {
             ctx.globalCompositeOperation = 'source-over';
             ctx.strokeStyle = color;
@@ -418,7 +448,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, 1024, 1024);
         saveToHistory();
         setHasTouchedCanvas(false);
     };
@@ -464,6 +494,8 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                 setPaintingTitle('');
                 onSave(pendingExportData); // Update local map
                 setHasTouchedCanvas(false); // Reset unsaved state after successful save
+                setSaveSuccess(true);
+                setTimeout(() => setSaveSuccess(false), 3000);
             } else {
                 alert(result.message);
             }
@@ -599,8 +631,8 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                 className="bg-[#FFE4C4] border-4 border-[#8B4513] p-2 md:p-4 shadow-[8px_8px_0_rgba(0,0,0,1)] max-w-5xl w-full max-h-[90vh] flex flex-col gap-2 md:gap-4 relative overflow-hidden"
                 style={{ fontFamily: "'Press Start 2P', monospace", imageRendering: 'pixelated' }}
             >
-                {/* Header */}
-                <div className="flex justify-between items-center border-b-4 border-[#8B4513] pb-2 md:pb-4">
+                {/* Header - Ensure it's never clipped and very visible */}
+                <div className="flex justify-between items-center border-b-4 border-[#8B4513] p-2 md:p-3 bg-[#8B4513]/10 shrink-0 z-50">
                     <div className="flex items-center gap-2 md:gap-4">
                         <div className="w-6 h-6 md:w-8 md:h-8 border-2 border-black shadow-[2px_2px_0_rgba(0,0,0,0.3)]" style={{ background: user.color }} />
                         <div className="flex flex-col">
@@ -621,8 +653,12 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                 <button onClick={() => handleZoom(zoom + 0.5)} className="hover:text-white">+</button>
                             </div>
                         )}
-                        <button onClick={handleCloseRequest} className="text-[#8B4513] hover:bg-[#DEB887] p-1 md:p-2 border-2 border-transparent hover:border-[#8B4513] transition-all active:translate-y-1">
-                            <X size={20} />
+                        <button
+                            onClick={handleCloseRequest}
+                            className="bg-red-600 text-white px-4 py-2 md:px-6 md:py-3 border-4 border-white shadow-[6px_6px_0_#000] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none flex items-center justify-center font-black text-xs md:text-sm z-[1000]"
+                            title="EXIT CANVAS"
+                        >
+                            <span className="mr-2 hidden md:inline">EXIT</span> <X size={24} strokeWidth={4} />
                         </button>
                     </div>
                 </div>
@@ -793,18 +829,33 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                 )}
 
                                 {/* Brush Preview */}
-                                {mode === 'edit' && tool !== 'fill' && tool !== 'powder' && tool !== 'pattern' && cursorPos.show && (
+                                {mode === 'edit' && tool !== 'fill' && cursorPos.show && (
                                     <div
-                                        className="pointer-events-none absolute border-2 border-white/50 mix-blend-difference rounded-full z-10"
+                                        className={`pointer-events-none absolute mix-blend-difference z-10 ${tool === 'powder' ? 'border-2 border-dotted border-white/70' : 'border-2 border-white/50 rounded-full'}`}
                                         style={{
-                                            width: brushSize,
-                                            height: brushSize,
-                                            left: (cursorPos.x / zoom) - (brushSize / 2),
-                                            top: (cursorPos.y / zoom) - (brushSize / 2),
+                                            width: tool === 'powder' ? (brushSize * 4.0) : brushSize,
+                                            height: tool === 'powder' ? (brushSize * 4.0) : brushSize,
+                                            left: (cursorPos.x / zoom) - (tool === 'powder' ? (brushSize * 2.0) : (brushSize / 2)),
+                                            top: (cursorPos.y / zoom) - (tool === 'powder' ? (brushSize * 2.0) : (brushSize / 2)),
+                                            borderRadius: '50%',
                                             boxShadow: '0 0 0 1px black'
                                         }}
                                     />
                                 )}
+
+                                {/* Save Success Toast */}
+                                <AnimatePresence>
+                                    {saveSuccess && (
+                                        <motion.div
+                                            initial={{ y: -50, opacity: 0 }}
+                                            animate={{ y: 20, opacity: 1 }}
+                                            exit={{ y: -50, opacity: 0 }}
+                                            className="absolute top-0 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-2 border-4 border-white shadow-lg z-[200] font-bold text-[10px]"
+                                        >
+                                            SAVED TO GALLERY!
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
 
                                 {/* Auth Overlay */}
                                 {mode === 'auth' && (
@@ -861,41 +912,55 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                         {/* Toolbar */}
                         {mode === 'edit' && (
                             <div className="flex flex-col gap-2 bg-[#DEB887] p-2 md:p-3 border-2 border-[#8B4513] shadow-[4px_4px_0_rgba(0,0,0,0.2)] shrink-0">
-                                {/* Row 1: Colors & Tools (Scrollable on Mobile) */}
-                                <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar-h">
-                                    {/* Current Color */}
-                                    <div className="shrink-0 flex items-center px-1 border-r border-[#8B4513]/30">
-                                        <div className="w-6 h-6 md:w-8 md:h-8 border-2 border-black" style={{ backgroundColor: color }} />
+                                {/* Row 1: Colors Palette */}
+                                <div className="flex items-center gap-2 bg-[#F5DEB3] p-1 border border-[#8B4513] overflow-x-auto custom-scrollbar-h shrink-0 shadow-inner">
+                                    <div className="shrink-0 flex items-center pr-2 border-r border-[#8B4513]/30">
+                                        <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-black shadow-sm" style={{ backgroundColor: color }} />
                                     </div>
-
-                                    {/* Colors Palette */}
-                                    <div className="flex gap-1 p-1 bg-[#F5DEB3] border border-[#8B4513] shrink-0">
+                                    <div className="flex gap-1">
                                         {['#000000', '#FF3B30', '#4CD964', '#007AFF', '#FFCC00', '#FF2D55', '#5856D6', '#8E8E93', '#FFFFFF', '#654321', '#FF6B00', '#00FFFF'].map(c => (
                                             <button
                                                 key={c}
                                                 onClick={(e) => handleColorClick(c, e)}
-                                                className={`w-5 h-5 md:w-6 md:h-6 border-2 border-black transition-transform hover:scale-110 active:scale-90 shrink-0 ${color === c ? 'ring-2 ring-white scale-110' : ''}`}
+                                                className={`w-6 h-6 md:w-7 md:h-7 border-2 border-black transition-transform hover:scale-110 active:scale-90 shrink-0 ${color === c ? 'ring-2 ring-white scale-110' : ''}`}
                                                 style={{ backgroundColor: c }}
                                             />
                                         ))}
                                     </div>
+                                </div>
 
-                                    {/* Tools */}
-                                    <div className="flex items-center gap-1 shrink-0 px-2 border-l border-[#8B4513]/30">
-                                        <button onClick={() => setTool('brush')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'brush' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><PixelPaintbrushIcon size={16} /></button>
-                                        <button onClick={() => setTool('calligraphy')} title="Calligraphy" className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'calligraphy' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="4" transform="rotate(45 12 12)" /></svg></button>
-                                        <button onClick={() => setTool('powder')} title="Powder Brush" className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'powder' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
+                                {/* Row 2: Drawing Tools */}
+                                <div className="flex items-center gap-1 overflow-x-auto pb-1 custom-scrollbar-h shrink-0 py-1 border-b border-[#8B4513]/20">
+                                    <div className="flex items-center gap-2 flex-wrap md:flex-nowrap px-1">
+                                        <button onClick={() => setTool('brush')} title="Brush (B)" className={`p-2 border-2 transition-all flex items-center gap-1.5 min-w-[50px] justify-center ${tool === 'brush' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
+                                            <PixelPaintbrushIcon size={14} />
+                                            <span className="text-[6px] font-bold">BRUSH</span>
+                                        </button>
+                                        <button onClick={() => setTool('powder')} title="Powder (P)" className={`p-2 border-2 transition-all flex items-center gap-1.5 min-w-[50px] justify-center ${tool === 'powder' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
                                             <div className="flex flex-col items-center gap-0.5">
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2" /><circle cx="8" cy="8" r="1" /><circle cx="16" cy="16" r="1" /><circle cx="16" cy="8" r="1" /><circle cx="8" cy="16" r="1" /></svg>
-                                                <span className="text-[4px] font-bold">POWDER</span>
+                                                <span className="text-[5px] font-bold">POWDER</span>
                                             </div>
                                         </button>
-                                        <button onClick={() => setTool('pattern')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'pattern' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="4" height="4" /><rect x="12" y="4" width="4" height="4" /><rect x="4" y="12" width="4" height="4" /><rect x="12" y="12" width="4" height="4" /></svg></button>
-                                        <button onClick={() => setTool('shade')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'shade' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 22h20L12 2z" /><path d="M12 6l-6 16" /><path d="M12 6l6 16" /></svg></button>
-                                        <button onClick={() => setTool('fill')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'fill' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 11l-8-8-9 9 8 8 5-5 9-9z" /><path d="M22 22l-5-5" /></svg></button>
-                                        <button onClick={() => setTool('eraser')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'eraser' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><Eraser size={16} /></button>
+                                        <button onClick={() => setTool('calligraphy')} title="Calligraphy (C)" className={`p-2 border-2 transition-all flex flex-col items-center gap-0.5 min-w-[50px] justify-center ${tool === 'calligraphy' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="4" transform="rotate(45 12 12)" /></svg>
+                                            <span className="text-[4px] font-bold">PEN</span>
+                                        </button>
+                                        <button onClick={() => setTool('shade')} title="Soft Shade (S)" className={`p-2 border-2 transition-all flex flex-col items-center gap-0.5 min-w-[50px] justify-center ${tool === 'shade' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 22h20L12 2z" /><path d="M12 6l-6 16" /><path d="M12 6l6 16" /></svg>
+                                            <span className="text-[4px] font-bold">SHADE</span>
+                                        </button>
+                                        <button onClick={() => setTool('fill')} title="Fill Bucket (F)" className={`p-2 border-2 transition-all flex flex-col items-center gap-0.5 min-w-[50px] justify-center ${tool === 'fill' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 11l-8-8-9 9 8 8 5-5 9-9z" /><path d="M22 22l-5-5" /></svg>
+                                            <span className="text-[4px] font-bold">FILL</span>
+                                        </button>
+                                        <button onClick={() => setTool('eraser')} title="Eraser (E)" className={`p-2 border-2 transition-all flex flex-col items-center gap-0.5 min-w-[50px] justify-center ${tool === 'eraser' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
+                                            <Eraser size={14} />
+                                            <span className="text-[4px] font-bold">ERASE</span>
+                                        </button>
                                     </div>
                                 </div>
+
 
                                 {/* Row 2: Slider, History, and Actions */}
                                 <div className="flex flex-wrap items-center gap-2 md:gap-4 overflow-x-auto py-1">
