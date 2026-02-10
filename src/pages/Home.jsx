@@ -170,7 +170,7 @@ const Home = () => {
       animation: 'wave',
       timeOfDay: 'day',
       skyGradient: 'linear-gradient(to bottom, #FF0000 0%, #CC0000 50%, #8B0000 100%)',
-      dob: '2000-01-01',
+      dob: '2007-01-28',
       hasGlasses: true
     },
     aaditya: {
