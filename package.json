@@ -2,13 +2,13 @@
   "name": "minimal-portfolio",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"node server.js\" \"vite\"",
+    "dev": "concurrently \"node api/index.js\" \"vite\"",
     "dev:frontend": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "server": "node server.js",
+    "server": "node api/index.js",
     "dev:full": "concurrently \"npm run server\" \"npm run dev\"",
-    "dev:backend": "nodemon server.js"
+    "dev:backend": "nodemon api/index.js"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
