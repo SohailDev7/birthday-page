@@ -29,6 +29,10 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     const [brushSize, setBrushSize] = useState(5);
     const [tool, setTool] = useState('brush'); // brush, eraser, fill, shade
 
+    // Color Shade State
+    const [shadePopup, setShadePopup] = useState({ show: false, color: '', x: 0, y: 0 });
+    const longPressTimer = useRef(null);
+
     // History State
     const [history, setHistory] = useState([]);
     const [historyIndex, setHistoryIndex] = useState(-1);
@@ -264,6 +268,43 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         onSave(canvas.toDataURL());
     };
 
+    const downloadDrawing = () => {
+        const canvas = canvasRef.current;
+        const link = document.createElement('a');
+        link.download = `${user.displayName.toLowerCase()}-art.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+    };
+
+    // Helper to generate shades
+    const generateShades = (hex) => {
+        // Simple shade generator
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+
+        const shades = [];
+        const factors = [0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6]; // Darker to lighter
+
+        factors.forEach(f => {
+            const nr = Math.min(255, Math.floor(r * f)).toString(16).padStart(2, '0');
+            const ng = Math.min(255, Math.floor(g * f)).toString(16).padStart(2, '0');
+            const nb = Math.min(255, Math.floor(b * f)).toString(16).padStart(2, '0');
+            shades.push(`#${nr}${ng}${nb}`);
+        });
+        return shades;
+    };
+
+    const handleColorLongPress = (c, e) => {
+        const rect = e.target.getBoundingClientRect();
+        setShadePopup({
+            show: true,
+            color: c,
+            x: rect.left,
+            y: rect.top - 50 // Above the button
+        });
+    };
+
     // Render using Portal
     return createPortal(
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 pointer-events-auto">
@@ -294,7 +335,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
 
                 {/* Canvas Container */}
                 <div className="relative p-2 bg-[#DEB887] border-4 border-[#5D4037] shadow-inner">
-                    <div className="relative aspect-[5/4] bg-white border-2 border-[#8B4513] overflow-hidden">
+                    <div className="relative aspect-5/4 bg-white border-2 border-[#8B4513] overflow-hidden">
                         <canvas
                             ref={canvasRef}
                             className={`w-full h-full block image-pixelated ${mode === 'edit' ? 'cursor-crosshair' : 'cursor-default'}`}
@@ -306,13 +347,37 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                             onMouseUp={stopDrawing}
                             onMouseLeave={stopDrawing}
                             onTouchStart={(e) => {
+                                if (e.cancelable) e.preventDefault();
                                 if (tool === 'fill') handleCanvasClick(e);
                                 else startDrawing(e);
                             }}
-                            onTouchMove={draw}
-                            onTouchEnd={stopDrawing}
-                            style={{ imageRendering: 'pixelated' }}
+                            onTouchMove={(e) => {
+                                if (e.cancelable) e.preventDefault();
+                                draw(e);
+                            }}
+                            onTouchEnd={(e) => {
+                                if (e.cancelable) e.preventDefault();
+                                stopDrawing();
+                            }}
+                            style={{
+                                imageRendering: 'pixelated',
+                                touchAction: 'none' // CRITICAL: Stop mobile scrolling
+                            }}
                         />
+
+                        {/* Brush Preview Circle */}
+                        {mode === 'edit' && tool !== 'fill' && isDrawing && (
+                            <div
+                                className="pointer-events-none absolute border border-black/30 rounded-full"
+                                style={{
+                                    width: brushSize,
+                                    height: brushSize,
+                                    left: getPos(isDrawing).x - brushSize / 2, // This logic is slightly flawed for preview but good for simple feedback
+                                    top: getPos(isDrawing).y - brushSize / 2,
+                                    display: 'none' // Hide for now to avoid complexity, focus on color shades
+                                }}
+                            />
+                        )}
 
                         {/* Auth Overlay */}
                         {mode === 'auth' && (
@@ -363,16 +428,67 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                 {/* Toolbar - Only visible in EDIT mode */}
                 {mode === 'edit' && (
                     <div className="flex flex-wrap items-center gap-4 bg-[#DEB887] p-3 border-2 border-[#8B4513] shadow-[4px_4px_0_rgba(0,0,0,0.2)]">
+                        {/* Current Color Indicator */}
+                        <div className="flex flex-col items-center gap-1 px-2 border-r border-[#8B4513]/30">
+                            <span className="text-[8px] text-[#5D4037]">COLOR</span>
+                            <div
+                                className="w-8 h-8 border-4 border-black"
+                                style={{ backgroundColor: color }}
+                            />
+                        </div>
+
                         {/* Colors */}
-                        <div className="flex gap-2 p-2 bg-[#F5DEB3] border border-[#8B4513] shadow-sm flex-wrap justify-center">
+                        <div className="flex gap-2 p-2 bg-[#F5DEB3] border border-[#8B4513] shadow-sm flex-wrap justify-center relative">
                             {['#000000', '#FF3B30', '#4CD964', '#007AFF', '#FFCC00', '#FF2D55', '#5856D6', '#8E8E93', '#FFFFFF', '#654321'].map(c => (
                                 <button
                                     key={c}
                                     onClick={() => { setColor(c); setTool('brush'); }}
+                                    onContextMenu={(e) => {
+                                        e.preventDefault();
+                                        handleColorLongPress(c, e);
+                                    }}
+                                    onTouchStart={(e) => {
+                                        longPressTimer.current = setTimeout(() => handleColorLongPress(c, e), 500);
+                                    }}
+                                    onTouchEnd={() => {
+                                        clearTimeout(longPressTimer.current);
+                                    }}
                                     className={`w-6 h-6 border-2 border-black transition-transform hover:scale-110 active:scale-90 ${color === c && (tool === 'brush' || tool === 'shade') ? 'ring-2 ring-black scale-110 shadow-[2px_2px_0_rgba(0,0,0,0.5)]' : ''}`}
                                     style={{ backgroundColor: c }}
                                 />
                             ))}
+
+                            {/* Shade Popup */}
+                            <AnimatePresence>
+                                {shadePopup.show && (
+                                    <>
+                                        {/* Click outside to close */}
+                                        <div
+                                            className="fixed inset-0 z-100"
+                                            onClick={() => setShadePopup({ ...shadePopup, show: false })}
+                                        />
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.8 }}
+                                            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-[#F5DEB3] border-4 border-[#8B4513] p-2 flex gap-1 z-101 shadow-[4px_4px_0_#000]"
+                                            style={{ imageRendering: 'pixelated' }}
+                                        >
+                                            {generateShades(shadePopup.color).map(sc => (
+                                                <button
+                                                    key={sc}
+                                                    onClick={() => {
+                                                        setColor(sc);
+                                                        setShadePopup({ ...shadePopup, show: false });
+                                                    }}
+                                                    className="w-6 h-6 border-2 border-black hover:scale-110 transition-transform"
+                                                    style={{ backgroundColor: sc }}
+                                                />
+                                            ))}
+                                        </motion.div>
+                                    </>
+                                )}
+                            </AnimatePresence>
                         </div>
 
                         <div className="h-8 w-1 bg-[#8B4513] opacity-50" />
@@ -452,12 +568,21 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                         <div className="flex-1" />
 
                         {/* Actions */}
-                        <button
-                            onClick={clearCanvas}
-                            className="px-4 py-2 bg-[#FFB6C1] text-[#8B0000] text-[10px] border-2 border-[#8B0000] hover:bg-[#FFC0CB] active:translate-y-1 shadow-[4px_4px_0_#8B0000] active:shadow-none transition-all flex items-center gap-2"
-                        >
-                            <RotateCcw size={12} /> CLEAR
-                        </button>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={downloadDrawing}
+                                title="Download Illustration"
+                                className="px-3 py-2 bg-[#90EE90] text-[#006400] text-[10px] border-2 border-[#006400] hover:bg-[#98FB98] active:translate-y-1 shadow-[4px_4px_0_#006400] active:shadow-none transition-all flex items-center gap-2"
+                            >
+                                <Eye size={12} /> SAVE
+                            </button>
+                            <button
+                                onClick={clearCanvas}
+                                className="px-3 py-2 bg-[#FFB6C1] text-[#8B0000] text-[10px] border-2 border-[#8B0000] hover:bg-[#FFC0CB] active:translate-y-1 shadow-[4px_4px_0_#8B0000] active:shadow-none transition-all flex items-center gap-2"
+                            >
+                                <RotateCcw size={12} /> CLEAR
+                            </button>
+                        </div>
                     </div>
                 )}
 
