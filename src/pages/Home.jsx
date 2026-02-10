@@ -222,7 +222,7 @@ const Home = () => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
       // Update usersPerPage based on screen width
-      if (window.innerWidth < 640) setUsersPerPage(3);
+      if (window.innerWidth < 640) setUsersPerPage(4); // Even smaller on mobile
       else if (window.innerWidth < 1024) setUsersPerPage(3);
       else setUsersPerPage(4);
     };
@@ -836,195 +836,150 @@ const Home = () => {
         </AnimatePresence>
 
         {/* Expandable Music Player - Top Left - TRULY BLOCKY */}
-        {!isMobile && (
-          <div
-            className="fixed top-4 left-4 z-50 group/player"
-            onMouseEnter={() => setIsPlayerExpanded(true)}
-            onMouseLeave={() => setIsPlayerExpanded(false)}
-          >
-            {/* Compact Player - Always Visible */}
-            <motion.div
-              className="px-4 py-3 text-white font-bold cursor-pointer select-none relative"
-              initial={{ x: -100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              style={{
-                backgroundColor: '#4e4e4e',
-                backgroundImage: `url("https://www.transparenttextures.com/patterns/dark-matter.png")`,
-                border: '6px solid #000',
-                imageRendering: 'pixelated',
-                boxShadow: `
+        <div
+          className="fixed top-4 left-4 z-50 group/player"
+          onMouseEnter={() => !isMobile && setIsPlayerExpanded(true)}
+          onMouseLeave={() => !isMobile && setIsPlayerExpanded(false)}
+          onClick={() => isMobile && setIsPlayerExpanded(!isPlayerExpanded)}
+        >
+          {/* Compact Player - Always Visible */}
+          <motion.div
+            className="px-2 md:px-4 py-2 md:py-3 text-white font-bold cursor-pointer select-none relative"
+            initial={{ x: -100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            style={{
+              backgroundColor: '#4e4e4e',
+              backgroundImage: `url("https://www.transparenttextures.com/patterns/dark-matter.png")`,
+              border: isMobile ? '3px solid #000' : '6px solid #000',
+              imageRendering: 'pixelated',
+              boxShadow: isMobile ? '2px 2px 0 rgba(0,0,0,0.3)' : `
                 inset 3px 3px 0 rgba(255, 255, 255, 0.4),
                 inset -3px -3px 0 rgba(0, 0, 0, 0.6),
                 4px 4px 12px rgba(0,0,0,0.5)
               `,
-                minWidth: '220px',
-                maxWidth: '300px'
-              }}
-            >
-              {/* Corner Details to make it look more like a block */}
-              <div className="absolute top-0 left-0 w-2 h-2 bg-white/20" />
-              <div className="absolute bottom-0 right-0 w-2 h-2 bg-black/40" />
+              minWidth: isMobile ? '120px' : '220px',
+              maxWidth: isMobile ? '160px' : '300px'
+            }}
+          >
+            {/* Corner Details */}
+            <div className="absolute top-0 left-0 w-1 h-1 bg-white/20" />
+            <div className="absolute bottom-0 right-0 w-1 h-1 bg-black/40" />
 
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-10 h-10 flex items-center justify-center bg-[#8b8b8b]"
-                  style={{
-                    border: '3px solid #000',
-                    boxShadow: 'inset 2px 2px 0 rgba(255,255,255,0.2), inset -2px -2px 0 rgba(0,0,0,0.4)'
-                  }}
-                >
-                  <Music size={20} className="text-[#3f3f3f]" />
-                </div>
+            <div className="flex items-center gap-2 md:gap-4">
+              <div
+                className="w-6 h-6 md:w-10 md:h-10 flex items-center justify-center bg-[#8b8b8b]"
+                style={{
+                  border: isMobile ? '2px solid #000' : '3px solid #000',
+                  boxShadow: 'inset 1px 1px 0 rgba(255,255,255,0.2), inset -1px -1px 0 rgba(0,0,0,0.4)'
+                }}
+              >
+                <Music size={isMobile ? 12 : 20} className="text-[#3f3f3f]" />
+              </div>
 
-                <div className="flex-1 overflow-hidden">
+              <div className="flex-1 overflow-hidden">
+                {!isMobile && (
                   <div
                     className="text-[10px] text-[#AAAAAA] mb-1"
                     style={{ fontFamily: "'Press Start 2P', cursive" }}
                   >
                     NOW PLAYING
                   </div>
-                  <motion.div
-                    key={currentTrack}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-[11px] text-white whitespace-nowrap overflow-hidden text-ellipsis"
-                    style={{
-                      fontFamily: "'Press Start 2P', cursive",
-                      textShadow: '2px 2px 0 #000'
-                    }}
-                  >
-                    {musicTracks[currentTrack].name}
-                  </motion.div>
-                </div>
-              </div>
-            </motion.div>
-
-            <AnimatePresence>
-              {isPlayerExpanded && (
+                )}
                 <motion.div
-                  className="absolute top-full left-0 mt-3"
-                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                  style={{ imageRendering: 'pixelated' }}
+                  key={currentTrack}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-[8px] md:text-[11px] text-white whitespace-nowrap overflow-hidden text-ellipsis"
+                  style={{
+                    fontFamily: "'Press Start 2P', cursive",
+                    textShadow: isMobile ? '1px 1px 0 #000' : '2px 2px 0 #000'
+                  }}
                 >
-                  <div
-                    className="px-4 py-4"
-                    style={{
-                      backgroundColor: '#4e4e4e',
-                      backgroundImage: `url("https://www.transparenttextures.com/patterns/dark-matter.png")`,
-                      border: '6px solid #000',
-                      boxShadow: 'inset 3px 3px 0 rgba(255,255,255,0.4), inset -3px -3px 0 rgba(0, 0, 0, 0.6), 8px 8px 0 rgba(0,0,0,0.3)',
-                      minWidth: '240px'
-                    }}
-                  >
-                    {/* Track Controls - AUTHENTIC BLOCKY BUTTONS */}
-                    <div className="flex justify-between gap-3 mb-4">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentTrack((prev) => (prev - 1 + musicTracks.length) % musicTracks.length);
-                        }}
-                        className="flex-1 py-3 bg-[#bebebe] hover:bg-[#c6c6c6] text-black active:translate-y-1 active:shadow-none"
-                        style={{
-                          border: '4px solid #000',
-                          boxShadow: 'inset 3px 3px 0 rgba(255,255,255,0.6), inset -3px -3px 0 rgba(0,0,0,0.4), 0 4px 0 #000',
-                          fontFamily: "'Press Start 2P', cursive",
-                          fontSize: '10px'
-                        }}
-                      >
-                        PREV
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentTrack((prev) => (prev + 1) % musicTracks.length);
-                        }}
-                        className="flex-1 py-3 bg-[#bebebe] hover:bg-[#c6c6c6] text-black active:translate-y-1 active:shadow-none"
-                        style={{
-                          border: '4px solid #000',
-                          boxShadow: 'inset 3px 3px 0 rgba(255,255,255,0.6), inset -3px -3px 0 rgba(0,0,0,0.4), 0 4px 0 #000',
-                          fontFamily: "'Press Start 2P', cursive",
-                          fontSize: '10px'
-                        }}
-                      >
-                        NEXT
-                      </button>
-                    </div>
+                  {musicTracks[currentTrack].name.split('-')[1]?.trim() || musicTracks[currentTrack].name}
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
 
-                    {/* Volume/Mute Button */}
+          <AnimatePresence>
+            {isPlayerExpanded && (
+              <motion.div
+                className="absolute top-full left-0 mt-3"
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                style={{ imageRendering: 'pixelated' }}
+              >
+                <div
+                  className="px-4 py-4"
+                  style={{
+                    backgroundColor: '#4e4e4e',
+                    backgroundImage: `url("https://www.transparenttextures.com/patterns/dark-matter.png")`,
+                    border: '6px solid #000',
+                    boxShadow: 'inset 3px 3px 0 rgba(255,255,255,0.4), inset -3px -3px 0 rgba(0, 0, 0, 0.6), 8px 8px 0 rgba(0,0,0,0.3)',
+                    minWidth: '240px'
+                  }}
+                >
+                  <div className="flex justify-between gap-3 mb-4">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        toggleMute();
+                        setCurrentTrack((prev) => (prev - 1 + musicTracks.length) % musicTracks.length);
                       }}
-                      className="w-full py-3 bg-[#8b8b8b] hover:bg-[#969696] text-white flex items-center justify-center gap-3 active:translate-y-1 active:shadow-none"
+                      className="flex-1 py-3 bg-[#bebebe] hover:bg-[#c6c6c6] text-black active:translate-y-1 active:shadow-none"
                       style={{
                         border: '4px solid #000',
-                        boxShadow: 'inset 3px 3px 0 rgba(255,255,255,0.4), inset -3px -3px 0 rgba(0, 0, 0, 0.6), 0 4px 0 #000',
+                        boxShadow: 'inset 3px 3px 0 rgba(255,255,255,0.6), inset -3px -3px 0 rgba(0,0,0,0.4), 0 4px 0 #000',
                         fontFamily: "'Press Start 2P', cursive",
-                        fontSize: '10px',
-                        textShadow: '2px 2px 0 #000'
+                        fontSize: '10px'
                       }}
                     >
-                      {isMuted ? '🔇 MUTED' : '🔊 PLAYING'}
+                      PREV
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentTrack((prev) => (prev + 1) % musicTracks.length);
+                      }}
+                      className="flex-1 py-3 bg-[#bebebe] hover:bg-[#c6c6c6] text-black active:translate-y-1 active:shadow-none"
+                      style={{
+                        border: '4px solid #000',
+                        boxShadow: 'inset 3px 3px 0 rgba(255,255,255,0.6), inset -3px -3px 0 rgba(0,0,0,0.4), 0 4px 0 #000',
+                        fontFamily: "'Press Start 2P', cursive",
+                        fontSize: '10px'
+                      }}
+                    >
+                      NEXT
                     </button>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
 
-            {/* Mobile: Compact Controls */}
-            <div className="md:hidden mt-3">
-              <div
-                className="px-3 py-2 text-white flex items-center gap-3"
-                style={{
-                  backgroundColor: '#4e4e4e',
-                  backgroundImage: `url("https://www.transparenttextures.com/patterns/dark-matter.png")`,
-                  border: '4px solid #000',
-                  boxShadow: 'inset 2px 2px 0 rgba(255,255,255,0.4), inset -2px -2px 0 rgba(0,0,0,0.6), 4px 4px 0 rgba(0,0,0,0.3)',
-                  imageRendering: 'pixelated'
-                }}
-              >
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentTrack((prev) => (prev - 1 + musicTracks.length) % musicTracks.length);
-                  }}
-                  className="p-2 bg-[#bebebe] border-2 border-black active:translate-y-0.5"
-                  style={{ fontFamily: "'Press Start 2P', cursive", fontSize: '8px', color: '#000' }}
-                >
-                  ◀
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleMute();
-                  }}
-                  className="flex-1 py-1 bg-[#8b8b8b] border-2 border-black"
-                  style={{ fontFamily: "'Press Start 2P', cursive", fontSize: '8px', textShadow: '1px 1px 0 #000' }}
-                >
-                  {isMuted ? '🔇' : '🔊'}
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentTrack((prev) => (prev + 1) % musicTracks.length);
-                  }}
-                  className="p-2 bg-[#bebebe] border-2 border-black active:translate-y-0.5"
-                  style={{ fontFamily: "'Press Start 2P', cursive", fontSize: '8px', color: '#000' }}
-                >
-                  ▶
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleMute();
+                    }}
+                    className="w-full py-3 bg-[#8b8b8b] hover:bg-[#969696] text-white flex items-center justify-center gap-3 active:translate-y-1 active:shadow-none"
+                    style={{
+                      border: '4px solid #000',
+                      boxShadow: 'inset 3px 3px 0 rgba(255,255,255,0.4), inset -3px -3px 0 rgba(0, 0, 0, 0.6), 0 4px 0 #000',
+                      fontFamily: "'Press Start 2P', cursive",
+                      fontSize: '10px',
+                      textShadow: '2px 2px 0 #000'
+                    }}
+                  >
+                    {isMuted ? '🔇 MUTED' : '🔊 PLAYING'}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
 
         {/* Top Right Control Buttons Container */}
-        <div className="fixed top-4 right-4 z-50 flex gap-4">
+        <div className="fixed top-4 right-4 z-50 flex gap-4 text-white">
           {/* Pixelated Eye Button - Toggle Visibility */}
           <motion.button
             onClick={() => setShowCards(!showCards)}
@@ -1034,85 +989,21 @@ const Home = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             style={{
-              width: isMobile ? '56px' : '80px',
-              height: isMobile ? '56px' : '80px',
+              width: isMobile ? '48px' : '80px',
+              height: isMobile ? '48px' : '80px',
               background: !showCards
                 ? 'linear-gradient(180deg, #FF4444 0%, #CC0000 100%)' // Red when hidden
                 : 'linear-gradient(180deg, #4CAF50 0%, #2E7D32 100%)', // Green when visible
               border: isMobile ? '4px solid #000' : '6px solid #000',
-              boxShadow: `
-              6px 0 0 #000,
-              -6px 0 0 #000,
-              0 6px 0 #000,
-              0 -6px 0 #000,
-              6px 6px 0 #000,
-              -6px 6px 0 #000,
-              6px -6px 0 #000,
-              -6px -6px 0 #000,
-              inset 4px 4px 0 rgba(255, 255, 255, 0.3),
-              inset -4px -4px 0 rgba(0, 0, 0, 0.3)
-            `,
-              cursor: 'pointer',
               imageRendering: 'pixelated',
-              clipPath: `polygon(
-              12px 0, calc(100% - 12px) 0,
-              100% 12px, 100% calc(100% - 12px),
-              calc(100% - 12px) 100%, 12px 100%,
-              0 calc(100% - 12px), 0 12px
-            )`,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              padding: '12px'
+              justifyContent: 'center'
             }}
           >
-            {/* Blocky Eye Icon */}
-            <div style={{ position: 'relative', width: '40px', height: '40px', transform: isMobile ? 'scale(0.7)' : 'none' }}>
-              {/* Eye White */}
-              <div style={{
-                position: 'absolute',
-                left: '4px', top: '12px',
-                width: '32px', height: '16px',
-                background: '#FFF',
-                boxShadow: '4px 4px 0 rgba(0,0,0,0.2)'
-              }} />
-              {/* Pupil */}
-              <div style={{
-                position: 'absolute',
-                left: !showCards ? '18px' : '14px', // Shift pupil when closed/hidden
-                top: '12px',
-                width: '12px', height: '16px',
-                background: '#000'
-              }} />
-
-              {!showCards && (
-                /* Red Cross / Slash - True Pixelated Staircase */
-                <>
-                  {/* Diagonal 1: Top-Left to Bottom-Right */}
-                  {[0, 1, 2, 3, 4, 5].map(i => (
-                    <div key={`d1-${i}`} style={{
-                      position: 'absolute',
-                      left: `${8 + i * 4}px`,
-                      top: `${8 + i * 4}px`,
-                      width: '4px', height: '4px',
-                      background: '#FF0000',
-                      boxShadow: '1px 1px 0 #000'
-                    }} />
-                  ))}
-
-                  {/* Diagonal 2: Top-Right to Bottom-Left */}
-                  {[0, 1, 2, 3, 4, 5].map(i => (
-                    <div key={`d2-${i}`} style={{
-                      position: 'absolute',
-                      right: `${8 + i * 4}px`,
-                      top: `${8 + i * 4}px`,
-                      width: '4px', height: '4px',
-                      background: '#FF0000',
-                      boxShadow: '-1px 1px 0 #000'
-                    }} />
-                  ))}
-                </>
-              )}
+            <div style={{ position: 'relative', width: isMobile ? '24px' : '40px', height: isMobile ? '24px' : '40px', transform: isMobile ? 'scale(0.6)' : 'none' }}>
+              <div style={{ position: 'absolute', left: '4px', top: '12px', width: '32px', height: '16px', background: '#FFF' }} />
+              <div style={{ position: 'absolute', left: !showCards ? '18px' : '14px', top: '12px', width: '12px', height: '16px', background: '#000' }} />
             </div>
           </motion.button>
 
@@ -1125,158 +1016,42 @@ const Home = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             style={{
-              width: isMobile ? '56px' : '80px',
-              height: isMobile ? '56px' : '80px',
+              width: isMobile ? '48px' : '80px',
+              height: isMobile ? '48px' : '80px',
               background: isMuted
                 ? 'linear-gradient(180deg, #FF4444 0%, #CC0000 100%)'
                 : 'linear-gradient(180deg, #4CAF50 0%, #2E7D32 100%)',
               border: isMobile ? '4px solid #000' : '6px solid #000',
-              boxShadow: `
-              6px 0 0 #000,
-              -6px 0 0 #000,
-              0 6px 0 #000,
-              0 -6px 0 #000,
-              6px 6px 0 #000,
-              -6px 6px 0 #000,
-              6px -6px 0 #000,
-              -6px -6px 0 #000,
-              inset 4px 4px 0 rgba(255, 255, 255, 0.3),
-              inset -4px -4px 0 rgba(0, 0, 0, 0.3)
-            `,
-              cursor: 'pointer',
               imageRendering: 'pixelated',
-              clipPath: `polygon(
-              12px 0, calc(100% - 12px) 0,
-              100% 12px, 100% calc(100% - 12px),
-              calc(100% - 12px) 100%, 12px 100%,
-              0 calc(100% - 12px), 0 12px
-            )`,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '32px',
-              transition: 'none',
-              filter: 'contrast(1.1) saturate(1.2)',
-              padding: '12px'
+              justifyContent: 'center'
             }}
-            aria-label={isMuted ? 'Unmute' : 'Mute'}
           >
-            {/* Blocky Pixelated Speaker Icon */}
-            <div style={{
-              position: 'relative',
-              width: '40px',
-              height: '40px',
-              imageRendering: 'pixelated',
-              transform: isMobile ? 'scale(0.7)' : 'none'
-            }}>
-              {/* Speaker body */}
-              <div style={{
-                position: 'absolute',
-                left: '0px',
-                top: '12px',
-                width: '12px',
-                height: '16px',
-                background: '#FFF',
-                boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-              }} />
-              {/* Speaker cone */}
-              <div style={{
-                position: 'absolute',
-                left: '12px',
-                top: '8px',
-                width: '8px',
-                height: '8px',
-                background: '#FFF',
-                boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-              }} />
-              <div style={{
-                position: 'absolute',
-                left: '12px',
-                top: '24px',
-                width: '8px',
-                height: '8px',
-                background: '#FFF',
-                boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-              }} />
-
-              {isMuted ? (
-                // X mark for muted
-                <>
-                  <div style={{
-                    position: 'absolute',
-                    left: '24px',
-                    top: '8px',
-                    width: '4px',
-                    height: '24px',
-                    background: '#FFF',
-                    transform: 'rotate(45deg)',
-                    transformOrigin: 'center',
-                    boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-                  }} />
-                  <div style={{
-                    position: 'absolute',
-                    left: '24px',
-                    top: '8px',
-                    width: '4px',
-                    height: '24px',
-                    background: '#FFF',
-                    transform: 'rotate(-45deg)',
-                    transformOrigin: 'center',
-                    boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-                  }} />
-                </>
-              ) : (
-                // Sound waves for unmuted
-                <>
-                  <div style={{
-                    position: 'absolute',
-                    left: '24px',
-                    top: '14px',
-                    width: '4px',
-                    height: '12px',
-                    background: '#FFF',
-                    boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-                  }} />
-                  <div style={{
-                    position: 'absolute',
-                    left: '30px',
-                    top: '10px',
-                    width: '4px',
-                    height: '20px',
-                    background: '#FFF',
-                    boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-                  }} />
-                  <div style={{
-                    position: 'absolute',
-                    left: '36px',
-                    top: '6px',
-                    width: '4px',
-                    height: '28px',
-                    background: '#FFF',
-                    boxShadow: '2px 2px 0 rgba(0,0,0,0.3)'
-                  }} />
-                </>
-              )}
+            <div style={{ position: 'relative', width: isMobile ? '24px' : '40px', height: isMobile ? '24px' : '40px', transform: isMobile ? 'scale(0.6)' : 'none' }}>
+              <div style={{ position: 'absolute', left: '0px', top: '12px', width: '12px', height: '16px', background: '#FFF' }} />
+              <div style={{ position: 'absolute', left: '12px', top: '8px', width: '8px', height: '24px', background: '#FFF' }} />
+              {isMuted && <div style={{ position: 'absolute', left: '0px', top: '0px', width: '100%', height: '4px', background: '#FF0000', transform: 'rotate(45deg)', transformOrigin: 'top left' }} />}
             </div>
           </motion.button>
         </div>
 
-        {/* Stars (fade in for night/twilight) */}
-        <AnimatePresence>
-          {(currentTimeOfDay === 'night' || currentTimeOfDay === 'twilight') && (
-            <motion.div
-              key="stars"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 3, ease: 'easeInOut' }}
-            >
-              <Stars />
-            </motion.div>
-          )}
-        </AnimatePresence>
+{/* Stars (fade in for night/twilight) */ }
+  <AnimatePresence>
+    {(currentTimeOfDay === 'night' || currentTimeOfDay === 'twilight') && (
+      <motion.div
+        key="stars"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 3, ease: 'easeInOut' }}
+      >
+        <Stars />
+      </motion.div>
+    )}
+  </AnimatePresence>
 
-        {/* Sun or Moon with sunset/moonrise animation */}
+  {/* Sun or Moon with sunset/moonrise animation */ }
         <AnimatePresence mode="wait">
           {(currentTimeOfDay === 'day' || currentTimeOfDay === 'sunset') && (
             <motion.div
@@ -1522,7 +1297,13 @@ const Home = () => {
               </motion.div>
 
               {/* Animals Layer - Reduced count to avoid congestion */}
-              <div className="animals-container">
+              <div
+                className="animals-container transition-transform duration-500"
+                style={{
+                  transform: selectedUser === 'sohail' ? 'scale(0.7)' : 'none',
+                  transformOrigin: 'bottom'
+                }}
+              >
                 {/* Single Pig - Patrol */}
                 <PixelPig delay={0} duration={25} startPos="10%" endPos="50%" />
 
@@ -1619,7 +1400,7 @@ const Home = () => {
                   wrapper="h1"
                   speed={50}
                   repeat={Infinity}
-                  className="text-2xl sm:text-4xl md:text-6xl mb-4 text-white px-4 block"
+                  className="text-xl sm:text-4xl md:text-6xl mb-4 text-white px-4 block"
                   style={{
                     fontFamily: "'Press Start 2P', monospace",
                     textShadow: '4px 4px 0 #000, 8px 8px 0 rgba(0,0,0,0.3)',
@@ -1919,46 +1700,8 @@ const Home = () => {
                     exit={{ y: 50, opacity: 0 }}
                     className="flex flex-col gap-4 sm:gap-6 px-4 action-button items-center justify-center pb-20 sm:pb-0"
                   >
-                    {/* Mobile Music Player - Only shows when character is tapped */}
-                    {isMobile && (
-                      <div
-                        className="w-full max-w-[280px] p-3 mb-2"
-                        style={{
-                          backgroundColor: '#4e4e4e',
-                          backgroundImage: `url("https://www.transparenttextures.com/patterns/dark-matter.png")`,
-                          border: '4px solid #000',
-                          boxShadow: 'inset 2px 2px 0 rgba(255,255,255,0.4), inset -2px -2px 0 rgba(0,0,0,0.6), 4px 4px 0 rgba(0,0,0,0.3)',
-                          imageRendering: 'pixelated'
-                        }}
-                      >
-                        <div className="text-[8px] text-[#AAAAAA] mb-2 font-['Press_Start_2P']">CHANGE MUSIC</div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setCurrentTrack((prev) => (prev - 1 + musicTracks.length) % musicTracks.length);
-                            }}
-                            className="p-2 bg-[#bebebe] border-2 border-black active:translate-y-0.5"
-                            style={{ fontFamily: "'Press Start 2P', cursive", fontSize: '8px', color: '#000' }}
-                          >
-                            ◀
-                          </button>
-                          <div className="flex-1 text-[8px] text-white text-center font-['Press_Start_2P'] truncate">
-                            {musicTracks[currentTrack].name.split('-')[1]?.trim() || musicTracks[currentTrack].name}
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setCurrentTrack((prev) => (prev + 1) % musicTracks.length);
-                            }}
-                            className="p-2 bg-[#bebebe] border-2 border-black active:translate-y-0.5"
-                            style={{ fontFamily: "'Press Start 2P', cursive", fontSize: '8px', color: '#000' }}
-                          >
-                            ▶
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                    {/* Mobile Music Player REMOVED - Moved to top left as per request */}
+                    {/* ... (empty) */}
 
                     <div className="flex flex-row gap-4 sm:gap-6 w-full justify-center">
                       {/* Cancel Button - Magnetic & Minecraft Red Stone Style */}
@@ -2023,16 +1766,16 @@ const Home = () => {
         </motion.div>
 
 
-        {/* Login Overlay - Minecraft Style */}
-        < AnimatePresence >
-          {showLoginOverlay && selectedUser && (
-            <LoginOverlay
-              userKey={selectedUser}
-              userData={users[selectedUser]}
-              onClose={() => setShowLoginOverlay(false)}
-            />
-          )}
-        </AnimatePresence >
+  {/* Login Overlay - Minecraft Style */}
+  <AnimatePresence>
+    {showLoginOverlay && selectedUser && (
+      <LoginOverlay
+        userKey={selectedUser}
+        userData={users[selectedUser]}
+        onClose={() => setShowLoginOverlay(false)}
+      />
+    )}
+  </AnimatePresence>
 
 
       </motion.div>
