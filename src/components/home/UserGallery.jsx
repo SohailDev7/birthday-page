@@ -551,21 +551,52 @@ const UserGallery = ({ users }) => {
     const [drawings, setDrawings] = useState({});
 
     // Load drawings from local storage on mount
+    // Load drawings from API on mount
     useEffect(() => {
-        try {
-            const saved = localStorage.getItem('pixel_birthday_drawings');
-            if (saved) {
-                setDrawings(JSON.parse(saved));
+        const fetchDrawings = async () => {
+            try {
+                const response = await fetch('/api/paintings');
+                const result = await response.json();
+                if (result.success) {
+                    setDrawings(result.data);
+                }
+            } catch (e) {
+                console.error("Failed to load drawings from API:", e);
+                // Fallback to local storage if API fails (optional, but good for offline dev)
+                const saved = localStorage.getItem('pixel_birthday_drawings');
+                if (saved) {
+                    setDrawings(JSON.parse(saved));
+                }
             }
-        } catch (e) {
-            console.error("Failed to load drawings", e);
-        }
+        };
+
+        fetchDrawings();
     }, []);
 
-    const handleSaveDrawing = (key, dataURL) => {
+    const handleSaveDrawing = async (key, dataURL) => {
+        // Optimistic UI update
         const newDrawings = { ...drawings, [key]: dataURL };
         setDrawings(newDrawings);
+
+        // Save to local storage as backup
         localStorage.setItem('pixel_birthday_drawings', JSON.stringify(newDrawings));
+
+        // Save to API
+        try {
+            await fetch('/api/paintings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userKey: key,
+                    displayName: users[key].displayName,
+                    drawingData: dataURL
+                }),
+            });
+        } catch (error) {
+            console.error("Failed to save drawing to API:", error);
+        }
     };
 
     return (

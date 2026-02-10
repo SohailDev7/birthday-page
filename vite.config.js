@@ -1,10 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import apiPlugin from './vite-plugin-api'
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), apiPlugin()],
+  plugins: [react(), tailwindcss()],
   server: {
     host: 'localhost',
     port: 5173,
@@ -12,6 +11,13 @@ export default defineConfig({
       host: 'localhost',
       port: 5173,
     },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
   },
   define: {
     global: 'globalThis',

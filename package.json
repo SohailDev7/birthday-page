@@ -2,10 +2,11 @@
   "name": "minimal-portfolio",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"node server.js\" \"vite\"",
+    "dev:frontend": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "server": "node server.cjs",
+    "server": "node server.js",
     "dev:full": "concurrently \"npm run server\" \"npm run dev\"",
     "dev:backend": "nodemon server.js"
   },
