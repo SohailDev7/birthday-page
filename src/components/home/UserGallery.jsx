@@ -608,8 +608,8 @@ const UserGallery = ({ users }) => {
 
             {/* Horizontal Scroll Container for Canvases placed on ground */}
             {/* pb-32 (128px) ensures legs are fully visible above the 80px grass layer */}
-            <div className="flex flex-row items-end gap-16 px-12 pb-32 overflow-x-auto w-full pointer-events-auto no-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                <div className="flex flex-row items-end gap-16 mx-auto">
+            <div className="flex flex-row items-end gap-8 md:gap-16 px-6 md:px-12 pb-32 overflow-x-auto w-full pointer-events-auto no-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <div className="flex flex-row items-end gap-8 md:gap-16 min-w-max mx-auto md:mx-0 md:justify-start">
                     {Object.entries(users).map(([key, user]) => (
                         <GalleryItem
                             key={key}
