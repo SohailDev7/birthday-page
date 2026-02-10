@@ -3,7 +3,6 @@ import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'fram
 import { Link } from 'react-router-dom';
 import YuzenceNavigation from '../components/yuzence/YuzenceNavigation';
 
-// Fluid Mesh Background
 const MeshGradient = () => (
     <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10 bg-sky-50">
         <motion.div
@@ -42,7 +41,6 @@ const MeshGradient = () => (
     </div>
 );
 
-// Minimalist Card Component
 const FeatureCard = ({ title, description, delay, to }) => {
     const CardContent = (
         <motion.div
@@ -58,7 +56,7 @@ const FeatureCard = ({ title, description, delay, to }) => {
                 <p className="text-sm font-light text-slate-500 leading-relaxed relative z-10">{description}</p>
             </div>
 
-            {/* Hover arrow */}
+            {}
             <div className="self-end mt-8 w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center bg-white group-hover:bg-blue-50 transition-all duration-300 transform group-hover:-translate-y-1 group-hover:translate-x-1 shadow-sm">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-400 group-hover:text-blue-500 transition-colors">
                     <path d="M7 17L17 7M17 7H7M17 7V17" />
@@ -80,7 +78,7 @@ const Yuzence_Home = () => {
             <YuzenceNavigation />
             <MeshGradient />
 
-            {/* Hero Section */}
+            {}
             <motion.section
                 style={{ y: yHero, opacity: opacityHero }}
                 className="h-screen flex flex-col items-center justify-center relative z-10 px-6"
@@ -106,7 +104,7 @@ const Yuzence_Home = () => {
                     </div>
                 </motion.div>
 
-                {/* Scroll Indicator */}
+                {}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -123,7 +121,7 @@ const Yuzence_Home = () => {
                 </motion.div>
             </motion.section>
 
-            {/* Content Section */}
+            {}
             <section className="relative z-10 min-h-screen py-32 px-6 md:px-20 max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
                     <div className="md:col-span-4 mb-12 md:mb-0">
@@ -165,7 +163,7 @@ const Yuzence_Home = () => {
                 </div>
             </section>
 
-            {/* Footer */}
+            {}
             <footer className="relative z-10 py-12 text-center text-slate-400 text-[10px] font-mono tracking-widest uppercase">
                 <div className="w-full h-px bg-linear-to-r from-transparent via-slate-200 to-transparent mb-8 opacity-50" />
                 <p>Yuzence Systems © 2026</p>

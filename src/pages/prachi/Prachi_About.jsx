@@ -12,7 +12,6 @@ const Prachi_About = () => {
   const birthday = isBirthday();
   const [animatedValues, setAnimatedValues] = useState({});
 
-
   const personalityTraits = [
     { name: 'Dumbness Level', value: 130, color: 'var(--soft-primary)' },
     { name: 'Pretty Level', value: 101, color: 'var(--soft-secondary)' },
@@ -143,7 +142,7 @@ const Prachi_About = () => {
         className="min-h-screen pt-5"
       >
         <Container className="mt-5 pt-5">
-          {/* Profile Section */}
+          {}
           <motion.section
             variants={itemVariants}
             className="py-5"
@@ -155,7 +154,7 @@ const Prachi_About = () => {
                   variants={floatingVariants}
                   animate="float"
                 >
-                  {/* Profile Frame */}
+                  {}
                   <motion.div
                     className="relative mx-auto w-[280px] h-[280px]"
                     whileHover={{ scale: 1.05, rotate: 5 }}
@@ -178,7 +177,7 @@ const Prachi_About = () => {
                       </div>
                     </div>
 
-                    {/* Floating Hearts */}
+                    {}
                     <motion.div
                       className="absolute -top-5 -left-5 text-4xl z-10"
                       animate={{
@@ -249,7 +248,7 @@ const Prachi_About = () => {
             </Row>
           </motion.section>
 
-          {/* Personality Section */}
+          {}
           <motion.section
             variants={itemVariants}
             className="py-5"
@@ -315,7 +314,7 @@ const Prachi_About = () => {
             </motion.div>
           </motion.section>
 
-          {/* Favorite Things Section */}
+          {}
           <motion.section
             variants={itemVariants}
             className="py-5"
@@ -369,7 +368,7 @@ const Prachi_About = () => {
             </motion.div>
           </motion.section>
 
-          {/* Fun Facts Section */}
+          {}
           <motion.section
             variants={itemVariants}
             className="py-5"
@@ -416,7 +415,7 @@ const Prachi_About = () => {
             </motion.div>
           </motion.section>
 
-          {/* Friendship Level Section */}
+          {}
           <motion.section
             variants={itemVariants}
             className="py-5"
@@ -464,7 +463,7 @@ const Prachi_About = () => {
             </motion.div>
           </motion.section>
 
-          {/* Daily Routine Section */}
+          {}
           <motion.section
             variants={itemVariants}
             className="py-5"
@@ -510,7 +509,7 @@ const Prachi_About = () => {
             </motion.div>
           </motion.section>
 
-          {/* IQ Graph Section */}
+          {}
           <motion.section
             variants={itemVariants}
             className="py-5"
@@ -518,7 +517,7 @@ const Prachi_About = () => {
             <IQGraph />
           </motion.section>
 
-          {/* Footer */}
+          {}
           <motion.footer
             variants={itemVariants}
             className="text-center py-5 mt-5"
@@ -545,7 +544,6 @@ const Prachi_About = () => {
     </>
   );
 };
-
 
 const IQGraph = () => {
   const [showError, setShowError] = useState(false);

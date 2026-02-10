@@ -15,7 +15,6 @@ export const MongoDBProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // MongoDB Configuration
   const MONGODB_CONFIG = {
     DATABASE: "PrachiSocial",
     COLLECTIONS: {
@@ -27,7 +26,6 @@ export const MongoDBProvider = ({ children }) => {
     }
   };
 
-  // API call function
   const callMongoAPI = async (action, collection, data = {}) => {
     try {
       setLoading(true);
@@ -61,7 +59,6 @@ export const MongoDBProvider = ({ children }) => {
     }
   };
 
-  // MongoDB Operations using API
   const insertOne = async (collection, document) => {
     return await callMongoAPI('insertOne', collection, { data: document });
   };
@@ -89,12 +86,11 @@ export const MongoDBProvider = ({ children }) => {
     return await callMongoAPI('aggregate', collection, { data: pipeline });
   };
 
-  // Test connection on mount
   useEffect(() => {
     const testConnection = async () => {
       try {
         setLoading(true);
-        // Try to get users count to test connection
+        
         await find('users');
         setIsConnected(true);
       } catch (error) {
@@ -113,23 +109,20 @@ export const MongoDBProvider = ({ children }) => {
   };
 
   const value = {
-    // Connection state
+    
     isConnected,
     loading,
     error,
-    
-    // Configuration
+
     config: MONGODB_CONFIG,
-    
-    // Operations
+
     insertOne,
     find,
     findOne,
     updateOne,
     deleteOne,
     aggregate,
-    
-    // Reconnect
+
     reconnect
   };
 

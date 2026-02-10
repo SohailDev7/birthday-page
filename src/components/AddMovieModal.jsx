@@ -16,14 +16,12 @@ const AddMovieModal = ({
   const [searchError, setSearchError] = useState('');
   const [selectedContent, setSelectedContent] = useState(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
-  const [searchType, setSearchType] = useState('movie'); // 'movie' or 'tv'
+  const [searchType, setSearchType] = useState('movie'); 
 
-  // TMDB API Configuration
-  const TMDB_API_KEY = 'ca3a0e8f666474fba42197776b8fd9a0'; // Get from https://www.themoviedb.org/settings/api
+  const TMDB_API_KEY = 'ca3a0e8f666474fba42197776b8fd9a0'; 
   const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
   const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
 
-  // Reset state when modal opens/closes
   useEffect(() => {
     if (show) {
       setSearchQuery('');
@@ -34,7 +32,6 @@ const AddMovieModal = ({
     }
   }, [show]);
 
-  // Search movies or TV shows with debounce
   useEffect(() => {
     if (!searchQuery.trim() || searchQuery.length < 2) {
       setSearchResults([]);
@@ -70,7 +67,6 @@ const AddMovieModal = ({
     return () => clearTimeout(timeoutId);
   }, [searchQuery, searchType]);
 
-  // Fetch details when content is selected
   const fetchContentDetails = async (contentId) => {
     setIsLoadingDetails(true);
     setSearchError('');
@@ -86,8 +82,7 @@ const AddMovieModal = ({
       }
       
       const contentData = await response.json();
-      
-      // Fill title, poster, and summary based on type
+
       const contentInfo = {
         movieName: searchType === 'movie' ? contentData.title : contentData.name,
         posterUrl: contentData.poster_path ? `${TMDB_IMAGE_BASE}${contentData.poster_path}` : '',
@@ -156,7 +151,7 @@ const AddMovieModal = ({
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {/* Content Search Section */}
+        {}
         {!editingMovie && (
           <div className="content-search-section mb-4">
             <Form.Group className="mb-3">
@@ -165,7 +160,7 @@ const AddMovieModal = ({
                 Search for Movies or TV Series (Auto-fills title, poster & summary)
               </Form.Label>
               
-              {/* Search Type Tabs */}
+              {}
               <Tabs
                 activeKey={searchType}
                 onSelect={(key) => setSearchType(key)}
@@ -177,7 +172,7 @@ const AddMovieModal = ({
                     Movies
                   </span>
                 }>
-                  {/* Movie search content */}
+                  {}
                 </Tab>
                 <Tab eventKey="tv" title={
                   <span>
@@ -185,7 +180,7 @@ const AddMovieModal = ({
                     TV Series
                   </span>
                 }>
-                  {/* TV search content */}
+                  {}
                 </Tab>
               </Tabs>
 
@@ -210,7 +205,7 @@ const AddMovieModal = ({
                 </Alert>
               )}
 
-              {/* Search Results */}
+              {}
               {searchResults.length > 0 && (
                 <div className="search-results-container mt-2">
                   <div className="search-results-header small text-muted mb-2">
@@ -279,7 +274,7 @@ const AddMovieModal = ({
           </div>
         )}
 
-        {/* Selected Content Info */}
+        {}
         {selectedContent && !editingMovie && (
           <div className="selected-content-info mb-4 p-3 border rounded bg-light">
             <div className="d-flex justify-content-between align-items-start mb-2">

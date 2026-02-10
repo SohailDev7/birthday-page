@@ -1,9 +1,8 @@
-// components/FloatingElements.jsx
+
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import './FloatingElements.css';
 
-// Cute Hello Kitty-style SVG components
 const CuteHeart = ({ color = '#FF69B4' }) => (
   <svg viewBox="0 0 24 24" fill={color} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}>
     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
@@ -71,19 +70,18 @@ const CutePaw = ({ color = '#FFB6C1' }) => (
 const FloatingElements = () => {
   const shapes = [CuteHeart, CuteBow, CuteFlower, CuteStar, CuteCloud, CuteRibbon, CuteSparkle, CutePaw];
   const colors = [
-    '#FF69B4', // Hot Pink
-    '#FFB6C1', // Light Pink
-    '#FF1493', // Deep Pink
-    '#FFC0CB', // Pink
-    '#FFD700', // Gold
-    '#FF6EB4', // Pink
-    '#E0BBE4', // Lavender
-    '#FFDFF5', // Light Pink
-    '#FFE5EC', // Pale Pink
-    '#FFF0F5', // Lavender Blush
+    '#FF69B4', 
+    '#FFB6C1', 
+    '#FF1493', 
+    '#FFC0CB', 
+    '#FFD700', 
+    '#FF6EB4', 
+    '#E0BBE4', 
+    '#FFDFF5', 
+    '#FFE5EC', 
+    '#FFF0F5', 
   ];
 
-  // Memoize adorable floating elements
   const elements = useMemo(() =>
     Array.from({ length: 20 }, (_, i) => {
       const ShapeComponent = shapes[i % shapes.length];
@@ -93,15 +91,15 @@ const FloatingElements = () => {
         id: i,
         Shape: ShapeComponent,
         color,
-        size: Math.random() * 30 + 20, // 20-50px
+        size: Math.random() * 30 + 20, 
         left: Math.random() * 100,
         delay: Math.random() * 5,
-        duration: Math.random() * 10 + 15, // 15-25s
-        opacity: Math.random() * 0.4 + 0.3, // 0.3-0.7
-        yRange: Math.random() * 100 + 80, // Larger movement
-        xRange: Math.random() * 30 - 15, // -15 to 15
-        rotationRange: Math.random() * 360, // Full rotation
-        scaleVariation: Math.random() * 0.3 + 0.85, // 0.85-1.15
+        duration: Math.random() * 10 + 15, 
+        opacity: Math.random() * 0.4 + 0.3, 
+        yRange: Math.random() * 100 + 80, 
+        xRange: Math.random() * 30 - 15, 
+        rotationRange: Math.random() * 360, 
+        scaleVariation: Math.random() * 0.3 + 0.85, 
       };
     }),
     []

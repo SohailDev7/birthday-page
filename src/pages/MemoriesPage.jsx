@@ -9,7 +9,6 @@ const MemoriesPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [uploading, setUploading] = useState(false);
 
-    // Form state
     const [formData, setFormData] = useState({
         title: '',
         year: new Date().getFullYear().toString(),
@@ -21,7 +20,6 @@ const MemoriesPage = () => {
 
     const fileInputRef = useRef(null);
 
-    // Fetch Memories
     const fetchMemories = async () => {
         try {
             const response = await fetch('http://localhost:3000/api/memories');
@@ -71,21 +69,19 @@ const MemoriesPage = () => {
         }
     };
 
-    // Group memories by year
     const groupedMemories = memories.reduce((acc, memory) => {
         if (!acc[memory.year]) acc[memory.year] = [];
         acc[memory.year].push(memory);
         return acc;
     }, {});
 
-    // Sorted years
     const sortedYears = Object.keys(groupedMemories).sort((a, b) => b - a);
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-blue-100 selection:text-blue-900 pb-20 overflow-x-hidden">
             <YuzenceNavigation />
 
-            {/* Soft Background */}
+            {}
             <div className="fixed inset-0 pointer-events-none -z-10 bg-sky-50" />
             <div className="fixed inset-0 pointer-events-none -z-10 bg-linear-to-b from-white to-transparent opacity-80" />
 
@@ -141,7 +137,7 @@ const MemoriesPage = () => {
                             className="relative"
                         >
                             <div className="flex gap-8 md:gap-16">
-                                {/* Year Marker */}
+                                {}
                                 <div className="flex flex-col items-center shrink-0">
                                     <div className="w-14 h-14 rounded-full bg-white border border-slate-100 flex items-center justify-center shadow-2xl shadow-blue-500/10 z-10">
                                         <span className="text-sm font-bold text-slate-800">{year}</span>
@@ -149,7 +145,7 @@ const MemoriesPage = () => {
                                     <div className="w-px h-full bg-slate-200 mt-4" />
                                 </div>
 
-                                {/* Content */}
+                                {}
                                 <div className="w-full pt-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {groupedMemories[year].map((memory, i) => (
@@ -185,7 +181,7 @@ const MemoriesPage = () => {
                 )}
             </div>
 
-            {/* Upload Modal */}
+            {}
             <AnimatePresence>
                 {isModalOpen && (
                     <div className="fixed inset-0 z-200 flex items-center justify-center p-6">

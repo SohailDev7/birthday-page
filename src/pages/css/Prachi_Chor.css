@@ -1,4 +1,4 @@
-/* components/SoilVerification.css */
+
 .soil-verification-page {
   min-height: 100vh;
   padding: 20px;
@@ -14,7 +14,6 @@
   margin: 0 auto;
 }
 
-/* Header Styles */
 .verification-header {
   text-align: center;
   margin-bottom: 40px;
@@ -47,7 +46,6 @@ body[data-theme="luxury"] .verification-header h1 {
   margin-bottom: 30px;
 }
 
-/* Progress Section */
 .progress-section {
   margin-top: 30px;
 }
@@ -99,7 +97,6 @@ body[data-theme="luxury"] .progress-fill {
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
 }
 
-/* Round Styles */
 .verification-round {
   background: var(--soft-card);
   padding: 40px;
@@ -161,7 +158,6 @@ body[data-theme="luxury"] .verification-round h3 {
   opacity: 0.9;
 }
 
-/* Input Styles */
 .verification-input {
   width: 100%;
   padding: 18px 20px;
@@ -197,7 +193,6 @@ body[data-theme="luxury"] .verification-input:focus {
   outline: none;
 }
 
-/* Password Input */
 .password-input-container {
   position: relative;
   margin-bottom: 25px;
@@ -236,7 +231,6 @@ body[data-theme="luxury"] .password-toggle:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Button Styles */
 .verification-btn {
   width: 100%;
   padding: 18px 20px;
@@ -272,7 +266,6 @@ body[data-theme="luxury"] .verification-btn:hover {
   box-shadow: 0 12px 40px rgba(255, 255, 255, 0.3);
 }
 
-/* Correct Phrase Display */
 .correct-phrase-display {
   font-size: 1.8rem;
   font-weight: 700;
@@ -296,7 +289,6 @@ body[data-theme="luxury"] .correct-phrase-display {
   border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Multiple Choice Options */
 .options-grid {
   display: grid;
   gap: 12px;
@@ -349,7 +341,6 @@ body[data-theme="luxury"] .option-btn:hover {
   background: rgba(239, 68, 68, 0.1) !important;
 }
 
-/* Legal Document */
 .legal-document {
   background: rgba(0, 0, 0, 0.05);
   padding: 25px;
@@ -406,7 +397,6 @@ body[data-theme="luxury"] .legal-document {
   flex-shrink: 0;
 }
 
-/* Voice Recording */
 .voice-recording-section {
   text-align: center;
   padding: 40px 0;
@@ -520,7 +510,6 @@ body[data-theme="luxury"] .processing-spinner {
   color: #10b981;
 }
 
-/* Writing Section */
 .writing-section {
   margin-bottom: 25px;
 }
@@ -557,7 +546,6 @@ body[data-theme="luxury"] .writing-input {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Rapid Fire */
 .rapid-fire-section {
   text-align: center;
   padding: 30px 0;
@@ -628,7 +616,6 @@ body[data-theme="luxury"] .progress-indicator {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Math Equation */
 .math-equation {
   font-size: 1.8rem;
   font-weight: 700;
@@ -651,7 +638,6 @@ body[data-theme="luxury"] .math-equation {
   border: 2px dashed rgba(255, 255, 255, 0.3);
 }
 
-/* Pattern Display */
 .pattern-display {
   display: flex;
   justify-content: center;
@@ -698,7 +684,6 @@ body[data-theme="luxury"] .pattern-input {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Drag and Drop */
 .drag-drop-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -803,7 +788,6 @@ body[data-theme="luxury"] .drop-placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* Timed Section */
 .timed-section {
   text-align: center;
   padding: 30px 0;
@@ -832,7 +816,6 @@ body[data-theme="luxury"] .timer-display {
   text-align: center;
 }
 
-/* CAPTCHA Grid */
 .captcha-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -876,7 +859,6 @@ body[data-theme="luxury"] .captcha-item.selected {
   margin-bottom: 12px;
 }
 
-/* Rhythm Section */
 .rhythm-section {
   text-align: center;
   padding: 30px 0;
@@ -948,7 +930,6 @@ body[data-theme="luxury"] .rhythm-dot.active {
   transform: scale(1.2);
 }
 
-/* Color Grid */
 .color-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -974,7 +955,6 @@ body[data-theme="luxury"] .rhythm-dot.active {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
-/* Decoding Section */
 .decoding-section {
   text-align: center;
   padding: 30px 0;
@@ -1002,7 +982,6 @@ body[data-theme="luxury"] .encoded-text {
   border: 2px dashed rgba(255, 255, 255, 0.3);
 }
 
-/* Final Round */
 .final-warning {
   text-align: center;
   padding: 30px;
@@ -1035,7 +1014,6 @@ body[data-theme="luxury"] .final-warning {
   padding: 20px !important;
 }
 
-/* Error Message */
 .error-message {
   display: flex;
   align-items: center;
@@ -1049,7 +1027,6 @@ body[data-theme="luxury"] .final-warning {
   font-weight: 600;
 }
 
-/* Navigation Buttons */
 .navigation-buttons {
   display: flex;
   gap: 15px;
@@ -1105,7 +1082,6 @@ body[data-theme="luxury"] .nav-btn.secondary:hover {
   transform: translateY(-2px);
 }
 
-/* Final Result */
 .final-result {
   text-align: center;
   padding: 60px 40px;
@@ -1175,7 +1151,6 @@ body[data-theme="luxury"] .final-result h1 {
   box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
   .soil-verification-page {
     padding: 10px;
@@ -1259,7 +1234,6 @@ body[data-theme="luxury"] .final-result h1 {
   }
 }
 
-/* Memory Sequence Round Styles */
 .memory-section {
   text-align: center;
   padding: 20px 0;
@@ -1404,7 +1378,6 @@ body[data-theme="luxury"] .memory-cell:hover {
   transform: scale(1.05);
 }
 
-/* Active state during sequence display */
 .memory-cell.active {
   transform: scale(1.1);
   box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
@@ -1418,7 +1391,6 @@ body[data-theme="luxury"] .memory-cell:hover {
   100% { transform: scale(1.1); }
 }
 
-/* User click feedback */
 .memory-cell.user-click {
   animation: user-click 0.3s ease;
 }
@@ -1429,7 +1401,6 @@ body[data-theme="luxury"] .memory-cell:hover {
   100% { transform: scale(1); }
 }
 
-/* Mobile responsive */
 @media (max-width: 768px) {
   .memory-grid {
     max-width: 300px;

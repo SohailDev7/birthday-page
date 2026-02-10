@@ -1,6 +1,6 @@
-/* styles/PrachiPortal.css */
+
 :root {
-  /* Pink Color Palette */
+  
   --pink-primary: #ff6b8b;
   --pink-secondary: #ff9eb5;
   --pink-accent: #ff477e;
@@ -8,48 +8,41 @@
   --pink-lighter: #fff0f6;
   --pink-dark: #d6336c;
   --pink-darker: #c2255c;
-  
-  /* Neutrals */
+
   --white: #ffffff;
   --white-90: rgba(255, 255, 255, 0.9);
   --white-80: rgba(255, 255, 255, 0.8);
   --white-60: rgba(255, 255, 255, 0.6);
   --white-40: rgba(255, 255, 255, 0.4);
   --white-20: rgba(255, 255, 255, 0.2);
-  
-  /* Text Colors */
+
   --text-primary: #1f2937;
   --text-secondary: #6b7280;
   --text-light: #9ca3af;
-  
-  /* Shadows */
+
   --shadow-sm: 0 2px 4px rgba(255, 107, 139, 0.1);
   --shadow-md: 0 4px 12px rgba(255, 107, 139, 0.15);
   --shadow-lg: 0 8px 24px rgba(255, 107, 139, 0.2);
   --shadow-xl: 0 12px 32px rgba(255, 107, 139, 0.25);
-  
-  /* Border Radius */
+
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
   --radius-2xl: 24px;
   --radius-full: 50%;
-  
-  /* Spacing */
+
   --space-xs: 0.5rem;
   --space-sm: 1rem;
   --space-md: 1.5rem;
   --space-lg: 2rem;
   --space-xl: 3rem;
   --space-2xl: 4rem;
-  
-  /* Fonts */
+
   --font-main: 'Patrick Hand', cursive;
   --font-secondary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Reset and Base Styles */
 .prachi-portal {
   min-height: 100vh;
   background: linear-gradient(135deg, var(--pink-lighter) 0%, var(--pink-light) 100%);
@@ -57,7 +50,6 @@
   overflow-x: hidden;
 }
 
-/* Navigation Styles */
 .prachi-navbar {
   background: linear-gradient(135deg, var(--pink-primary), var(--pink-accent)) !important;
   box-shadow: var(--shadow-md);
@@ -119,7 +111,6 @@
   font-size: 1.2rem;
 }
 
-/* Home Page Styles */
 .prachi-home {
   min-height: 100vh;
   position: relative;
@@ -132,7 +123,6 @@
   margin: 0 auto;
 }
 
-/* Hero Section */
 .hero-card {
   background: var(--white-90);
   border-radius: var(--radius-2xl);
@@ -165,7 +155,6 @@
   font-family: var(--font-main);
 }
 
-/* Transport Button */
 .transport-section {
   margin-bottom: var(--space-xl);
 }
@@ -189,7 +178,6 @@
   box-shadow: var(--shadow-xl);
 }
 
-/* Profile Section */
 .profile-section {
   background: var(--white-90);
   border-radius: var(--radius-2xl);
@@ -248,7 +236,6 @@
   color: var(--pink-darker);
 }
 
-/* Countdown Section */
 .countdown-section {
   background: var(--white-90);
   border-radius: var(--radius-2xl);
@@ -304,7 +291,6 @@
   opacity: 0.8;
 }
 
-/* Archive Section */
 .archive-section {
   background: var(--white-90);
   border-radius: var(--radius-2xl);
@@ -391,7 +377,6 @@
   box-shadow: var(--shadow-md);
 }
 
-/* Modal Styles */
 .premium-modal .modal-content {
   border-radius: var(--radius-2xl);
   border: none;
@@ -432,7 +417,6 @@
   font-weight: 500;
 }
 
-/* Background Animations */
 .svg-background {
   position: fixed;
   top: 0;
@@ -490,7 +474,6 @@
   background: radial-gradient(circle, var(--pink-secondary) 0%, transparent 70%);
 }
 
-/* Animations */
 @keyframes float {
   0%, 100% {
     transform: translateY(0px) rotate(0deg) scale(1);
@@ -533,7 +516,6 @@
   }
 }
 
-/* Click Sparkles */
 .click-sparkle {
   position: fixed;
   pointer-events: none;
@@ -556,7 +538,6 @@
   }
 }
 
-/* Confetti */
 .premium-confetti {
   position: fixed;
   top: 0;
@@ -575,7 +556,6 @@
   opacity: 0.8;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .hero-title {
     font-size: 2.2rem;

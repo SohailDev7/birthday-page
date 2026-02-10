@@ -1,4 +1,4 @@
-/* Prachi_Reviews.css - Soft Pink Windows 98 Style */
+
 .review-page.windows-98-style {
   min-height: 100vh;
   padding-top: 80px;
@@ -10,7 +10,6 @@
   position: relative;
 }
 
-/* Windows 98 Title Bar */
 .windows-title-bar {
   background: linear-gradient(90deg, #ec4899, #f472b6);
   color: white;
@@ -68,7 +67,6 @@
   border-color: #831843 #fdf2f8 #fdf2f8 #831843;
 }
 
-/* Windows Content Area */
 .windows-content {
   background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
   padding: 10px;
@@ -78,7 +76,6 @@
   min-height: 600px;
 }
 
-/* Windows Tabs */
 .windows-tabs {
   border: none;
 }
@@ -127,7 +124,6 @@
   margin-top: -2px;
 }
 
-/* Windows Buttons */
 .windows-btn {
   background: #fbcfe8;
   border: 2px solid;
@@ -179,7 +175,6 @@
   transform: none !important;
 }
 
-/* Form Styles */
 .windows-form {
   background: #fdf2f8;
   padding: 15px;
@@ -212,7 +207,6 @@
   border-radius: 4px;
 }
 
-/* Question Container */
 .question-container {
   background: white;
   border: 2px solid;
@@ -238,7 +232,6 @@
   color: #831843;
 }
 
-/* Input Styles */
 .windows-input, .windows-textarea {
   width: 100%;
   background: white;
@@ -262,7 +255,6 @@
   border-color: #ec4899;
 }
 
-/* Radio Group */
 .radio-group {
   display: flex;
   flex-direction: column;
@@ -303,7 +295,6 @@
   font-size: 14px;
 }
 
-/* Slider Styles */
 .slider-container {
   padding: 15px 0;
 }
@@ -369,7 +360,6 @@
   border-radius: 4px;
 }
 
-/* Star Rating */
 .star-rating {
   display: flex;
   justify-content: center;
@@ -404,14 +394,12 @@
   border-radius: 4px;
 }
 
-/* Form Navigation */
 .form-navigation {
   display: flex;
   justify-content: space-between;
   padding: 15px 0;
 }
 
-/* Success Screen */
 .success-screen {
   text-align: center;
   padding: 40px 20px;
@@ -434,7 +422,6 @@
   margin-top: 20px;
 }
 
-/* Reviews Tab */
 .reviews-tab {
   background: white;
   border: 2px solid;
@@ -569,7 +556,6 @@
   background: #f472b6;
 }
 
-/* Admin Overlay Button */
 .admin-overlay-btn {
   position: fixed;
   top: 90px;
@@ -597,7 +583,6 @@
   border-color: #831843 #fdf2f8 #fdf2f8 #831843;
 }
 
-/* Admin Modal */
 .admin-modal .modal-content,
 .full-review-modal .modal-content {
   background: #fdf2f8;
@@ -693,7 +678,6 @@
   color: #831843;
 }
 
-/* Full Review Modal Styles */
 .full-review-content {
   color: #831843;
 }
@@ -772,7 +756,6 @@
   color: #ec4899;
 }
 
-/* Scrollbar Styling */
 .reviews-grid::-webkit-scrollbar,
 .data-preview::-webkit-scrollbar {
   width: 12px;
@@ -797,7 +780,6 @@
   background: #f472b6;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .review-page.windows-98-style {
     margin: 5px;
@@ -871,7 +853,6 @@
   }
 }
 
-/* Server Status Indicator */
 .server-status-indicator {
   position: fixed;
   top: 90px;
@@ -900,7 +881,6 @@
   border-color: #dc2626 #fecaca #fecaca #dc2626;
 }
 
-/* Server Warning Banner */
 .server-warning {
   display: flex;
   align-items: center;
@@ -929,7 +909,6 @@
   margin-bottom: 4px;
 }
 
-/* Loading Screen */
 .loading-screen {
   text-align: center;
   padding: 60px 20px;
@@ -951,7 +930,6 @@
   margin: 0;
 }
 
-/* Server Wake Modal */
 .server-wake-modal .modal-content {
   background: #fdf2f8;
   border: 3px solid;
@@ -1065,7 +1043,6 @@
   justify-content: center;
 }
 
-/* Modal backdrop for server wake modal */
 .server-wake-modal .modal-backdrop {
   background-color: rgba(131, 24, 67, 0.5);
 }
@@ -1074,7 +1051,6 @@
   opacity: 1;
 }
 
-/* Enhanced form disabled state */
 .windows-form:has(.server-warning) {
   position: relative;
 }
@@ -1091,7 +1067,6 @@
   pointer-events: none;
 }
 
-/* Retry button animations */
 @keyframes pulse {
   0% {
     transform: scale(1);
@@ -1108,7 +1083,6 @@
   animation: pulse 2s infinite;
 }
 
-/* Connection status in admin panel */
 .connection-status {
   display: flex;
   align-items: center;
@@ -1150,7 +1124,6 @@
   }
 }
 
-/* Enhanced no-reviews state with server info */
 .no-reviews .server-warning {
   margin-top: 20px;
   text-align: center;
@@ -1161,7 +1134,6 @@
   text-align: center;
 }
 
-/* Responsive design for new elements */
 @media (max-width: 768px) {
   .server-status-indicator {
     top: 80px;

@@ -24,57 +24,76 @@ const PixelPaintbrushIcon = ({ size = 24, className }) => (
 
 const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     const canvasRef = useRef(null);
-    const previewCanvasRef = useRef(null); // For Magnifying Glass
+    const previewCanvasRef = useRef(null); 
     const [isDrawing, setIsDrawing] = useState(false);
     const [color, setColor] = useState('#000000');
     const [brushSize, setBrushSize] = useState(5);
-    const [tool, setTool] = useState('brush'); // brush, eraser, fill, shade, calligraphy, powder
+    const [tool, setTool] = useState('brush'); 
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [isPanMode, setIsPanMode] = useState(false);
     const lastTapRef = useRef({ time: 0, color: null });
-    const touchStateRef = useRef(null); // Separate ref for pinch-zoom state
+    const touchStateRef = useRef(null); 
 
-    // Performance & Preview State
     const [shadePopup, setShadePopup] = useState({ show: false, color: '', x: 0, y: 0 });
     const [cursorPos, setCursorPos] = useState({ x: 0, y: 0, show: false, canvasX: 0, canvasY: 0 });
     const longPressTimer = useRef(null);
 
-    // History State
     const [history, setHistory] = useState([]);
     const [historyIndex, setHistoryIndex] = useState(-1);
 
-    // Gallery State
     const [gallery, setGallery] = useState([]);
     const [equippedIndex, setEquippedIndex] = useState(0);
     const [isSaving, setIsSaving] = useState(false);
     const [paintingTitle, setPaintingTitle] = useState('');
     const [showSaveDialog, setShowSaveDialog] = useState(false);
-    const [saveSlot, setSaveSlot] = useState(0); // For selecting export slot
+    const [saveSlot, setSaveSlot] = useState(0); 
     const [pendingExportData, setPendingExportData] = useState(null);
     const [hasTouchedCanvas, setHasTouchedCanvas] = useState(false);
-    const [selectedSlotIndex, setSelectedSlotIndex] = useState(null); // For slot management overlay
+    const [selectedSlotIndex, setSelectedSlotIndex] = useState(null); 
 
-    // Auth & Mode State
-    const [mode, setMode] = useState('view'); // 'view', 'auth', 'edit'
+    const [mode, setMode] = useState('view'); 
     const [authInput, setAuthInput] = useState('');
     const [authError, setAuthError] = useState(false);
+
+    const drawStateRef = useRef({
+        isDrawing: false,
+        tool: 'brush',
+        color: '#000000',
+        brushSize: 5,
+        zoom: 1,
+        mode: 'view',
+        isPanMode: false,
+        lastPoint: { x: 0, y: 0 },
+        points: []
+    });
+
+    const lastPointRef = useRef(null);
+    const pointsRef = useRef([]);
+    const brushPreviewRef = useRef(null);
+    const canvasBoundsRef = useRef(null);
+    const magnifierTimerRef = useRef(null);
     const [showKeypad, setShowKeypad] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
 
-    // Exit Warning State
-    const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-    const [pendingExitAction, setPendingExitAction] = useState(null); // { type: 'close' | 'newSlot', index?: number }
+    useEffect(() => {
+        drawStateRef.current.tool = tool;
+        drawStateRef.current.color = color;
+        drawStateRef.current.brushSize = brushSize;
+        drawStateRef.current.zoom = zoom;
+        drawStateRef.current.mode = mode;
+        drawStateRef.current.isPanMode = isPanMode;
+    }, [tool, color, brushSize, zoom, mode, isPanMode]);
 
-    // 1. One-time Canvas & Gallery Initialization
+    const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+    const [pendingExitAction, setPendingExitAction] = useState(null); 
+
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
         const ctx = canvas.getContext('2d');
 
-        // FIXED RESOLUTION: Always 1024x1024 internal pixels
-        // This prevents "stretching" when loading on different devices
         const RESOLUTION = 1024;
         canvas.width = RESOLUTION;
         canvas.height = RESOLUTION;
@@ -85,7 +104,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         if (initialData) {
             const img = new Image();
             img.onload = () => {
-                // Draw image to fill the fixed resolution canvas
+                
                 ctx.drawImage(img, 0, 0, RESOLUTION, RESOLUTION);
                 const dataURL = canvas.toDataURL();
                 setHistory([dataURL]);
@@ -113,9 +132,60 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
             }
         };
         fetchGallery();
-    }, []); // Only on mount
+    }, []); 
 
-    // 2. Separate Keyboard Shortcuts Effect
+    useEffect(() => {
+        if (!canvasRef.current) return;
+
+        const handlePointerMove = (e) => {
+            const state = drawStateRef.current;
+            if (!state.isDrawing || state.isPanMode || state.mode !== 'edit') return;
+
+            if (e.getCoalescedEvents) {
+                const coalesced = e.getCoalescedEvents();
+                for (const cev of coalesced) {
+                    executeDraw(cev);
+                }
+            } else {
+                executeDraw(e);
+            }
+
+            const pos = getPos(e);
+            updateMagnifier(pos.x, pos.y);
+
+            if (brushPreviewRef.current) {
+                const offset = state.tool === 'powder' ? (state.brushSize * 2.0) : (state.brushSize / 2);
+                const tx = (pos.screenX / state.zoom) - offset;
+                const ty = (pos.screenY / state.zoom) - offset;
+                brushPreviewRef.current.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+                brushPreviewRef.current.style.opacity = '1';
+            }
+        };
+
+        const handlePointerUp = () => {
+            const state = drawStateRef.current;
+            if (state.isDrawing) {
+                const lastIdx = state.points.length - 1;
+                const pos = state.points[lastIdx];
+                if (pos) updateMagnifier(pos.x, pos.y);
+
+                state.isDrawing = false;
+                setIsDrawing(false); 
+                setCursorPos(prev => ({ ...prev, show: false }));
+                saveToHistory();
+            }
+            state.isPanMode = false;
+        };
+
+        window.addEventListener('pointermove', handlePointerMove, { passive: true });
+        window.addEventListener('pointerup', handlePointerUp);
+
+        return () => {
+            window.removeEventListener('pointermove', handlePointerMove);
+            window.removeEventListener('pointerup', handlePointerUp);
+        };
+    }, []); 
+
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (mode !== 'edit' || showSaveDialog || showKeypad) return;
@@ -142,12 +212,11 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [mode, showSaveDialog, showKeypad, equippedIndex, historyIndex, history.length]); // Re-bind only when necessary
+    }, [mode, showSaveDialog, showKeypad, equippedIndex, historyIndex]);
 
-    // 3. Resize Effect
     useEffect(() => {
         const handleResize = () => {
-            // Optional: Handle resize if needed, but avoid wiping canvas
+            
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -157,17 +226,13 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         const canvas = canvasRef.current;
         const dataURL = canvas.toDataURL();
 
-        // If we are in the middle of history, slice off the future
         const newHistory = history.slice(0, historyIndex + 1);
 
-        // Add new state
         newHistory.push(dataURL);
 
-        // Update state
         setHistory(newHistory);
         setHistoryIndex(newHistory.length - 1);
 
-        // Persist to storage
         onSave(dataURL);
     };
 
@@ -179,7 +244,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(img, 0, 0);
             const source = data || history[index];
-            onSave(source); // Sync with parent/storage
+            onSave(source); 
         };
         img.src = data || history[index];
         if (!data) setHistoryIndex(index);
@@ -206,8 +271,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
 
     const handleUnlock = (e) => {
         e.preventDefault();
-        // Check against user DOB
-        // Input should be YYYY-MM-DD
+
         if (authInput === user.dob) {
             setMode('edit');
             setAuthError(false);
@@ -221,23 +285,19 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     const handleZoom = (newZoom) => {
         const clampedZoom = Math.min(3, Math.max(1, newZoom));
 
-        // If zooming out to 1x (or below), reset pan
         if (clampedZoom <= 1) {
             setZoom(1);
             setPan({ x: 0, y: 0 });
             setIsPanMode(false);
         } else {
-            // If zooming, calculate new pan to maintain relative center
-            // This is especially for "centering down by down" when zooming out 2.5x -> 2.0x
+
             const currentZoom = zoom;
 
-            // Pan scaling ratio: proportional to zoom level above 1
             let ratio = 1;
             if (currentZoom > 1) {
                 ratio = (clampedZoom - 1) / (currentZoom - 1);
             }
 
-            // Safety check for ratio validity
             if (isFinite(ratio)) {
                 setPan(prev => ({
                     x: prev.x * ratio,
@@ -249,20 +309,18 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         }
     };
 
-    // --- Drawing Logic ---
     const getPos = (e) => {
         const canvas = canvasRef.current;
-        const rect = canvas.getBoundingClientRect();
+        if (!canvas) return { x: 0, y: 0, screenX: 0, screenY: 0 };
 
-        // Support mouse and touch
+        const rect = canvasBoundsRef.current || canvas.getBoundingClientRect();
+
         const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
         const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
 
-        // Position relative to the canvas element on screen
         const relativeX = clientX - rect.left;
         const relativeY = clientY - rect.top;
 
-        // Scale factor between internal coordinate system and onscreen display
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
 
@@ -275,7 +333,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     };
 
     const floodFill = (ctx, startX, startY, fillColor) => {
-        // ... (Keep existing floodFill logic) ...
+        
         const r = parseInt(fillColor.slice(1, 3), 16);
         const g = parseInt(fillColor.slice(3, 5), 16);
         const b = parseInt(fillColor.slice(5, 7), 16);
@@ -338,94 +396,100 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         if (mode !== 'edit' || isPanMode) return;
         setHasTouchedCanvas(true);
         const { x, y } = getPos(e);
+
+        drawStateRef.current.isDrawing = true;
+        drawStateRef.current.points = [{ x, y }];
+        drawStateRef.current.lastPoint = { x, y };
+
+        setIsDrawing(true); 
+        setCursorPos(prev => ({ ...prev, show: true }));
+
         const ctx = canvasRef.current.getContext('2d');
         ctx.beginPath();
         ctx.moveTo(x, y);
-        setIsDrawing(true);
+        updateMagnifier(x, y);
     };
 
-    const draw = (e) => {
-        if (!isDrawing || mode !== 'edit' || tool === 'fill') return;
-
-        const { x, y } = getPos(e);
+    const executeDraw = (e) => {
+        const state = drawStateRef.current;
+        const pos = getPos(e);
         const ctx = canvasRef.current.getContext('2d');
+
+        state.points.push(pos);
 
         ctx.save();
 
-        if (tool === 'eraser') {
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.strokeStyle = 'rgba(0,0,0,1)';
-            ctx.lineWidth = brushSize;
+        if (state.tool === 'eraser' || state.tool === 'brush' || state.tool === 'shade') {
+            if (state.tool === 'eraser') {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.strokeStyle = 'white';
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = state.color;
+                ctx.globalAlpha = state.tool === 'shade' ? 0.05 : 1.0;
+            }
+
+            ctx.lineWidth = state.brushSize;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            ctx.lineTo(x, y);
-            ctx.stroke();
-        } else if (tool === 'powder') {
-            ctx.fillStyle = color;
-            ctx.globalAlpha = 1.0;
 
-            // True sparse speckle logic (Star Dust / Sand effect)
-            const particleCount = Math.max(10, Math.floor(brushSize * 1.5));
-            const radius = brushSize * 3.0;
+            if (state.points.length > 2) {
+                const prev = state.points[state.points.length - 2];
+                const midX = (prev.x + pos.x) / 2;
+                const midY = (prev.y + pos.y) / 2;
+
+                ctx.beginPath();
+                ctx.moveTo(state.lastPoint.x, state.lastPoint.y);
+                ctx.quadraticCurveTo(prev.x, prev.y, midX, midY);
+                ctx.stroke();
+
+                state.lastPoint = { x: midX, y: midY };
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(state.lastPoint.x, state.lastPoint.y);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                state.lastPoint = pos;
+            }
+        } else if (state.tool === 'powder') {
+            ctx.fillStyle = state.color;
+            ctx.globalAlpha = 1.0;
+            const particleCount = Math.max(5, Math.floor(state.brushSize * 0.8));
+            const radius = state.brushSize * 3.0;
 
             for (let i = 0; i < particleCount; i++) {
                 const angle = Math.random() * Math.PI * 2;
                 const dist = Math.sqrt(Math.random()) * radius;
-                const offsetX = Math.cos(angle) * dist;
-                const offsetY = Math.sin(angle) * dist;
-                ctx.fillRect(Math.floor(x + offsetX), Math.floor(y + offsetY), 1, 1);
+                ctx.fillRect(Math.floor(pos.x + Math.cos(angle) * dist), Math.floor(pos.y + Math.sin(angle) * dist), 1, 1);
             }
-        } else if (tool === 'shade') {
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.strokeStyle = color;
-            ctx.globalAlpha = 0.05;
-            ctx.lineWidth = brushSize;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.lineTo(x, y);
-            ctx.stroke();
-        } else if (tool === 'calligraphy') {
-            ctx.fillStyle = color;
-            ctx.globalAlpha = 1.0;
-            const width = brushSize;
-            const height = brushSize * 2;
-            ctx.translate(x, y);
+        } else if (state.tool === 'calligraphy') {
+            ctx.fillStyle = state.color;
+            ctx.save();
+            ctx.translate(pos.x, pos.y);
             ctx.rotate(Math.PI / 4);
-            ctx.fillRect(-width / 2, -height / 2, width, height);
-        } else {
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.strokeStyle = color;
-            ctx.globalAlpha = 1.0;
-            ctx.lineWidth = brushSize;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.lineTo(x, y);
-            ctx.stroke();
+            ctx.fillRect(-state.brushSize / 2, -state.brushSize, state.brushSize, state.brushSize * 2);
+            ctx.restore();
         }
 
         ctx.restore();
-
-        // Update magnifying glass content
-        updateMagnifier(x, y);
     };
 
     const updateMagnifier = (x, y) => {
         if (!previewCanvasRef.current || !canvasRef.current) return;
         const prevCtx = previewCanvasRef.current.getContext('2d');
-        const mainCtx = canvasRef.current.getContext('2d');
 
-        const size = 60; // Size of source area
-        const destSize = 120; // Size of preview canvas
+        const size = 60;
+        const destSize = 120;
 
         prevCtx.fillStyle = '#FFFFFF';
         prevCtx.fillRect(0, 0, destSize, destSize);
+
         prevCtx.drawImage(
             canvasRef.current,
-            x - size / 2, y - size / 2, size, size,
+            Math.floor(x - size / 2), Math.floor(y - size / 2), size, size,
             0, 0, destSize, destSize
         );
 
-        // Crosshair in magnifier
         prevCtx.strokeStyle = 'rgba(0,0,0,0.5)';
         prevCtx.lineWidth = 1;
         prevCtx.beginPath();
@@ -461,7 +525,6 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Hard reset history for the new slot
         const dataURL = canvas.toDataURL();
         setHistory([dataURL]);
         setHistoryIndex(0);
@@ -483,7 +546,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     displayName: user.displayName,
                     drawingData: pendingExportData,
                     title: paintingTitle,
-                    index: saveSlot // Save to SELECTED slot
+                    index: saveSlot 
                 })
             });
             const result = await res.json();
@@ -492,8 +555,8 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                 setShowSaveDialog(false);
                 setPendingExportData(null);
                 setPaintingTitle('');
-                onSave(pendingExportData); // Update local map
-                setHasTouchedCanvas(false); // Reset unsaved state after successful save
+                onSave(pendingExportData); 
+                setHasTouchedCanvas(false); 
                 setSaveSuccess(true);
                 setTimeout(() => setSaveSuccess(false), 3000);
             } else {
@@ -516,7 +579,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
             const result = await res.json();
             if (result.success) {
                 setEquippedIndex(index);
-                onSave(gallery[index].drawingData); // Update map
+                onSave(gallery[index].drawingData); 
             }
         } catch (e) {
             console.error("Equip failed:", e);
@@ -550,15 +613,14 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         link.click();
     };
 
-    // Helper to generate shades
     const generateShades = (hex) => {
-        // Simple shade generator
+        
         const r = parseInt(hex.slice(1, 3), 16);
         const g = parseInt(hex.slice(3, 5), 16);
         const b = parseInt(hex.slice(5, 7), 16);
 
         const shades = [];
-        const factors = [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8]; // More granular shades
+        const factors = [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8]; 
 
         factors.forEach(f => {
             const nr = Math.max(0, Math.min(255, Math.floor(r * f))).toString(16).padStart(2, '0');
@@ -571,10 +633,10 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
 
     const handleColorClick = (c, e) => {
         const now = Date.now();
-        const DOUBLE_TAP_DELAY = 400; // Slightly increased for comfort
+        const DOUBLE_TAP_DELAY = 400; 
 
         if (lastTapRef.current.color === c && now - lastTapRef.current.time < DOUBLE_TAP_DELAY) {
-            // Success double tap on the same color
+            
             handleColorLongPress(c, e);
         } else {
             setColor(c);
@@ -621,7 +683,6 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         setPendingExitAction(null);
     };
 
-    // Render using Portal
     return createPortal(
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 pointer-events-auto">
             <motion.div
@@ -631,15 +692,18 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                 className="bg-[#FFE4C4] border-4 border-[#8B4513] p-2 md:p-4 shadow-[8px_8px_0_rgba(0,0,0,1)] max-w-5xl w-full max-h-[90vh] flex flex-col gap-2 md:gap-4 relative overflow-hidden"
                 style={{ fontFamily: "'Press Start 2P', monospace", imageRendering: 'pixelated' }}
             >
-                {/* Header - Ensure it's never clipped and very visible */}
+                {}
                 <div className="flex justify-between items-center border-b-4 border-[#8B4513] p-2 md:p-3 bg-[#8B4513]/10 shrink-0 z-50">
                     <div className="flex items-center gap-2 md:gap-4">
                         <div className="w-6 h-6 md:w-8 md:h-8 border-2 border-black shadow-[2px_2px_0_rgba(0,0,0,0.3)]" style={{ background: user.color }} />
                         <div className="flex flex-col">
-                            <h2 className="text-[#5D4037] text-[8px] md:text-sm">
+                            <h2 className="text-[#5D4037] text-[9px] md:text-sm max-w-[150px] md:max-w-[300px] truncate">
                                 {mode === 'edit' ? 'EDITING: ' : 'VIEWING: '}
-                                {user.displayName.toUpperCase()}
+                                {(gallery && gallery[equippedIndex]?.title) || 'UNTITLED'}
                             </h2>
+                            <span className="text-[7px] md:text-[8px] text-[#8B4513] opacity-60">
+                                OWNER: {user.displayName.toUpperCase()}
+                            </span>
                             {mode === 'view' && <span className="text-[7px] md:text-[10px] text-[#8B4513] opacity-70">LOCKED <Lock size={8} className="inline" /></span>}
                             {mode === 'edit' && <span className="text-[7px] md:text-[10px] text-green-700">UNLOCKED <Key size={8} className="inline" /></span>}
                         </div>
@@ -655,7 +719,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                         )}
                         <button
                             onClick={handleCloseRequest}
-                            className="bg-red-600 text-white px-4 py-2 md:px-6 md:py-3 border-4 border-white shadow-[6px_6px_0_#000] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none flex items-center justify-center font-black text-xs md:text-sm z-[1000]"
+                            className="bg-red-600 text-white px-4 py-2 md:px-6 md:py-3 border-4 border-white shadow-[6px_6px_0_#000] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none flex items-center justify-center font-black text-xs md:text-sm z-1000"
                             title="EXIT CANVAS"
                         >
                             <span className="mr-2 hidden md:inline">EXIT</span> <X size={24} strokeWidth={4} />
@@ -663,11 +727,43 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     </div>
                 </div>
 
-                {/* Main Content Area: Sidebar on Desktop */}
+                {}
+                <AnimatePresence>
+                    {mode === 'edit' && cursorPos.show && isDrawing && (
+                        <motion.div
+                            initial={{ x: -20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: -20, opacity: 0 }}
+                            className="fixed top-24 left-4 pointer-events-none border-4 border-[#8B4513] shadow-[8px_8px_0_rgba(0,0,0,0.4)] z-200 overflow-hidden bg-white"
+                            style={{
+                                width: '120px',
+                                height: '120px',
+                                borderRadius: '8px',
+                                border: '4px solid #8B4513',
+                                transform: 'translateZ(0)' 
+                            }}
+                        >
+                            <canvas
+                                ref={previewCanvasRef}
+                                width={120}
+                                height={120}
+                                style={{ imageRendering: 'pixelated', width: '112px', height: '112px' }}
+                            />
+                            <div className="absolute top-0 right-0 bg-[#8B4513] text-white text-[8px] px-1 py-0.5 font-bold">PREVIEW</div>
+                            {}
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div className="w-full h-px bg-[#8B4513]/30" />
+                                <div className="h-full w-px bg-[#8B4513]/30" />
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {}
                 <div className="flex flex-col md:flex-row gap-2 md:gap-3 flex-1 min-h-0 overflow-hidden">
-                    {/* Left/Center: Canvas + Toolbar */}
+                    {}
                     <div className="flex-1 flex flex-col gap-2 md:gap-4 min-w-0 overflow-hidden">
-                        {/* Canvas Container */}
+                        {}
                         <div className="relative p-1 md:p-3 bg-[#DEB887] border-4 border-[#5D4037] shadow-inner flex-1 overflow-auto flex flex-col items-center min-h-[200px] md:min-h-[300px]">
                             <div
                                 className="relative bg-white border-4 border-[#8B4513] overflow-hidden m-auto shadow-[4px_4px_0_rgba(0,0,0,0.3)]"
@@ -687,11 +783,9 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     className={`w-full h-full block image-pixelated ${mode === 'edit' ? (isPanMode ? 'cursor-grabbing' : 'cursor-crosshair') : 'cursor-default'}`}
                                     onContextMenu={(e) => e.preventDefault()}
                                     onMouseDown={(e) => {
-                                        // Disable pan if zoom is 1x
+                                        canvasBoundsRef.current = canvasRef.current.getBoundingClientRect();
                                         if (mode === 'edit' && (e.button === 2 || e.buttons === 2)) {
-                                            if (zoom > 1) {
-                                                setIsPanMode(true);
-                                            }
+                                            if (zoom > 1) setIsPanMode(true);
                                             return;
                                         }
                                         if (tool === 'fill') handleCanvasClick(e);
@@ -699,20 +793,21 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     }}
                                     onMouseMove={(e) => {
                                         if (isPanMode) {
-                                            // Extra safety check
                                             if (zoom <= 1) { setIsPanMode(false); return; }
                                             setPan(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }));
                                             return;
                                         }
-                                        const pos = getPos(e);
-                                        if (isDrawing) draw(e);
-                                        setCursorPos({
-                                            x: pos.screenX,
-                                            y: pos.screenY,
-                                            canvasX: pos.x,
-                                            canvasY: pos.y,
-                                            show: true
-                                        });
+
+                                        if (!isDrawing) {
+                                            const pos = getPos(e);
+                                            if (brushPreviewRef.current) {
+                                                const offset = tool === 'powder' ? (brushSize * 2.0) : (brushSize / 2);
+                                                const tx = (pos.screenX / zoom) - offset;
+                                                const ty = (pos.screenY / zoom) - offset;
+                                                brushPreviewRef.current.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+                                                brushPreviewRef.current.style.opacity = '1';
+                                            }
+                                        }
                                     }}
                                     onMouseUp={() => {
                                         stopDrawing();
@@ -721,11 +816,11 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     onMouseLeave={() => {
                                         stopDrawing();
                                         setIsPanMode(false);
-                                        setCursorPos(prev => ({ ...prev, show: false }));
+                                        if (brushPreviewRef.current) brushPreviewRef.current.style.opacity = '0';
                                     }}
                                     onTouchStart={(e) => {
                                         if (e.touches.length === 2) {
-                                            // Pinch Zoom Start
+                                            
                                             const dist = Math.hypot(
                                                 e.touches[0].clientX - e.touches[1].clientX,
                                                 e.touches[0].clientY - e.touches[1].clientY
@@ -797,7 +892,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     }}
                                 />
 
-                                {/* CLICK TO PAINT OVERLAY */}
+                                {}
                                 {!initialData && !hasTouchedCanvas && (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-40">
                                         <PixelPaintbrushIcon size={40} className="text-[#8B4513] mb-4" />
@@ -807,57 +902,39 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     </div>
                                 )}
 
-                                {/* Magnifying Glass Preview */}
-                                {mode === 'edit' && cursorPos.show && isDrawing && (
-                                    <div
-                                        className="absolute top-4 left-4 pointer-events-none border-4 border-[#8B4513] shadow-[4px_4px_0_rgba(0,0,0,0.5)] z-100 overflow-hidden bg-white"
-                                        style={{
-                                            width: '120px',
-                                            height: '120px',
-                                            borderRadius: '8px',
-                                            border: '4px solid #8B4513'
-                                        }}
-                                    >
-                                        <canvas
-                                            ref={previewCanvasRef}
-                                            width={120}
-                                            height={120}
-                                            style={{ imageRendering: 'pixelated' }}
-                                        />
-                                        <div className="absolute top-0 left-0 bg-[#8B4513] text-white text-[6px] px-1 py-0.5">PREVIEW</div>
-                                    </div>
-                                )}
+                                {}
 
-                                {/* Brush Preview */}
-                                {mode === 'edit' && tool !== 'fill' && cursorPos.show && (
+                                {}
+                                {mode === 'edit' && tool !== 'fill' && (
                                     <div
-                                        className={`pointer-events-none absolute mix-blend-difference z-10 ${tool === 'powder' ? 'border-2 border-dotted border-white/70' : 'border-2 border-white/50 rounded-full'}`}
+                                        ref={brushPreviewRef}
+                                        className={`pointer-events-none absolute mix-blend-difference z-10 transition-opacity duration-150 top-0 left-0 ${tool === 'powder' ? 'border-2 border-dotted border-white/70' : 'border-2 border-white/50 rounded-full'}`}
                                         style={{
                                             width: tool === 'powder' ? (brushSize * 4.0) : brushSize,
                                             height: tool === 'powder' ? (brushSize * 4.0) : brushSize,
-                                            left: (cursorPos.x / zoom) - (tool === 'powder' ? (brushSize * 2.0) : (brushSize / 2)),
-                                            top: (cursorPos.y / zoom) - (tool === 'powder' ? (brushSize * 2.0) : (brushSize / 2)),
                                             borderRadius: '50%',
-                                            boxShadow: '0 0 0 1px black'
+                                            boxShadow: '0 0 0 1px black',
+                                            opacity: 0,
+                                            willChange: 'transform'
                                         }}
                                     />
                                 )}
 
-                                {/* Save Success Toast */}
+                                {}
                                 <AnimatePresence>
                                     {saveSuccess && (
                                         <motion.div
                                             initial={{ y: -50, opacity: 0 }}
                                             animate={{ y: 20, opacity: 1 }}
                                             exit={{ y: -50, opacity: 0 }}
-                                            className="absolute top-0 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-2 border-4 border-white shadow-lg z-[200] font-bold text-[10px]"
+                                            className="absolute top-0 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-2 border-4 border-white shadow-lg z-200 font-bold text-[10px]"
                                         >
                                             SAVED TO GALLERY!
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
 
-                                {/* Auth Overlay */}
+                                {}
                                 {mode === 'auth' && (
                                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20 backdrop-blur-sm">
                                         <motion.div
@@ -909,10 +986,10 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                             </div>
                         </div>
 
-                        {/* Toolbar */}
+                        {}
                         {mode === 'edit' && (
                             <div className="flex flex-col gap-2 bg-[#DEB887] p-2 md:p-3 border-2 border-[#8B4513] shadow-[4px_4px_0_rgba(0,0,0,0.2)] shrink-0">
-                                {/* Row 1: Colors Palette */}
+                                {}
                                 <div className="flex items-center gap-2 bg-[#F5DEB3] p-1 border border-[#8B4513] overflow-x-auto custom-scrollbar-h shrink-0 shadow-inner">
                                     <div className="shrink-0 flex items-center pr-2 border-r border-[#8B4513]/30">
                                         <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-black shadow-sm" style={{ backgroundColor: color }} />
@@ -929,42 +1006,41 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     </div>
                                 </div>
 
-                                {/* Row 2: Drawing Tools */}
+                                {}
                                 <div className="flex items-center gap-1 overflow-x-auto pb-1 custom-scrollbar-h shrink-0 py-1 border-b border-[#8B4513]/20">
                                     <div className="flex items-center gap-2 flex-wrap md:flex-nowrap px-1">
-                                        <button onClick={() => setTool('brush')} title="Brush (B)" className={`p-2 border-2 transition-all flex items-center gap-1.5 min-w-[50px] justify-center ${tool === 'brush' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
-                                            <PixelPaintbrushIcon size={14} />
-                                            <span className="text-[6px] font-bold">BRUSH</span>
+                                        <button onClick={() => setTool('brush')} title="Brush (B)" className={`p-2 border-2 transition-all flex items-center gap-1.5 min-w-[60px] md:min-w-[80px] justify-center ${tool === 'brush' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
+                                            <PixelPaintbrushIcon size={16} />
+                                            <span className="text-[8px] md:text-[10px] font-bold">BRUSH</span>
                                         </button>
-                                        <button onClick={() => setTool('powder')} title="Powder (P)" className={`p-2 border-2 transition-all flex items-center gap-1.5 min-w-[50px] justify-center ${tool === 'powder' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
-                                            <div className="flex flex-col items-center gap-0.5">
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2" /><circle cx="8" cy="8" r="1" /><circle cx="16" cy="16" r="1" /><circle cx="16" cy="8" r="1" /><circle cx="8" cy="16" r="1" /></svg>
-                                                <span className="text-[5px] font-bold">POWDER</span>
+                                        <button onClick={() => setTool('powder')} title="Powder (P)" className={`p-2 border-2 transition-all flex items-center gap-1.5 min-w-[60px] md:min-w-[80px] justify-center ${tool === 'powder' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
+                                            <div className="flex items-center gap-1.5">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2" /><circle cx="8" cy="8" r="1" /><circle cx="16" cy="16" r="1" /><circle cx="16" cy="8" r="1" /><circle cx="8" cy="16" r="1" /></svg>
+                                                <span className="text-[8px] md:text-[10px] font-bold">POWDER</span>
                                             </div>
                                         </button>
-                                        <button onClick={() => setTool('calligraphy')} title="Calligraphy (C)" className={`p-2 border-2 transition-all flex flex-col items-center gap-0.5 min-w-[50px] justify-center ${tool === 'calligraphy' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="4" transform="rotate(45 12 12)" /></svg>
-                                            <span className="text-[4px] font-bold">PEN</span>
+                                        <button onClick={() => setTool('calligraphy')} title="Calligraphy (C)" className={`p-2 border-2 transition-all flex items-center gap-1.5 min-w-[60px] md:min-w-[80px] justify-center ${tool === 'calligraphy' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="4" transform="rotate(45 12 12)" /></svg>
+                                            <span className="text-[8px] md:text-[10px] font-bold">PEN</span>
                                         </button>
-                                        <button onClick={() => setTool('shade')} title="Soft Shade (S)" className={`p-2 border-2 transition-all flex flex-col items-center gap-0.5 min-w-[50px] justify-center ${tool === 'shade' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 22h20L12 2z" /><path d="M12 6l-6 16" /><path d="M12 6l6 16" /></svg>
-                                            <span className="text-[4px] font-bold">SHADE</span>
+                                        <button onClick={() => setTool('shade')} title="Soft Shade (S)" className={`p-2 border-2 transition-all flex items-center gap-1.5 min-w-[60px] md:min-w-[80px] justify-center ${tool === 'shade' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 22h20L12 2z" /><path d="M12 6l-6 16" /><path d="M12 6l6 16" /></svg>
+                                            <span className="text-[8px] md:text-[10px] font-bold">SHADE</span>
                                         </button>
-                                        <button onClick={() => setTool('fill')} title="Fill Bucket (F)" className={`p-2 border-2 transition-all flex flex-col items-center gap-0.5 min-w-[50px] justify-center ${tool === 'fill' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 11l-8-8-9 9 8 8 5-5 9-9z" /><path d="M22 22l-5-5" /></svg>
-                                            <span className="text-[4px] font-bold">FILL</span>
+                                        <button onClick={() => setTool('fill')} title="Fill Bucket (F)" className={`p-2 border-2 transition-all flex items-center gap-1.5 min-w-[60px] md:min-w-[80px] justify-center ${tool === 'fill' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 11l-8-8-9 9 8 8 5-5 9-9z" /><path d="M22 22l-5-5" /></svg>
+                                            <span className="text-[8px] md:text-[10px] font-bold">FILL</span>
                                         </button>
-                                        <button onClick={() => setTool('eraser')} title="Eraser (E)" className={`p-2 border-2 transition-all flex flex-col items-center gap-0.5 min-w-[50px] justify-center ${tool === 'eraser' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
-                                            <Eraser size={14} />
-                                            <span className="text-[4px] font-bold">ERASE</span>
+                                        <button onClick={() => setTool('eraser')} title="Eraser (E)" className={`p-2 border-2 transition-all flex items-center gap-1.5 min-w-[60px] md:min-w-[80px] justify-center ${tool === 'eraser' ? 'bg-[#8B4513] text-white border-black scale-105 shadow-[2px_2px_0_#000]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
+                                            <Eraser size={16} />
+                                            <span className="text-[8px] md:text-[10px] font-bold">ERASE</span>
                                         </button>
                                     </div>
                                 </div>
 
-
-                                {/* Row 2: Slider, History, and Actions */}
+                                {}
                                 <div className="flex flex-wrap items-center gap-2 md:gap-4 overflow-x-auto py-1">
-                                    {/* Brush Size Slider */}
+                                    {}
                                     <div className="flex items-center gap-2 px-2 border-r border-[#8B4513]/30 min-w-0">
                                         <span className="text-[7px] text-[#5D4037] whitespace-nowrap">SIZE</span>
                                         <input
@@ -978,13 +1054,13 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                         <span className="text-[8px] text-[#5D4037] min-w-[15px]">{brushSize}</span>
                                     </div>
 
-                                    {/* History */}
+                                    {}
                                     <div className="flex gap-1 px-2 border-r border-[#8B4513]/30">
                                         <button onClick={handleUndo} disabled={historyIndex <= 0} className="p-1.5 border-2 bg-[#F5DEB3] border-[#8B4513] text-[#5D4037] disabled:opacity-50 hover:bg-[#DEB887] active:scale-95"><Undo size={14} /></button>
                                         <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className="p-1.5 border-2 bg-[#F5DEB3] border-[#8B4513] text-[#5D4037] disabled:opacity-50 hover:bg-[#DEB887] active:scale-95"><Redo size={14} /></button>
                                     </div>
 
-                                    {/* Export/Clear */}
+                                    {}
                                     <div className="flex gap-1 ml-auto">
                                         <button
                                             onClick={() => {
@@ -1008,7 +1084,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                         )}
                     </div>
 
-                    {/* Right: Sidebar Gallery (Desktop) / Bottom Gallery (Mobile) */}
+                    {}
                     {mode === 'edit' && (
                         <div className="w-full md:w-64 bg-[#DEB887] p-1 md:p-3 border-t-4 md:border-l-4 border-[#8B4513] shadow-inner flex flex-col min-h-0 overflow-hidden shrink-0">
                             <h3 className="text-[#5D4037] text-[8px] md:text-[10px] mb-1 md:mb-2 flex items-center gap-2 font-bold bg-[#F5DEB3] p-1 md:p-2 border-2 border-[#8B4513] shrink-0">
@@ -1036,7 +1112,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                                     <div className="flex-1 w-full relative min-h-0 p-1">
                                                         <img src={p.drawingData} className="w-full h-full object-contain image-pixelated" alt={p.title} />
 
-                                                        {/* Simple Checkmark corner when equipped */}
+                                                        {}
                                                         {isSelected && (
                                                             <div className="absolute top-0 right-0 bg-green-600 text-white p-0.5 border-l border-b border-white shadow-sm z-10">
                                                                 <Check size={8} />
@@ -1044,7 +1120,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                                         )}
                                                     </div>
 
-                                                    {/* Title Tag at bottom */}
+                                                    {}
                                                     <div className="bg-black/70 text-white text-[5px] text-center p-0.5 truncate pointer-events-none font-bold">
                                                         {p.title}
                                                     </div>
@@ -1067,7 +1143,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     )}
                 </div>
 
-                {/* Save Dialog */}
+                {}
                 <AnimatePresence>
                     {showSaveDialog && (
                         <div className="fixed inset-0 z-100000 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -1078,7 +1154,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                             >
                                 <h3 className="text-[#5D4037] text-xs mb-4 text-center">SAVE TO SLOT {saveSlot + 1}</h3>
 
-                                {/* Slot Selector */}
+                                {}
                                 <div className="flex gap-1 justify-center mb-4">
                                     {[...Array(8)].map((_, i) => (
                                         <button
@@ -1094,7 +1170,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     ))}
                                 </div>
 
-                                {/* Preview of what's being saved */}
+                                {}
                                 {pendingExportData && (
                                     <div className="w-full aspect-square border-4 border-[#8B4513] mb-4 bg-white image-pixelated">
                                         <img src={pendingExportData} className="w-full h-full object-contain p-2" alt="Preview" />
@@ -1136,7 +1212,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     )}
                 </AnimatePresence>
 
-                {/* Slot Management Overlay */}
+                {}
                 <AnimatePresence>
                     {selectedSlotIndex !== null && gallery[selectedSlotIndex] && (
                         <div className="fixed inset-0 z-100000 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -1193,10 +1269,10 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     )}
                 </AnimatePresence>
 
-                {/* Color Shade Menu Overlay - MOVED OUTSIDE SCROLLABLE AREA TO PREVENT CLIPPING */}
+                {}
                 <AnimatePresence>
                     {shadePopup.show && (
-                        <div className="fixed inset-0 z-[1000000] pointer-events-auto">
+                        <div className="fixed inset-0 z-1000000 pointer-events-auto">
                             <div className="absolute inset-0" onClick={() => setShadePopup({ ...shadePopup, show: false })} />
                             <motion.div
                                 initial={{ opacity: 0, y: 10, scale: 0.8 }}
@@ -1223,10 +1299,10 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     )}
                 </AnimatePresence>
 
-                {/* Unsaved Changes Warning Overlay */}
+                {}
                 <AnimatePresence>
                     {showUnsavedWarning && (
-                        <div className="fixed inset-0 z-[2000000] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+                        <div className="fixed inset-0 z-2000000 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
                             <motion.div
                                 initial={{ scale: 0.9, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
@@ -1270,8 +1346,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     )}
                 </AnimatePresence>
 
-
-                {/* View Mode Lock Button - Placed in footer area */}
+                {}
                 {mode === 'view' && (
                     <div className="flex justify-center p-2">
                         <button
@@ -1301,12 +1376,24 @@ const GalleryItem = ({ user, userKey, drawingData, onClick }) => {
             }}
             style={{ pointerEvents: 'auto' }}
         >
-            {/* Easel/Canvas Container - FLEX COLUMN */}
+            {}
+            <div
+                className="mb-3 px-3 py-1.5 bg-[#8B4513] border-4 border-[#3E2723] shadow-[4px_4px_0_rgba(0,0,0,0.4)] transform rotate-1 group-hover:rotate-0 transition-all origin-center z-30 pointer-events-auto"
+                style={{ imageRendering: 'pixelated' }}
+            >
+                <span className="text-white text-[8px] md:text-[10px] font-bold font-['Press_Start_2P'] drop-shadow-md whitespace-nowrap">
+                    {user.displayName.toUpperCase()}
+                </span>
+                {}
+                <div className="absolute top-[-8px] left-1/4 w-1 h-2 bg-[#5D4037]" />
+                <div className="absolute top-[-8px] right-1/4 w-1 h-2 bg-[#5D4037]" />
+            </div>
+
+            {}
             <div className="relative flex flex-col items-center">
-                {/* Main Canvas Frame */}
-                {/* Canvas is on top of legs */}
-                <div className="relative z-10 bg-[#DEB887] p-2 border-l-4 border-t-4 border-r-4 border-b-8 border-[#5D4037] shadow-[4px_4px_0_rgba(0,0,0,0.2)] w-24 h-24 md:w-32 md:h-32">
-                    {/* Canvas Surface */}
+                {}
+                <div className="relative z-10 bg-[#DEB887] p-2 border-l-4 border-t-4 border-r-4 border-b-8 border-[#5D4037] shadow-[6px_6px_0_rgba(0,0,0,0.2)] w-24 h-24 md:w-32 md:h-32">
+                    {}
                     <div className="w-full h-full bg-white border-2 border-[#8B4513] relative overflow-hidden flex items-center justify-center image-pixelated">
                         {drawingData ? (
                             <img src={drawingData} alt="User drawing" className="w-full h-full object-contain image-pixelated" />
@@ -1319,7 +1406,7 @@ const GalleryItem = ({ user, userKey, drawingData, onClick }) => {
                             </div>
                         )}
 
-                        {/* HOVER OVERLAY ON PAINTING SURFACE */}
+                        {}
                         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center gap-1 md:gap-2 pointer-events-none p-1">
                             <button
                                 onClick={(e) => { e.stopPropagation(); onClick(userKey); }}
@@ -1327,39 +1414,27 @@ const GalleryItem = ({ user, userKey, drawingData, onClick }) => {
                             >
                                 OPEN
                             </button>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); /* Delete if needed */ }}
-                                className="w-full max-w-[80px] py-1 bg-red-500 text-white text-[7px] md:text-[8px] border-2 border-white font-bold shadow-[2px_2px_0_rgba(0,0,0,0.3)] active:translate-y-0.5 pointer-events-auto"
-                            >
-                                DEL
-                            </button>
                         </div>
                     </div>
                 </div>
 
-                {/* Pixel Art Legs - Rendered as a block element below canvas */}
-                <div className="w-full h-[60px] -mt-2 z-0 flex flex-col items-center pointer-events-none relative">
-                    <svg width="100%" height="40px" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-                        {/* Left Leg */}
-                        <path d="M15 0 H25 V10 H24 V20 H23 V30 H22 V40 H15 V40 V30 H16 V20 H17 V10 H18 V0 Z" fill="#5D4037" />
-                        {/* Right Leg */}
-                        <path d="M85 0 H75 V10 H76 V20 H77 V30 H78 V40 H85 V40 V30 H84 V20 H83 V30 H82 V20 H81 V10 H80 V0 Z" fill="#5D4037" />
-                        {/* Horizontal Crossbar */}
-                        <rect x="20" y="5" width="60" height="5" fill="#5D4037" />
+                {}
+                <div className="w-full h-[80px] -mt-2 z-0 flex flex-col items-center pointer-events-none relative">
+                    <svg width="100%" height="80px" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                        {}
+                        <ellipse cx="50" cy="75" rx="40" ry="5" fill="rgba(0,0,0,0.2)" />
+                        {}
+                        <path d="M15 0 H25 V20 H24 V40 H23 V60 H22 V80 H15 V80 V60 H16 V40 H17 V20 H18 V0 Z" fill="#5D4037" />
+                        {}
+                        <path d="M85 0 H75 V20 H76 V40 H77 V60 H78 V80 H85 V80 V60 H84 V40 H83 V60 H82 V40 H81 V20 H80 V0 Z" fill="#5D4037" />
+                        {}
+                        <rect x="20" y="5" width="60" height="8" fill="#5D4037" />
+                        {}
+                        <path d="M48 0 H52 V70 H48 Z" fill="#3D2723" opacity="0.6" />
                     </svg>
 
-                    {/* Name Placard - ATTACHED TO CROSSBAR AREA */}
-                    <div
-                        className="absolute top-2 px-2 py-1 bg-[#8B4513] border-2 border-[#3E2723] shadow-[2px_2px_0_rgba(0,0,0,0.3)] transform -rotate-1 group-hover:rotate-0 transition-transform origin-center z-20 pointer-events-auto"
-                        style={{ imageRendering: 'pixelated' }}
-                    >
-                        <span className="text-white text-[7px] md:text-[9px] font-bold font-['Press_Start_2P'] drop-shadow-md whitespace-nowrap">
-                            {user.displayName.toUpperCase()}
-                        </span>
-                    </div>
-
-                    {/* Ground Shadow */}
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-3 bg-black/30 rounded-[100%] blur-sm -z-10" />
+                    {}
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-4 bg-black/40 rounded-[100%] blur-md -z-10" />
                 </div>
             </div>
         </motion.div>
@@ -1370,8 +1445,6 @@ const UserGallery = ({ users }) => {
     const [selectedUserKey, setSelectedUserKey] = useState(null);
     const [drawings, setDrawings] = useState({});
 
-    // Load drawings from local storage on mount
-    // Load drawings from API on mount
     useEffect(() => {
         const fetchDrawings = async () => {
             try {
@@ -1382,7 +1455,7 @@ const UserGallery = ({ users }) => {
                 }
             } catch (e) {
                 console.error("Failed to load drawings from API:", e);
-                // Fallback to local storage if API fails (optional, but good for offline dev)
+                
                 const saved = localStorage.getItem('pixel_birthday_drawings');
                 if (saved) {
                     setDrawings(JSON.parse(saved));
@@ -1394,14 +1467,12 @@ const UserGallery = ({ users }) => {
     }, []);
 
     const handleSaveDrawing = async (key, dataURL) => {
-        // Optimistic UI update
+        
         const newDrawings = { ...drawings, [key]: dataURL };
         setDrawings(newDrawings);
 
-        // Save to local storage as backup
         localStorage.setItem('pixel_birthday_drawings', JSON.stringify(newDrawings));
 
-        // Save to API
         try {
             await fetch('/api/paintings', {
                 method: 'POST',
@@ -1421,16 +1492,16 @@ const UserGallery = ({ users }) => {
 
     return (
         <div className="absolute bottom-20 left-0 w-full flex flex-col justify-end z-20 pointer-events-none">
-            {/* Title - Floating in sky */}
+            {}
             <h2 className="absolute top-[-40vh] left-0 w-full text-center text-xl md:text-2xl text-[#5D4037] font-['Press_Start_2P'] drop-shadow-[2px_2px_0_#FFF] pointer-events-auto">
                 COMMUNITY GALLERY
             </h2>
 
-            {/* Horizontal Scroll Container for Canvases placed on ground */}
-            {/* pb-14 ensures legs are correctly 'planted' near grass top while maintaining space for names */}
+            {}
+            {}
             <div className="flex flex-row items-end overflow-x-auto md:overflow-x-visible w-full pointer-events-auto no-scrollbar snap-x snap-mandatory md:snap-none scroll-smooth pb-14 md:justify-center" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 <div className="flex flex-row items-end gap-8 md:gap-16 px-4 md:px-0 md:justify-center w-full md:w-auto">
-                    {/* Start Spacer for centering first item - Mobile Only */}
+                    {}
                     <div className="w-[35vw] md:hidden shrink-0" />
 
                     {Object.entries(users).map(([key, user]) => (
@@ -1449,7 +1520,7 @@ const UserGallery = ({ users }) => {
                         </motion.div>
                     ))}
 
-                    {/* End Spacer for centering last item - Mobile Only */}
+                    {}
                     <div className="w-[35vw] md:hidden shrink-0" />
                 </div>
             </div>

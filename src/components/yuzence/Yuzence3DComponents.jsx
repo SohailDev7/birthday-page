@@ -3,11 +3,9 @@ import { useFrame } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
-// A "Nebula" particle system that reacts to mouse
 export const Nebula = ({ count = 2000, mouse }) => {
     const mesh = useRef();
 
-    // Create randomized position data for particles
     const particles = useMemo(() => {
         const temp = [];
         for (let i = 0; i < count; i++) {
@@ -22,7 +20,6 @@ export const Nebula = ({ count = 2000, mouse }) => {
         return temp;
     }, [count]);
 
-    // Use a dummy object for matrix calculations (avoids creating new objects per frame)
     const dummy = useMemo(() => new THREE.Object3D(), []);
 
     useFrame((state) => {
@@ -33,7 +30,6 @@ export const Nebula = ({ count = 2000, mouse }) => {
             const b = Math.sin(t) + Math.cos(t * 2) / 10;
             const s = Math.cos(t);
 
-            // Mouse influence
             particle.mx += (mouse.current[0] * 100 - particle.mx) * 0.02;
             particle.my += (-mouse.current[1] * 100 - particle.my) * 0.02;
 
@@ -66,7 +62,6 @@ export const Nebula = ({ count = 2000, mouse }) => {
     );
 };
 
-// "The Core" - A distorted glass object
 export const TheCore = ({ position = [0, 0, 0] }) => {
     const mesh = useRef();
 
@@ -74,7 +69,6 @@ export const TheCore = ({ position = [0, 0, 0] }) => {
         mesh.current.rotation.x += delta * 0.2;
         mesh.current.rotation.y += delta * 0.3;
 
-        // Pulse scale
         const scale = 1 + Math.sin(state.clock.elapsedTime) * 0.1;
         mesh.current.scale.set(scale, scale, scale);
     });

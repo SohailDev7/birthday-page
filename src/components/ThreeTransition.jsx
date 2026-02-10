@@ -3,22 +3,19 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 
-// Animated 3D Plane with shader
 const TransitionPlane = ({ isTransitioning }) => {
     const meshRef = useRef();
     const materialRef = useRef();
 
     useFrame((state) => {
         if (meshRef.current && materialRef.current) {
-            // Rotate and animate the plane
+            
             meshRef.current.rotation.y = state.clock.elapsedTime * 2;
             meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime) * 0.5;
 
-            // Pulse scale
             const scale = 1 + Math.sin(state.clock.elapsedTime * 3) * 0.2;
             meshRef.current.scale.set(scale, scale, scale);
 
-            // Animate opacity
             if (isTransitioning) {
                 materialRef.current.opacity = Math.min(1, materialRef.current.opacity + 0.05);
             } else {
@@ -42,7 +39,6 @@ const TransitionPlane = ({ isTransitioning }) => {
     );
 };
 
-// Particle system
 const Particles = () => {
     const particlesRef = useRef();
     const particleCount = 100;
@@ -89,7 +85,6 @@ const Particles = () => {
     );
 };
 
-// Main Three.js Transition Component
 const ThreeTransition = ({ isTransitioning }) => {
     return (
         <AnimatePresence>

@@ -1,5 +1,5 @@
-/* components/NowPlayingOverlay.css */
-/* Main Player - Bottom Left */
+
+
 .now-playing-player {
   position: fixed;
   bottom: 20px;
@@ -17,7 +17,6 @@
   transform-origin: bottom left;
 }
 
-/* Soft Theme Player */
 body[data-theme="soft"] .now-playing-player {
   background: linear-gradient(135deg, 
     rgba(255, 255, 255, 0.95) 0%,
@@ -26,7 +25,6 @@ body[data-theme="soft"] .now-playing-player {
   border: 2px solid rgba(236, 72, 153, 0.2);
 }
 
-/* Luxury Theme Player */
 body[data-theme="luxury"] .now-playing-player {
   background: linear-gradient(135deg, 
     rgba(255, 255, 255, 0.15) 0%,
@@ -35,7 +33,6 @@ body[data-theme="luxury"] .now-playing-player {
   border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Current Song Info in Player */
 .player-current-info {
   display: flex;
   align-items: center;
@@ -95,7 +92,6 @@ body[data-theme="luxury"] .player-song-artist {
   color: var(--luxury-text);
 }
 
-/* Main Controls */
 .player-controls-main {
   display: flex;
   justify-content: center;
@@ -169,7 +165,6 @@ body[data-theme="luxury"] .play-pause-btn-main:hover:not(:disabled) {
   box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
 }
 
-/* Progress Bar */
 .player-progress-section {
   margin-bottom: 12px;
 }
@@ -242,7 +237,6 @@ body[data-theme="luxury"] .player-progress-fill {
   opacity: 1;
 }
 
-/* Player Header */
 .player-header {
   display: flex;
   justify-content: space-between;
@@ -313,7 +307,6 @@ body[data-theme="luxury"] .header-action-btn:hover {
   transform: scale(1.1);
 }
 
-/* Music Launcher Button (Closed State) */
 .music-launcher-btn {
   position: fixed;
   bottom: 20px;
@@ -363,7 +356,6 @@ body[data-theme="luxury"] .music-launcher-btn {
   border: 2px solid white;
 }
 
-/* Compact Player */
 .now-playing-compact {
   position: fixed;
   bottom: 20px;
@@ -399,7 +391,6 @@ body[data-theme="luxury"] .now-playing-compact {
   border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Compact Song Info */
 .compact-song-info {
   display: flex;
   align-items: center;
@@ -579,7 +570,6 @@ body[data-theme="luxury"] .action-btn-compact:hover {
   transform: scale(1.1);
 }
 
-/* Library Sidebar */
 .library-backdrop {
   position: fixed;
   top: 0;
@@ -605,7 +595,6 @@ body[data-theme="luxury"] .action-btn-compact:hover {
   box-shadow: -4px 0 25px rgba(0, 0, 0, 0.3);
 }
 
-/* Soft Theme Sidebar */
 body[data-theme="soft"] .library-sidebar {
   background: linear-gradient(135deg,
     rgba(255, 255, 255, 0.98) 0%,
@@ -614,7 +603,6 @@ body[data-theme="soft"] .library-sidebar {
   border-left: 2px solid rgba(236, 72, 153, 0.2);
 }
 
-/* Luxury Theme Sidebar */
 body[data-theme="luxury"] .library-sidebar {
   background: linear-gradient(135deg,
     rgba(255, 255, 255, 0.2) 0%,
@@ -705,7 +693,6 @@ body[data-theme="luxury"] .library-info {
   color: var(--luxury-text);
 }
 
-/* Song List in Library */
 .song-list-main {
   display: flex;
   flex-direction: column;
@@ -820,7 +807,6 @@ body[data-theme="luxury"] .song-item-duration-main {
   color: var(--luxury-text);
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
   .music-launcher-btn,
   .now-playing-compact,
@@ -902,7 +888,6 @@ body[data-theme="luxury"] .song-item-duration-main {
   }
 }
 
-/* Ensure audio files are properly loaded */
 audio {
   display: none;
 }

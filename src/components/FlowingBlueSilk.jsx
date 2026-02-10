@@ -3,7 +3,6 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useLocation } from 'react-router-dom';
 
-// Simple noise function
 const vertexShader = `
 uniform float uTime;
 varying vec2 vUv;
@@ -40,17 +39,14 @@ export const FlowingBlueSilk = () => {
     const mesh = useRef();
     const location = useLocation();
 
-    // Color Targets based on route
     const palettes = useMemo(() => ({
-        '/': { A: '#E0F2FE', B: '#3B82F6' },       // Light Blue -> Blue
-        '/work': { A: '#EEF2FF', B: '#6366F1' },   // Indigo -> Purple-ish
-        '/about': { A: '#F8FAFC', B: '#94A3B8' },  // Slate -> Gray
+        '/': { A: '#E0F2FE', B: '#3B82F6' },       
+        '/work': { A: '#EEF2FF', B: '#6366F1' },   
+        '/about': { A: '#F8FAFC', B: '#94A3B8' },  
     }), []);
 
-    // Current target
     const activePalette = palettes[location.pathname] || palettes['/'];
 
-    // Store current values for lerping
     const uniforms = useMemo(() => ({
         uTime: { value: 0 },
         uColorA: { value: new THREE.Color(activePalette.A) },
@@ -62,7 +58,6 @@ export const FlowingBlueSilk = () => {
         if (mesh.current) {
             mesh.current.material.uniforms.uTime.value = clock.getElapsedTime();
 
-            // Smoothly transition colors
             mesh.current.material.uniforms.uColorA.value.lerp(new THREE.Color(activePalette.A), 0.05);
             mesh.current.material.uniforms.uColorB.value.lerp(new THREE.Color(activePalette.B), 0.05);
         }

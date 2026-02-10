@@ -1,4 +1,4 @@
-// pages/Review.jsx
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Container, Row, Col, Card, Form, Button, Modal, Tab, Tabs, Spinner } from 'react-bootstrap';
@@ -64,11 +64,10 @@ const Prachi_Reviews = () => {
   const [showFullReview, setShowFullReview] = useState(null);
   const [serverLoading, setServerLoading] = useState(true);
   const [showServerWakeModal, setShowServerWakeModal] = useState(false);
-  const [serverStatus, setServerStatus] = useState('checking'); // 'checking', 'sleeping', 'active'
+  const [serverStatus, setServerStatus] = useState('checking'); 
   const [deletingReviewId, setDeletingReviewId] = useState(null);
   const [wakingServer, setWakingServer] = useState(false);
 
-  // Server configuration
   const API_BASE_URL = 'https://express-umdy.onrender.com/api';
   const SERVER_URL = 'https://express-umdy.onrender.com';
 
@@ -76,7 +75,6 @@ const Prachi_Reviews = () => {
     initializeServerConnection();
   }, []);
 
-  // Enhanced server status check with timeout
   const checkServerConnection = async (timeout = 10000) => {
     try {
       const controller = new AbortController();
@@ -107,22 +105,20 @@ const Prachi_Reviews = () => {
     }
   };
 
-  // Enhanced wake up server with better feedback
   const wakeUpServer = async () => {
     setWakingServer(true);
     setServerStatus('checking');
 
     try {
-      // First, ping the server directly to wake it up
+      
       console.log('Pinging server to wake it up...');
       await fetch(SERVER_URL, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-      }).catch(() => { }); // Ignore errors for the initial ping
+      }).catch(() => { }); 
 
-      // Try to ping the server multiple times with better feedback
       let attempts = 0;
-      const maxAttempts = 12; // 60 seconds total (12 * 5s)
+      const maxAttempts = 12; 
 
       const attemptWakeUp = async () => {
         attempts++;
@@ -135,10 +131,9 @@ const Prachi_Reviews = () => {
           setServerConnected(true);
           setWakingServer(false);
 
-          // Small delay to show "active" status
           setTimeout(() => {
             setShowServerWakeModal(false);
-            // Reload reviews after server is up
+            
             loadReviewsFromServer();
           }, 1500);
 
@@ -147,7 +142,7 @@ const Prachi_Reviews = () => {
 
         if (attempts < maxAttempts) {
           setServerStatus('waking');
-          // Wait 5 seconds before next attempt
+          
           setTimeout(attemptWakeUp, 5000);
         } else {
           setServerStatus('sleeping');
@@ -156,7 +151,6 @@ const Prachi_Reviews = () => {
         }
       };
 
-      // Start attempting to wake up
       setTimeout(attemptWakeUp, 3000);
 
     } catch (error) {
@@ -742,7 +736,7 @@ const Prachi_Reviews = () => {
               This usually takes 30-60 seconds.
             </div>
 
-            {/* Server Status Display */}
+            {}
             {serverStatus === 'checking' && (
               <div className="mt-3">
                 <Spinner animation="border" size="sm" className="me-2" />
@@ -820,7 +814,7 @@ const Prachi_Reviews = () => {
 
   return (
     <div className="review-page windows-98-style">
-      {/* Admin Overlay Button */}
+      {}
       <motion.button
         className="admin-overlay-btn"
         onClick={() => setShowAdmin(true)}
@@ -830,7 +824,7 @@ const Prachi_Reviews = () => {
         <Settings size={20} />
       </motion.button>
 
-      {/* Server Status Indicator */}
+      {}
       <div className={`server-status-indicator ${serverConnected ? 'connected' : 'disconnected'}`}>
         {serverConnected ? '🟢 Server Connected' : '🔴 Server Offline'}
         {!serverConnected && (
@@ -843,7 +837,7 @@ const Prachi_Reviews = () => {
       <Container className="py-5 mt-5">
         <Row className="justify-content-center">
           <Col lg={12}>
-            {/* Windows 98 Style Title Bar */}
+            {}
             <motion.div
               className="windows-title-bar"
               initial={{ y: -50, opacity: 0 }}
@@ -1099,7 +1093,7 @@ const Prachi_Reviews = () => {
                   )}
                 </Tab>
 
-                {/* Reviews Tab */}
+                {}
                 <Tab eventKey="reviews" title={
                   <span className="tab-title">
                     <Database size={14} className="tab-icon" />
@@ -1212,7 +1206,7 @@ const Prachi_Reviews = () => {
         </Row>
       </Container>
 
-      {/* Admin Overlay Modal */}
+      {}
       <Modal show={showAdmin} onHide={() => setShowAdmin(false)} size="lg" className="admin-modal">
         <Modal.Header closeButton className="windows-modal-header">
           <Modal.Title>🛠️ Admin Panel</Modal.Title>
@@ -1265,13 +1259,13 @@ const Prachi_Reviews = () => {
         </Modal.Body>
       </Modal>
 
-      {/* Full Review Modal */}
+      {}
       <FullReviewModal
         review={showFullReview}
         onClose={() => setShowFullReview(null)}
       />
 
-      {/* Server Wake Modal */}
+      {}
       <ServerWakeModal />
     </div>
   );

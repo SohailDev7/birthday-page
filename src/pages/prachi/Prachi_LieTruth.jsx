@@ -1,4 +1,4 @@
-// components/TwoTruthsLie.jsx
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Star, Sparkles, RotateCcw, Eye, EyeOff, ArrowLeft, ArrowRight } from 'lucide-react';
@@ -12,7 +12,7 @@ const Prachi_LieTruth = () => {
   const [currentRound, setCurrentRound] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState({});
   const [revealedAnswers, setRevealedAnswers] = useState({});
-  const [gamePhase, setGamePhase] = useState('truths'); // 'truths' or 'jokes'
+  const [gamePhase, setGamePhase] = useState('truths'); 
   const { currentTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -272,12 +272,10 @@ const Prachi_LieTruth = () => {
     { bottom: '45%', right: '6%' }
   ];
 
-  // Get current questions based on phase
   const currentQuestions = gamePhase === 'truths' ? questions : jokeQuestions;
   const totalRounds = currentQuestions.length;
   const currentQuestion = currentQuestions[currentRound];
 
-  // Calculate progress percentage
   const getProgressPercentage = () => {
     const totalQuestions = questions.length + jokeQuestions.length;
     const completedQuestions = gamePhase === 'truths'
@@ -308,7 +306,7 @@ const Prachi_LieTruth = () => {
     if (currentRound < totalRounds - 1) {
       setCurrentRound(prev => prev + 1);
     } else if (gamePhase === 'truths') {
-      // Switch to joke questions after completing truth rounds
+      
       setGamePhase('jokes');
       setCurrentRound(0);
     }
@@ -318,7 +316,7 @@ const Prachi_LieTruth = () => {
     if (currentRound > 0) {
       setCurrentRound(prev => prev - 1);
     } else if (gamePhase === 'jokes' && currentRound === 0) {
-      // Go back to last truth round
+      
       setGamePhase('truths');
       setCurrentRound(questions.length - 1);
     }
@@ -393,7 +391,7 @@ const Prachi_LieTruth = () => {
 
   return (
     <div className="truths-lie-page">
-      {/* Floating Background Elements */}
+      {}
       {floatingElements.map((element, index) => {
         const IconComponent = element.icon;
         return (
@@ -418,7 +416,7 @@ const Prachi_LieTruth = () => {
         );
       })}
 
-      {/* Sparkle Decorations */}
+      {}
       {sparklePositions.map((position, index) => (
         <motion.div
           key={index}
@@ -444,7 +442,7 @@ const Prachi_LieTruth = () => {
         animate="visible"
         variants={containerVariants}
       >
-        {/* Header */}
+        {}
         <motion.div className="truths-header" variants={itemVariants}>
           <motion.h1
             className="truths-title"
@@ -476,7 +474,7 @@ const Prachi_LieTruth = () => {
               : 'Discover more about our friendship'}
           </motion.p>
 
-          {/* Progress Section */}
+          {}
           <div className="progress-section">
             <div className="round-counter">
               {gamePhase === 'truths' ? 'Round' : 'Bonus'} {currentRound + 1}/{totalRounds}
@@ -495,7 +493,7 @@ const Prachi_LieTruth = () => {
           </div>
         </motion.div>
 
-        {/* Current Round Content */}
+        {}
         <AnimatePresence mode="wait" custom={slideDirection}>
           <motion.div
             className="round-content"
@@ -508,7 +506,7 @@ const Prachi_LieTruth = () => {
             transition={{ duration: 0.3 }}
           >
             {gamePhase === 'truths' ? (
-              /* Truth/Lie Round */
+              
               <motion.div className="question-card" variants={itemVariants}>
                 <h3 className="question-number">Question {currentRound + 1}</h3>
                 <div className="options-container">
@@ -532,7 +530,7 @@ const Prachi_LieTruth = () => {
                 </div>
               </motion.div>
             ) : (
-              /* Joke Question Round */
+              
               <motion.div className="joke-card" variants={itemVariants}>
                 <h3 className="joke-number">Bonus Question {currentRound + 1}</h3>
                 <p className="joke-question">{currentQuestion.question}</p>
@@ -564,7 +562,7 @@ const Prachi_LieTruth = () => {
           </motion.div>
         </AnimatePresence>
 
-        {/* Navigation Controls */}
+        {}
         <motion.div className="navigation-controls" variants={itemVariants}>
           <motion.button
             className="nav-btn prev-btn"
@@ -595,7 +593,7 @@ const Prachi_LieTruth = () => {
           </motion.button>
         </motion.div>
 
-        {/* Reset Game */}
+        {}
         <motion.div className="game-controls" variants={itemVariants}>
           <motion.button
             className="reset-btn"
@@ -609,7 +607,7 @@ const Prachi_LieTruth = () => {
         </motion.div>
       </motion.div>
 
-      {/* Background Particles */}
+      {}
       <div className="particles-container">
         {[...Array(15)].map((_, i) => (
           <motion.div

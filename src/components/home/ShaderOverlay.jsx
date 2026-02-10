@@ -1,24 +1,24 @@
 import React from 'react';
 
 export const ShaderOverlay = ({ timeOfDay = 'day' }) => {
-    // Dynamic color grading based on time of day
+    
     const getGradient = () => {
         switch (timeOfDay) {
             case 'sunset':
-                return 'linear-gradient(to bottom, rgba(255, 100, 50, 0.1), rgba(100, 0, 255, 0.1))'; // Warm/Purple tint
+                return 'linear-gradient(to bottom, rgba(255, 100, 50, 0.1), rgba(100, 0, 255, 0.1))'; 
             case 'night':
-                return 'linear-gradient(to bottom, rgba(0, 10, 50, 0.3), rgba(0, 0, 20, 0.2))'; // Dark Blue tint
+                return 'linear-gradient(to bottom, rgba(0, 10, 50, 0.3), rgba(0, 0, 20, 0.2))'; 
             case 'twilight':
-                return 'linear-gradient(to bottom, rgba(75, 0, 130, 0.2), rgba(0, 0, 0, 0.2))'; // Deep Purple
-            default: // Day
-                return 'linear-gradient(to bottom, rgba(255, 255, 200, 0.1), rgba(255, 255, 255, 0))'; // Sunny warm tint
+                return 'linear-gradient(to bottom, rgba(75, 0, 130, 0.2), rgba(0, 0, 0, 0.2))'; 
+            default: 
+                return 'linear-gradient(to bottom, rgba(255, 255, 200, 0.1), rgba(255, 255, 255, 0))'; 
         }
     };
 
     return (
         <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden" style={{ mixBlendMode: 'overlay' }}>
 
-            {/* 1. Global Color Grading (Tone Mapping) */}
+            {}
             <div
                 className="absolute inset-0"
                 style={{
@@ -28,7 +28,7 @@ export const ShaderOverlay = ({ timeOfDay = 'day' }) => {
                 }}
             />
 
-            {/* 2. Stronger Scanlines */}
+            {}
             <div
                 className="absolute inset-0 opacity-[0.08]"
                 style={{
@@ -38,7 +38,7 @@ export const ShaderOverlay = ({ timeOfDay = 'day' }) => {
                 }}
             />
 
-            {/* 3. Bloom / Soft Glow Simulation */}
+            {}
             <div
                 className="absolute inset-0 opacity-30"
                 style={{
@@ -48,7 +48,7 @@ export const ShaderOverlay = ({ timeOfDay = 'day' }) => {
                 }}
             />
 
-            {/* 4. Film Grain (Animated via CSS if possible, static here for perf) */}
+            {}
             <div
                 className="absolute inset-0 opacity-[0.1]"
                 style={{
@@ -58,7 +58,7 @@ export const ShaderOverlay = ({ timeOfDay = 'day' }) => {
                 }}
             />
 
-            {/* 5. Vignette (Dark borders) */}
+            {}
             <div
                 className="absolute inset-0"
                 style={{
@@ -67,7 +67,7 @@ export const ShaderOverlay = ({ timeOfDay = 'day' }) => {
                 }}
             />
 
-            {/* 6. CRT Curvature Edge Shadow */}
+            {}
             <div
                 className="absolute inset-0"
                 style={{

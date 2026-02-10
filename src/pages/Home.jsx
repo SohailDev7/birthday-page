@@ -10,8 +10,8 @@ import { PixelPig, PixelCow, PixelPanda, PixelDeer, PixelFawn } from '../compone
 import { Stars, PixelTree, PixelGrass, PixelWildflowers, FloatingPollen } from '../components/home/NatureDetails';
 import Tilt from 'react-parallax-tilt';
 import { TypeAnimation } from 'react-type-animation';
-import { PixelCursorTrail, EnchantedGlint } from '../components/home/InteractiveEffects'; // Import Effects
-import { ShaderOverlay } from '../components/home/ShaderOverlay'; // Import Shader
+import { PixelCursorTrail, EnchantedGlint } from '../components/home/InteractiveEffects'; 
+import { ShaderOverlay } from '../components/home/ShaderOverlay'; 
 import { CharacterHead, FullBodyCharacter } from '../components/home/Characters';
 import gsap from 'gsap';
 import LoginOverlay from '../components/home/LoginOverlay';
@@ -20,7 +20,6 @@ import { useAuth } from '../context/AuthContext';
 import confetti from 'canvas-confetti';
 import { Music } from 'lucide-react';
 
-// Music tracks - Audio files should be in public/audio/ folder
 const musicTracks = [
   {
     name: "C418 - CHIRP",
@@ -32,7 +31,6 @@ const musicTracks = [
   },
 ];
 
-// --- Magnetic Button Component ---
 const MagneticButton = ({ children, className, onClick, ...props }) => {
   const ref = useRef(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -66,7 +64,6 @@ const MagneticButton = ({ children, className, onClick, ...props }) => {
   );
 };
 
-// Locally defined PixelBurst to prevent ReferenceError
 const PixelBurst = ({ color }) => (
   <div className="absolute inset-0 pointer-events-none overflow-hidden">
     {[...Array(6)].map((_, i) => (
@@ -99,7 +96,6 @@ const PixelBurst = ({ color }) => (
 const Home = () => {
   const navigate = useNavigate();
   const { user, login: authLogin, checkUserSession } = useAuth();
-  // Renamed login to avoid conflict if needed, though handleLogin is the local function name
 
   const users = {
     yuzence: {
@@ -110,7 +106,7 @@ const Home = () => {
       animation: 'wave',
       timeOfDay: 'day',
       skyGradient: 'linear-gradient(to bottom, #4A90E2 0%, #7CB9E8 50%, #B8E6F5 100%)',
-      dob: '2000-01-01'
+      dob: '2007-03-27'
     },
     prachi: {
       color: '#FF2D92',
@@ -130,7 +126,7 @@ const Home = () => {
       animation: 'tilt',
       timeOfDay: 'night',
       skyGradient: 'linear-gradient(to bottom, #0f1419 0%, #1a2332 50%, #2d3e50 100%)',
-      dob: '2000-01-01'
+      dob: '2000-07-02'
     },
     sameer: {
       color: '#FF9F0A',
@@ -150,7 +146,7 @@ const Home = () => {
       animation: 'jump',
       timeOfDay: 'day',
       skyGradient: 'linear-gradient(to bottom, #10B981 0%, #6EE7B7 50%, #D1FAE5 100%)',
-      dob: '2007-05-13'
+      dob: '2000-05-13'
     },
     sama: {
       color: '#8B5CF6',
@@ -170,7 +166,7 @@ const Home = () => {
       animation: 'shake',
       timeOfDay: 'day',
       skyGradient: 'linear-gradient(to bottom, #06B6D4 0%, #67E8F9 50%, #CFFAFE 100%)',
-      dob: '2007-03-19'
+      dob: '2000-03-19'
     },
     sohail: {
       color: '#FFD700',
@@ -189,41 +185,36 @@ const Home = () => {
   const [selectedUser, setSelectedUser] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [usersPerPage, setUsersPerPage] = useState(4); // Responsive users per page
-  const [hoveredUser, setHoveredUser] = useState(null); // Focus Mode State
+  const [usersPerPage, setUsersPerPage] = useState(4); 
+  const [hoveredUser, setHoveredUser] = useState(null); 
 
-  // Music player expansion state
   const [isPlayerExpanded, setIsPlayerExpanded] = useState(false);
 
-  // Login overlay state
   const [showLoginOverlay, setShowLoginOverlay] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Intro firecracker animation state
   const [showIntroFirecracker, setShowIntroFirecracker] = useState(false);
   const [hasPlayedIntro, setHasPlayedIntro] = useState(false);
   const [isGeneratingWorld, setIsGeneratingWorld] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingText, setLoadingText] = useState('GENERATING TERRAIN...');
 
-  // Background music state
   const [isMuted, setIsMuted] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(0);
-  const [showCards, setShowCards] = useState(true); // New state for toggling cards
-  const [waitingForEntry, setWaitingForEntry] = useState(false); // State for explicit user entry
-  const [cameraPosition, setCameraPosition] = useState('center'); // 'center' | 'left'
+  const [showCards, setShowCards] = useState(true); 
+  const [waitingForEntry, setWaitingForEntry] = useState(false); 
+  const [cameraPosition, setCameraPosition] = useState('center'); 
   const audioRef = React.useRef(null);
-  const audioLoadedRef = useRef(false); // Track audio loading state across re-renders
+  const audioLoadedRef = useRef(false); 
 
   const [isMobile, setIsMobile] = useState(false);
-  // Handle initial hydration/mount to prevent flash
+  
   useEffect(() => {
     setIsMounted(true);
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
 
-      // Update usersPerPage based on screen width
-      if (window.innerWidth < 640) setUsersPerPage(4); // Even smaller on mobile
+      if (window.innerWidth < 640) setUsersPerPage(4); 
       else if (window.innerWidth < 1024) setUsersPerPage(3);
       else setUsersPerPage(4);
     };
@@ -232,7 +223,6 @@ const Home = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Initialize audio and handle auto-play
   React.useEffect(() => {
     const audio = audioRef.current;
     if (!audio) {
@@ -243,22 +233,18 @@ const Home = () => {
     console.log('🎵 Loading track:', musicTracks[currentTrack].name);
     console.log('🎵 Audio URL:', musicTracks[currentTrack].url);
 
-    // Set volume
-    audio.volume = 0.5; // 50% volume
+    audio.volume = 0.5; 
 
-    // Handle track ended - play next track
     const handleTrackEnd = () => {
       console.log('✅ Track ended, playing next...');
       setCurrentTrack((prev) => (prev + 1) % musicTracks.length);
     };
 
-    // Handle errors
     const handleError = (e) => {
       console.error('❌ Audio error:', e);
       console.error('❌ Error details:', audio.error);
     };
 
-    // Handle successful load
     const handleCanPlay = () => {
       console.log('✅ Audio loaded and ready to play');
     };
@@ -274,22 +260,19 @@ const Home = () => {
     };
   }, [currentTrack]);
 
-  // Handle track changing auto-play
   useEffect(() => {
     if (isMounted && !isGeneratingWorld && audioRef.current) {
-      // Ensure the audio actually plays when switching tracks
+      
       audioRef.current.play().catch(error => {
         console.warn('⚠️ Track change playback blocked:', error.message);
       });
     }
   }, [currentTrack, isGeneratingWorld]);
 
-  // Handle initial hydration/mount and world generation
   useEffect(() => {
-    // Reset ref on mount
+    
     audioLoadedRef.current = false;
 
-    // Async Audio Preloading with Timeout
     const preloadAudio = async () => {
       try {
         const track = musicTracks[currentTrack];
@@ -301,12 +284,11 @@ const Home = () => {
 
         setLoadingText(`LOADING AUDIO: ${track.name.toUpperCase()}...`);
 
-        // Race between load and timeout
         await Promise.race([
           new Promise((resolve) => {
             const audio = new Audio();
             audio.src = track.url;
-            // 'canplay' is often enough/safer than 'canplaythrough' for short clips or initial load
+            
             audio.oncanplay = () => resolve();
             audio.oncanplaythrough = () => resolve();
             audio.onerror = (e) => {
@@ -315,25 +297,23 @@ const Home = () => {
             };
             audio.load();
           }),
-          new Promise(resolve => setTimeout(resolve, 3000)) // 3s Timeout max
+          new Promise(resolve => setTimeout(resolve, 3000)) 
         ]);
 
         audioLoadedRef.current = true;
         setLoadingText('FINALIZING WORLD...');
       } catch (e) {
         console.error("Audio loading error", e);
-        audioLoadedRef.current = true; // Proceed anyway
+        audioLoadedRef.current = true; 
       }
     };
 
     preloadAudio();
 
-    // Simulator for Chunks + Wait for Audio
     const interval = setInterval(() => {
       setLoadingProgress(prev => {
         const isAudioReady = audioLoadedRef.current;
 
-        // If we are finished loading standard progress...
         if (prev >= 100) {
           if (isAudioReady) {
             clearInterval(interval);
@@ -341,20 +321,16 @@ const Home = () => {
             setWaitingForEntry(true);
             return 100;
           } else {
-            // Wait for audio, maybe cap at 99% visually or just wait
-            // Force finish if it's been too long (handled by timeout above setting ref to true)
+
             return 100;
           }
         }
 
-        // If audio not ready yet, slow down near the end
         if (!isAudioReady && prev >= 90) {
-          // Creep forward slowly up to 95
+          
           return Math.min(prev + 0.5, 95);
         }
 
-        // Normal progress
-        // Ensure at least some progress is made
         const increment = isAudioReady ? 15 : (2 + Math.random() * 8);
         return Math.min(prev + increment, 100);
       });
@@ -365,7 +341,7 @@ const Home = () => {
 
   const handleEnterWorld = async () => {
     setIsGeneratingWorld(false);
-    setShowIntroFirecracker(true); // Firecrackers!
+    setShowIntroFirecracker(true); 
 
     if (audioRef.current) {
       try {
@@ -377,8 +353,6 @@ const Home = () => {
     }
   };
 
-
-  // GSAP Entrance Animations when world is ready (delay to account for firecrackers)
   useEffect(() => {
     if (!isGeneratingWorld) {
       gsap.fromTo(".main-title",
@@ -403,35 +377,32 @@ const Home = () => {
       setIsMuted(newMutedState);
       console.log(newMutedState ? '🔇 Muted' : '🔊 Unmuted');
 
-      // If unmuting and audio is paused, try to play
       if (!newMutedState && audioRef.current.paused) {
         audioRef.current.play().catch(e => console.log('Play on unmute failed:', e));
       }
     }
   };
 
-  // Intro firecracker animation sequence - triggers after world generation
   React.useEffect(() => {
     if (showIntroFirecracker && !hasPlayedIntro) {
-      // Show firecracker for 3.5 seconds then hide
+      
       const timer = setTimeout(() => {
         setShowIntroFirecracker(false);
         setHasPlayedIntro(true);
-      }, 2400);
+      }, 3000);
 
       return () => clearTimeout(timer);
     }
   }, [showIntroFirecracker, hasPlayedIntro]);
 
-  // Responsive users per page based on screen size
   React.useEffect(() => {
     const updateUsersPerPage = () => {
       if (window.innerWidth < 640) {
-        setUsersPerPage(1); // Mobile: 1 card
+        setUsersPerPage(1); 
       } else if (window.innerWidth < 1024) {
-        setUsersPerPage(2); // Tablet: 2 cards
+        setUsersPerPage(2); 
       } else {
-        setUsersPerPage(4); // Desktop: 4 cards
+        setUsersPerPage(4); 
       }
     };
 
@@ -461,20 +432,19 @@ const Home = () => {
 
   const handleLogin = () => {
     if (selectedUser) {
-      // Trigger Confetti Celebration - "Golden Apple Reached" style
+      
       confetti({
         particleCount: 150,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#FFD700', '#FFA500', '#FFFFFF', users[selectedUser]?.color || '#00FF00'], // Gold, Orange, White, User Color
-        shapes: ['square'], // Minecraft style
+        colors: ['#FFD700', '#FFA500', '#FFFFFF', users[selectedUser]?.color || '#00FF00'], 
+        shapes: ['square'], 
         scalar: 1.2,
         disableForReducedMotion: true
       });
 
-      // Check if this specific user has a valid session cookie
       if (checkUserSession(selectedUser)) {
-        // Restore session for this user and navigate
+        
         authLogin(selectedUser);
 
         setTimeout(() => {
@@ -483,9 +453,9 @@ const Home = () => {
           } else {
             navigate(`/${selectedUser}/home`);
           }
-        }, 800); // Slight delay to enjoy confetti
+        }, 800); 
       } else {
-        // Not authenticated as this user, show login overlay
+        
         setShowLoginOverlay(true);
       }
     }
@@ -501,13 +471,13 @@ const Home = () => {
     if (currentPage < totalPages - 1) {
       const newPage = currentPage + 1;
       setCurrentPage(newPage);
-      // Auto-select first user on new page
+      
       const newUsers = userEntries.slice(
         newPage * usersPerPage,
         (newPage + 1) * usersPerPage
       );
       if (newUsers.length > 0) {
-        setSelectedUser(newUsers[0][0]); // Select first user's key
+        setSelectedUser(newUsers[0][0]); 
       }
     }
   };
@@ -516,18 +486,16 @@ const Home = () => {
     if (currentPage > 0) {
       const newPage = currentPage - 1;
       setCurrentPage(newPage);
-      // Auto-select first user on new page
+      
       const newUsers = userEntries.slice(
         newPage * usersPerPage,
         (newPage + 1) * usersPerPage
       );
       if (newUsers.length > 0) {
-        setSelectedUser(newUsers[0][0]); // Select first user's key
+        setSelectedUser(newUsers[0][0]); 
       }
     }
   };
-
-
 
   return (
     <motion.div
@@ -543,7 +511,7 @@ const Home = () => {
         imageRendering: 'pixelated'
       }}
     >
-      {/* MINECRAFT WORLD LOADING OVERLAY */}
+      {}
       <AnimatePresence>
         {isGeneratingWorld && (
           <motion.div
@@ -555,7 +523,7 @@ const Home = () => {
             }}
             style={{ imageRendering: 'pixelated' }}
           >
-            {/* Minecraft Dirt Texture Background */}
+            {}
             <div
               className="absolute inset-0 opacity-20"
               style={{
@@ -577,7 +545,7 @@ const Home = () => {
 
               {!waitingForEntry ? (
                 <>
-                  {/* Minecraft Progress Bar */}
+                  {}
                   <div
                     className="w-64 md:w-96 h-8 bg-[#444] relative"
                     style={{
@@ -629,13 +597,13 @@ const Home = () => {
         }
       </AnimatePresence >
 
-      {/* Global Interactive FX */}
+      {}
       < PixelCursorTrail />
 
-      {/* Global Interactive FX */}
+      {}
       < PixelCursorTrail />
 
-      {/* Screen Shader Overlay */}
+      {}
       < ShaderOverlay timeOfDay={currentTimeOfDay} />
 
       <motion.div
@@ -643,7 +611,7 @@ const Home = () => {
         initial={false}
         animate={{ opacity: 1 }}
       >
-        {/* Hidden Audio Element */}
+        {}
         <audio
           ref={audioRef}
           src={musicTracks[currentTrack].url}
@@ -651,11 +619,11 @@ const Home = () => {
           preload="auto"
         />
 
-        {/* INTRO SKY FIREWORKS ANIMATION */}
+        {}
         <AnimatePresence>
           {showIntroFirecracker && (
             <>
-              {/* Night Sky that morphs to day */}
+              {}
               <motion.div
                 className="fixed inset-0 z-100 pointer-events-none"
                 style={{
@@ -678,7 +646,7 @@ const Home = () => {
                 }}
               />
 
-              {/* Multiple Fireworks in Sky */}
+              {}
               {[
                 { x: '30%', y: '20%', delay: 0.3, color: '#FFD700' },
                 { x: '50%', y: '25%', delay: 0.6, color: '#FF4500' },
@@ -700,7 +668,7 @@ const Home = () => {
                     times: [0, 0.2, 0.6, 1]
                   }}
                 >
-                  {/* Explosion particles in all directions - BLOCKY */}
+                  {}
                   {Array.from({ length: 20 }).map((_, i) => {
                     const angle = (i / 20) * Math.PI * 2;
                     const distance = 80 + Math.random() * 80;
@@ -732,7 +700,7 @@ const Home = () => {
                         }}
                         animate={{
                           x: Math.cos(angle) * distance,
-                          y: Math.sin(angle) * distance + 40, // Slight gravity
+                          y: Math.sin(angle) * distance + 40, 
                           opacity: [0, 1, 1, 0],
                           scale: [0.5, 1.5, 1, 0.3],
                           rotate: [0, 180, 360]
@@ -745,7 +713,7 @@ const Home = () => {
                     );
                   })}
 
-                  {/* Center flash burst - BLOCKY */}
+                  {}
                   <motion.div
                     style={{
                       position: 'absolute',
@@ -770,7 +738,7 @@ const Home = () => {
                     }}
                   />
 
-                  {/* Trailing sparks - BLOCKY */}
+                  {}
                   {Array.from({ length: 8 }).map((_, i) => {
                     const angle = (i / 8) * Math.PI * 2;
                     const sparkDist = 40 + Math.random() * 30;
@@ -806,7 +774,7 @@ const Home = () => {
                 </motion.div>
               ))}
 
-              {/* Stars twinkling in night sky before dawn */}
+              {}
               {Array.from({ length: 30 }).map((_, i) => (
                 <motion.div
                   key={`star-${i}`}
@@ -836,14 +804,14 @@ const Home = () => {
           )}
         </AnimatePresence>
 
-        {/* Expandable Music Player - Top Left - TRULY BLOCKY */}
+        {}
         <div
           className="fixed top-4 left-4 z-50 group/player"
           onMouseEnter={() => !isMobile && setIsPlayerExpanded(true)}
           onMouseLeave={() => !isMobile && setIsPlayerExpanded(false)}
           onClick={() => isMobile && setIsPlayerExpanded(!isPlayerExpanded)}
         >
-          {/* Compact Player - Always Visible */}
+          {}
           <motion.div
             className="px-2 md:px-4 py-2 md:py-3 text-white font-bold cursor-pointer select-none relative"
             initial={{ x: -100, opacity: 0 }}
@@ -863,7 +831,7 @@ const Home = () => {
               maxWidth: isMobile ? '160px' : '300px'
             }}
           >
-            {/* Corner Details */}
+            {}
             <div className="absolute top-0 left-0 w-1 h-1 bg-white/20" />
             <div className="absolute bottom-0 right-0 w-1 h-1 bg-black/40" />
 
@@ -978,10 +946,9 @@ const Home = () => {
           </AnimatePresence>
         </div>
 
-
-        {/* Top Right Control Buttons Container */}
+        {}
         <div className="fixed top-4 right-4 z-50 flex gap-4 text-white">
-          {/* Pixelated Eye Button - Toggle Visibility */}
+          {}
           <motion.button
             onClick={() => setShowCards(!showCards)}
             initial={{ x: 50, opacity: 0 }}
@@ -993,8 +960,8 @@ const Home = () => {
               width: isMobile ? '48px' : '80px',
               height: isMobile ? '48px' : '80px',
               background: !showCards
-                ? 'linear-gradient(180deg, #FF4444 0%, #CC0000 100%)' // Red when hidden
-                : 'linear-gradient(180deg, #4CAF50 0%, #2E7D32 100%)', // Green when visible
+                ? 'linear-gradient(180deg, #FF4444 0%, #CC0000 100%)' 
+                : 'linear-gradient(180deg, #4CAF50 0%, #2E7D32 100%)', 
               border: isMobile ? '4px solid #000' : '6px solid #000',
               imageRendering: 'pixelated',
               display: 'flex',
@@ -1008,7 +975,7 @@ const Home = () => {
             </div>
           </motion.button>
 
-          {/* Pixelated Mute Button */}
+          {}
           <motion.button
             onClick={toggleMute}
             initial={{ x: 50, opacity: 0 }}
@@ -1037,7 +1004,7 @@ const Home = () => {
           </motion.button>
         </div>
 
-        {/* Stars (fade in for night/twilight) */}
+        {}
         <AnimatePresence>
           {(currentTimeOfDay === 'night' || currentTimeOfDay === 'twilight') && (
             <motion.div
@@ -1052,7 +1019,7 @@ const Home = () => {
           )}
         </AnimatePresence>
 
-        {/* Sun or Moon with sunset/moonrise animation */}
+        {}
         <AnimatePresence mode="wait">
           {(currentTimeOfDay === 'day' || currentTimeOfDay === 'sunset') && (
             <motion.div
@@ -1060,22 +1027,22 @@ const Home = () => {
               className="absolute top-8 left-1/2 -translate-x-1/2"
               initial={{
                 opacity: 0,
-                y: 150,  // Sun starts below horizon
+                y: 150,  
                 scale: 0.6
               }}
               animate={{
                 opacity: 1,
-                y: 0,  // Sun rises
+                y: 0,  
                 scale: 1
               }}
               exit={{
                 opacity: 0,
-                y: 200,  // Sun sets downward
+                y: 200,  
                 scale: 0.8
               }}
               transition={{
                 duration: 4,
-                ease: [0.4, 0.0, 0.2, 1]  // Smooth deceleration
+                ease: [0.4, 0.0, 0.2, 1]  
               }}
             >
               <PixelSun />
@@ -1087,12 +1054,12 @@ const Home = () => {
               className="absolute top-8 left-1/2 -translate-x-1/2"
               initial={{
                 opacity: 0,
-                y: -150,  // Moon starts below horizon
+                y: -150,  
                 scale: 0.6
               }}
               animate={{
                 opacity: 1,
-                y: 0,  // Moon rises slowly
+                y: 0,  
                 scale: 1
               }}
               exit={{
@@ -1115,7 +1082,7 @@ const Home = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 1.0, delay: 2.0 }}
         >
-          {/* CAMERA WRAPPER: Shifts everything when cameraPosition changes */}
+          {}
           <motion.div
             className="absolute inset-0 min-h-screen w-full"
             animate={{
@@ -1129,21 +1096,17 @@ const Home = () => {
             }}
           >
 
-
-            {/* THE LEFT SIDE OF THE MAP (Hidden by default, shifts into view) */}
+            {}
             <div className="absolute top-0 left-[-100vw] w-full h-full z-0">
 
-              {/* User Gallery Overlay - Scrollable & Interactive */}
+              {}
               <div className="absolute inset-0 z-30 pointer-events-auto">
                 <UserGallery users={users} />
               </div>
 
-              {/* Ground for Left Side */}
-              <div className="absolute bottom-0 w-full pointer-events-none z-10">
-                <PixelGrass />
-              </div>
+              {}
 
-              {/* Clouds for Left Side */}
+              {}
               <div className="clouds-container pointer-events-none z-10">
                 <PixelCloud delay={2} yPosition="12%" size={1.1} speed={42} timeOfDay={currentTimeOfDay} />
                 <PixelCloud delay={12} yPosition="22%" size={0.95} speed={48} timeOfDay={currentTimeOfDay} />
@@ -1151,9 +1114,8 @@ const Home = () => {
               </div>
             </div>
 
-
-            {/* Persistent Living Layer (Birds, Bees, Butterflies, Animals) */}
-            {/* We use opacity here instead of AnimatePresence for the grouping so they don't RESTART their walk/flight cycles when switching users */}
+            {}
+            {}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{
@@ -1162,7 +1124,7 @@ const Home = () => {
               }}
               transition={{ duration: 2 }}
             >
-              {/* Flying Creatures Layer (Day/Sunset/Twilight) */}
+              {}
               <motion.div
                 animate={{ opacity: (currentTimeOfDay === 'day' || currentTimeOfDay === 'sunset' || currentTimeOfDay === 'twilight') ? 1 : 0 }}
                 transition={{ duration: 2 }}
@@ -1174,7 +1136,7 @@ const Home = () => {
 
                 <Butterflies />
 
-                {/* Sohail Exclusive background: Flying Divine Body */}
+                {}
                 <AnimatePresence>
                   {selectedUser === 'sohail' && (
                     <motion.div
@@ -1188,7 +1150,7 @@ const Home = () => {
                 </AnimatePresence>
               </motion.div>
 
-              {/* Animals Layer - Reduced count to avoid congestion */}
+              {}
               <div
                 className="animals-container transition-transform duration-500"
                 style={{
@@ -1196,16 +1158,16 @@ const Home = () => {
                   transformOrigin: 'bottom'
                 }}
               >
-                {/* Single Pig - Patrol */}
+                {}
                 <PixelPig delay={0} duration={25} startPos="10%" endPos="50%" />
 
-                {/* Single Cow - Grazing */}
+                {}
                 <PixelCow delay={5} duration={30} startPos="30%" endPos="70%" />
 
-                {/* Single Panda - Wandering */}
+                {}
                 <PixelPanda delay={10} duration={28} startPos="50%" endPos="85%" />
 
-                {/* Cute Deer - Only for Prachi */}
+                {}
                 <AnimatePresence>
                   {selectedUser === 'prachi' && (
                     <motion.div
@@ -1215,7 +1177,7 @@ const Home = () => {
                       transition={{ duration: 0.8, ease: [0.4, 0.0, 0.2, 1] }}
                     >
                       <PixelDeer delay={3} duration={30} startPos="60%" endPos="95%" />
-                      {/* Adorable Baby Fawn companion */}
+                      {}
                       <PixelFawn delay={3.2} duration={30} startPos="64%" endPos="99%" />
                     </motion.div>
                   )}
@@ -1224,14 +1186,37 @@ const Home = () => {
               </div>
             </motion.div>
 
-            {/* Trees Layer - Always visible, persistent */}
+            {}
             <PixelTree />
 
-            {/* Wildflowers and Pollen Layer */}
+            {}
             <PixelWildflowers />
             <FloatingPollen timeOfDay={currentTimeOfDay} />
 
-            {/* Fireflies Layer - Only for Night/Twilight */}
+            {}
+
+            {}
+            <motion.div
+              className="absolute bottom-0 h-20 z-10 pointer-events-none flex"
+              style={{
+                width: '220vw',
+                left: '-110vw'
+              }}
+              animate={{
+                x: cameraPosition === 'left' ? '5vw' : '-5vw', 
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 35,
+                damping: 20,
+                mass: 1.5
+              }}
+            >
+              <div className="w-[110vw] h-full overflow-hidden flex"><PixelGrass /><PixelGrass /></div>
+              <div className="w-[110vw] h-full overflow-hidden flex"><PixelGrass /><PixelGrass /></div>
+            </motion.div>
+
+            {}
             <AnimatePresence>
               {(currentTimeOfDay === 'night' || currentTimeOfDay === 'twilight') && (
                 <motion.div
@@ -1246,7 +1231,7 @@ const Home = () => {
               )}
             </AnimatePresence>
 
-            {/* Pixelated Clouds Layer */}
+            {}
             <div className="clouds-container">
               <PixelCloud delay={0} yPosition="10%" size={1.2} speed={40} timeOfDay={currentTimeOfDay} />
               <PixelCloud delay={10} yPosition="25%" size={0.9} speed={50} timeOfDay={currentTimeOfDay} />
@@ -1255,20 +1240,20 @@ const Home = () => {
               <PixelCloud delay={5} yPosition="20%" size={1} speed={48} timeOfDay={currentTimeOfDay} />
             </div>
 
-            {/* Main Content - Toggleable Visibility (Opacity Only for Performance) */}
+            {}
             <motion.div
               className="relative z-30 flex flex-col items-center justify-center min-h-screen px-4 py-8 pointer-events-none"
               animate={{
                 opacity: showCards ? 1 : 0,
                 scale: showCards ? 1 : 0.95,
                 pointerEvents: showCards ? 'auto' : 'none',
-                filter: showCards ? 'blur(0px)' : 'blur(0px)' // Removed blur for performance
+                filter: showCards ? 'blur(0px)' : 'blur(0px)' 
               }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
             >
-              {/* Children need pointer-events-auto back */}
+              {}
               <div className="flex flex-col items-center justify-center w-full h-full pointer-events-none *:pointer-events-auto">
-                {/* Minecraft-style Title */}
+                {}
                 <motion.div
                   initial={{ y: -100, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -1304,9 +1289,9 @@ const Home = () => {
                   />
                 </motion.div>
 
-                {/* User Selection Carousel with Arrows */}
+                {}
                 <div className="relative w-full max-w-7xl mb-12">
-                  {/* Left Arrow - Minecraft Stone Button Style */}
+                  {}
                   {currentPage > 0 && (
                     <motion.button
                       onClick={prevPage}
@@ -1332,7 +1317,7 @@ const Home = () => {
                     </motion.button>
                   )}
 
-                  {/* Right Arrow - Minecraft Stone Button Style */}
+                  {}
                   {currentPage < totalPages - 1 && (
                     <motion.button
                       onClick={nextPage}
@@ -1358,7 +1343,7 @@ const Home = () => {
                     </motion.button>
                   )}
 
-                  {/* User Cards - Minecraft Wooden Panel Style - Mobile Responsive */}
+                  {}
                   <div className="overflow-hidden w-full px-4 sm:px-12 md:px-24 mb-8 carousel-container">
                     <motion.div
                       className="flex"
@@ -1395,7 +1380,7 @@ const Home = () => {
                             glareMaxOpacity={0.45}
                             glareColor={selectedUser === userKey ? userData.accent : "#ffffff"}
                             glarePosition="all"
-                            glareBorderRadius="0px" // Square corners for Minecraft style
+                            glareBorderRadius="0px" 
                             className="h-full"
                           >
                             <div
@@ -1418,7 +1403,7 @@ const Home = () => {
                                 opacity: 1
                               }}
                             >
-                              {/* Character Aura - Glow Effect */}
+                              {}
                               {userData.isSpecial && (
                                 <motion.div
                                   className="absolute inset-0 pointer-events-none"
@@ -1438,7 +1423,7 @@ const Home = () => {
                                 />
                               )}
 
-                              {/* Floating Aura Particles for special users */}
+                              {}
                               {userData.isSpecial && [...Array(12)].map((_, i) => (
                                 <motion.div
                                   key={`aura-${i}`}
@@ -1470,7 +1455,7 @@ const Home = () => {
                                 />
                               ))}
 
-                              {/* Special Label */}
+                              {}
                               {userData.specialText && (
                                 <div
                                   className="absolute top-4 left-4 z-10 px-2 py-1 text-[8px] text-white font-bold"
@@ -1484,7 +1469,7 @@ const Home = () => {
                                   {userData.specialText}
                                 </div>
                               )}
-                              {/* Character Full Body */}
+                              {}
                               <div
                                 className="mb-4 mx-auto w-full h-48 relative pointer-events-none"
                                 style={userData.isSpecial ? { transform: 'translateY(0px)' } : {}}
@@ -1497,7 +1482,7 @@ const Home = () => {
                                 />
                               </div>
 
-                              {/* Name - Minecraft Font Style */}
+                              {}
                               <div
                                 className="text-center text-white text-sm mb-2 uppercase pointer-events-none"
                                 style={{
@@ -1510,7 +1495,7 @@ const Home = () => {
                                 {userData.displayName}
                               </div>
 
-                              {/* Selection Indicator - Minecraft Checkmark */}
+                              {}
                               {selectedUser === userKey && (
                                 <>
                                   <motion.div
@@ -1527,7 +1512,7 @@ const Home = () => {
                                     <span className="text-white text-2xl font-bold" style={{ textShadow: '2px 2px 0 #000' }}>✓</span>
                                   </motion.div>
 
-                                  {/* Minecraft Particle Effects */}
+                                  {}
                                   {[...Array(8)].map((_, i) => (
                                     <motion.div
                                       key={i}
@@ -1554,7 +1539,7 @@ const Home = () => {
                                     />
                                   ))}
                                   <PixelBurst color={userData.color} />
-                                  {/* Enchanted Item Glint Overlay */}
+                                  {}
                                   <EnchantedGlint />
                                 </>
                               )}
@@ -1565,7 +1550,7 @@ const Home = () => {
                     </motion.div>
                   </div>
 
-                  {/* Page Indicators - Minecraft Style */}
+                  {}
                   <div className="flex justify-center gap-4 mt-10 relative z-50">
                     {[...Array(totalPages)].map((_, i) => (
                       <div
@@ -1585,7 +1570,7 @@ const Home = () => {
                   </div>
                 </div>
 
-                {/* Minecraft-style Action Buttons - Mobile Responsive */}
+                {}
                 <AnimatePresence>
                   {selectedUser && (
                     <motion.div
@@ -1594,11 +1579,11 @@ const Home = () => {
                       exit={{ y: 50, opacity: 0 }}
                       className="flex flex-col gap-4 sm:gap-6 px-4 action-button items-center justify-center pb-20 sm:pb-0"
                     >
-                      {/* Mobile Music Player REMOVED - Moved to top left as per request */}
-                      {/* ... (empty) */}
+                      {}
+                      {}
 
                       <div className="flex flex-row gap-4 sm:gap-6 w-full justify-center">
-                        {/* Cancel Button - Magnetic & Minecraft Red Stone Style */}
+                        {}
                         <MagneticButton
                           onClick={handleCancel}
                           className="cursor-pointer"
@@ -1621,7 +1606,7 @@ const Home = () => {
                           </motion.button>
                         </MagneticButton>
 
-                        {/* Login Button - Magnetic & Minecraft Diamond Style */}
+                        {}
                         <MagneticButton
                           onClick={handleLogin}
                           className="cursor-pointer"
@@ -1659,10 +1644,9 @@ const Home = () => {
         </motion.div>
       </motion.div>
 
-      {/* Pixelated Ground/Grass at bottom */}
-      <PixelGrass />
+      {}
 
-      {/* Login Overlay - Minecraft Style */}
+      {}
       <AnimatePresence>
         {showLoginOverlay && selectedUser && (
           <LoginOverlay
@@ -1673,10 +1657,10 @@ const Home = () => {
         )}
       </AnimatePresence>
 
-      {/* Persistent Navigation Signs (Fixed HUD Layer) */}
+      {}
       {!isGeneratingWorld && (
         <div className="fixed inset-0 pointer-events-none z-9999">
-          {/* Pixelated Arrow Sign - Bottom Left of Home (Navigate to GALLERY) */}
+          {}
           <motion.div
             className="absolute bottom-[80px] left-[2%] cursor-pointer group pointer-events-auto"
             onClick={() => {
@@ -1687,13 +1671,14 @@ const Home = () => {
                 origin: { x: 0.1, y: 0.8 }
               });
             }}
-            initial={{ opacity: 0 }}
+            initial={{ x: -100, opacity: 0 }}
             animate={{
+              x: 0,
               opacity: (cameraPosition === 'center' && !showIntroFirecracker && hasPlayedIntro) ? 1 : 0,
               pointerEvents: (cameraPosition === 'center' && !showIntroFirecracker && hasPlayedIntro) ? 'auto' : 'none'
             }}
             transition={{
-              opacity: { duration: 0.1 }
+              opacity: { duration: 0.3 }
             }}
             whileHover={{ scale: 1.1, rotate: -5 }}
             whileTap={{ scale: 0.9 }}
@@ -1702,7 +1687,7 @@ const Home = () => {
               filter: 'drop-shadow(0 0 15px rgba(255,215,0,0.4))'
             }}
           >
-            {/* Sign Content */}
+            {}
             <div className="relative">
               <motion.div
                 className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black/80 px-2 py-1 border-2 border-white text-white text-[8px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity"
@@ -1718,17 +1703,18 @@ const Home = () => {
             </div>
           </motion.div>
 
-          {/* Pixelated Arrow Sign - Bottom Right of Gallery (Return to HOME) */}
+          {}
           <motion.div
             className="absolute bottom-[80px] right-[2%] cursor-pointer group pointer-events-auto"
             onClick={() => setCameraPosition('center')}
-            initial={{ opacity: 0 }}
+            initial={{ x: 100, opacity: 0 }}
             animate={{
+              x: 0,
               opacity: (cameraPosition === 'left' && !showIntroFirecracker && hasPlayedIntro) ? 1 : 0,
               pointerEvents: (cameraPosition === 'left' && !showIntroFirecracker && hasPlayedIntro) ? 'auto' : 'none'
             }}
             transition={{
-              opacity: { duration: 0.1 }
+              opacity: { duration: 0.3 }
             }}
             whileHover={{ scale: 1.1, rotate: 5 }}
             whileTap={{ scale: 0.9 }}
@@ -1737,7 +1723,7 @@ const Home = () => {
               filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.5))'
             }}
           >
-            {/* Sign Content */}
+            {}
             <div className="relative">
               <motion.div
                 className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black/80 px-2 py-1 border-2 border-white text-white text-[8px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity"

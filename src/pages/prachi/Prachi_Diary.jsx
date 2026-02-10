@@ -1,4 +1,4 @@
-// DiaryPage.js
+
 import React, { useState, useEffect } from 'react';
 import { Container, Navbar, Nav } from 'react-bootstrap';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -52,7 +52,7 @@ const DiaryPage = () => {
 
     return (
         <div className="diary-app">
-            {/* Navigation Bar */}
+            {}
             <Navbar fixed="top" className="custom-navbar diary-navbar">
                 <Container>
                     <Navbar.Brand className="navbar-brand-custom">

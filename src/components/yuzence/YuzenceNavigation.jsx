@@ -16,19 +16,19 @@ const YuzenceNavigation = () => {
 
     return (
         <>
-            {/* Desktop Floating Navigation - Light Minimalist */}
+            {}
             <motion.nav
                 initial={{ y: -100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} // Apple-like easing
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} 
                 className="fixed top-8 left-1/2 -translate-x-1/2 z-100 hidden md:flex items-center gap-2 p-1.5 rounded-full bg-white/80 backdrop-blur-xl border border-slate-200 shadow-xl shadow-blue-900/5"
             >
-                {/* Brand Icon */}
+                {}
                 <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center ml-1">
                     <Activity className="text-blue-500 w-4 h-4" />
                 </div>
 
-                {/* Links */}
+                {}
                 <div className="flex items-center">
                     {navItems.map((item) => {
                         const isActive = location.pathname === item.path;
@@ -58,10 +58,10 @@ const YuzenceNavigation = () => {
                     })}
                 </div>
 
-                {/* Separator */}
+                {}
                 <div className="w-px h-5 bg-slate-200 mx-2" />
 
-                {/* Logout Button */}
+                {}
                 <motion.button
                     onClick={logout}
                     className="p-2.5 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors mr-1"
@@ -72,7 +72,7 @@ const YuzenceNavigation = () => {
                 </motion.button>
             </motion.nav>
 
-            {/* Mobile Bottom Bar - Light */}
+            {}
             <motion.nav
                 initial={{ y: 100 }}
                 animate={{ y: 0 }}

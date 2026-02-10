@@ -1,4 +1,4 @@
-// PoemPage.js
+
 import React, { useState } from 'react';
 import { Container, Navbar, Nav } from 'react-bootstrap';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,7 +6,6 @@ import { FaBook, FaHeart, FaStar, FaCalendarAlt, FaFilePdf, FaArrowLeft, FaDownl
 import { GiFeather } from 'react-icons/gi';
 import { useTheme } from '../../context/ThemeContext';
 
-// Import your PDF file
 import SkyRemembersPDF from '../../assets/poetry01.pdf';
 import '../css/Prachi_Poetry.css';
 
@@ -47,7 +46,7 @@ const PoemPage = () => {
 
     return (
         <div className="poetry-app">
-            {/* Navigation */}
+            {}
             <Navbar fixed="top" className="poetry-navbar">
                 <Container>
                     <Navbar.Brand className="poetry-brand">
@@ -65,11 +64,11 @@ const PoemPage = () => {
                 </Container>
             </Navbar>
 
-            {/* Main Content */}
+            {}
             <Container className="poetry-container">
                 <AnimatePresence mode="wait">
                     {!selectedPoem ? (
-                        // Poem Selection View
+                        
                         <motion.div
                             key="selection"
                             initial={{ opacity: 0 }}
@@ -77,7 +76,7 @@ const PoemPage = () => {
                             exit={{ opacity: 0 }}
                             className="selection-view"
                         >
-                            {/* Header */}
+                            {}
                             <motion.div
                                 initial={{ y: -50, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
@@ -88,7 +87,7 @@ const PoemPage = () => {
                                 <p className="subtitle">For Prachi, with words from the heart</p>
                             </motion.div>
 
-                            {/* Year Selection */}
+                            {}
                             <motion.div
                                 initial={{ y: 30, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
@@ -117,7 +116,7 @@ const PoemPage = () => {
                                 </div>
                             </motion.div>
 
-                            {/* Selected Poem Preview */}
+                            {}
                             <motion.div
                                 initial={{ y: 30, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
@@ -150,7 +149,7 @@ const PoemPage = () => {
                             </motion.div>
                         </motion.div>
                     ) : (
-                        // PDF View
+                        
                         <motion.div
                             key="pdf"
                             initial={{ opacity: 0, x: 50 }}
@@ -158,7 +157,7 @@ const PoemPage = () => {
                             exit={{ opacity: 0, x: -50 }}
                             className="pdf-view"
                         >
-                            {/* PDF Header */}
+                            {}
                             <div className="pdf-header">
                                 <button
                                     className="back-btn"
@@ -184,7 +183,7 @@ const PoemPage = () => {
                                 </a>
                             </div>
 
-                            {/* PDF Embed */}
+                            {}
                             <div className="pdf-embed-wrapper">
                                 <iframe
                                     src={selectedPoem.pdf}

@@ -1,6 +1,5 @@
-/* Enhanced CSS for dual themes */
 
-/* Import luxury fonts */
+
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap');
 body[data-theme="soft"] .custom-navbar {
   background: rgba(255, 255, 255, 0.95) !important;
@@ -14,7 +13,6 @@ body[data-theme="luxury"] .custom-navbar {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Theme-specific card styles */
 body[data-theme="soft"] .feature-card,
 body[data-theme="soft"] .archive-item,
 body[data-theme="soft"] .counter-card {
@@ -31,7 +29,6 @@ body[data-theme="luxury"] .counter-card {
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Gradient text */
 .gradient-text {
   background: linear-gradient(135deg, var(--soft-primary), var(--soft-secondary), var(--soft-accent));
   -webkit-background-clip: text;
@@ -46,7 +43,6 @@ body[data-theme="luxury"] .gradient-text {
   background-clip: text;
 }
 
-/* Countdown styles */
 .countdown-item {
   background: var(--soft-card);
   backdrop-filter: blur(10px);
@@ -77,17 +73,14 @@ body[data-theme="luxury"] .countdown-value {
   background-clip: text;
 }
 
-/* Badge styles */
 body[data-theme="luxury"] .badge.bg-primary {
   background: linear-gradient(135deg, var(--luxury-primary), var(--luxury-accent)) !important;
 }
 
-/* Link styles */
 body[data-theme="luxury"] .archive-link {
   color: var(--luxury-secondary) !important;
 }
 
-/* Transport Model Button & Overlay Styles */
 .transport-floating-btn {
   position: fixed;
   bottom: 30px;
@@ -123,7 +116,6 @@ body[data-theme="luxury"] .archive-link {
   transform: translateZ(0);
 }
 
-/* Soft Theme Transport Button */
 body[data-theme="soft"] .transport-floating-btn {
   background: linear-gradient(135deg, 
     rgba(236, 72, 153, 0.9), 
@@ -162,7 +154,6 @@ body[data-theme="soft"] .transport-activate-btn:hover {
     0 0 0 3px rgba(255, 255, 255, 0.3);
 }
 
-/* Luxury Theme Transport Button */
 body[data-theme="luxury"] .transport-floating-btn {
   background: linear-gradient(135deg, 
     rgba(255, 255, 255, 0.9), 
@@ -201,7 +192,6 @@ body[data-theme="luxury"] .transport-activate-btn:hover {
     0 0 0 3px rgba(255, 255, 255, 0.4);
 }
 
-/* Transport Model Overlay */
 .transport-overlay {
   position: fixed;
   top: 0;
@@ -216,7 +206,6 @@ body[data-theme="luxury"] .transport-activate-btn:hover {
   transform: translateZ(0);
 }
 
-/* Soft Theme Overlay */
 body[data-theme="soft"] .transport-overlay {
   background: radial-gradient(
     circle at center,
@@ -227,7 +216,6 @@ body[data-theme="soft"] .transport-overlay {
   backdrop-filter: blur(20px);
 }
 
-/* Luxury Theme Overlay */
 body[data-theme="luxury"] .transport-overlay {
   background: radial-gradient(
     circle at center,
@@ -238,7 +226,6 @@ body[data-theme="luxury"] .transport-overlay {
   backdrop-filter: blur(20px);
 }
 
-/* Transport Model Container */
 .transport-model-container {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(30px);
@@ -257,7 +244,6 @@ body[data-theme="luxury"] .transport-overlay {
   transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Soft Theme Container */
 body[data-theme="soft"] .transport-model-container {
   background: linear-gradient(
     135deg,
@@ -270,7 +256,6 @@ body[data-theme="soft"] .transport-model-container {
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-/* Luxury Theme Container */
 body[data-theme="luxury"] .transport-model-container {
   background: linear-gradient(
     135deg,
@@ -283,7 +268,6 @@ body[data-theme="luxury"] .transport-model-container {
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* Close Button */
 .transport-close-btn {
   position: absolute;
   top: 20px;
@@ -302,7 +286,6 @@ body[data-theme="luxury"] .transport-model-container {
   transform: translateZ(0);
 }
 
-/* Soft Theme Close Button */
 body[data-theme="soft"] .transport-close-btn {
   background: rgba(236, 72, 153, 0.1);
   color: var(--soft-primary);
@@ -315,7 +298,6 @@ body[data-theme="soft"] .transport-close-btn:hover {
   box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
 }
 
-/* Luxury Theme Close Button */
 body[data-theme="luxury"] .transport-close-btn {
   background: rgba(255, 255, 255, 0.1);
   color: var(--luxury-primary);
@@ -328,7 +310,6 @@ body[data-theme="luxury"] .transport-close-btn:hover {
   box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
 }
 
-/* Transport Model Content */
 .transport-content {
   text-align: center;
 }
@@ -367,7 +348,6 @@ body[data-theme="luxury"] .transport-description {
   color: var(--luxury-text);
 }
 
-/* Input Styling */
 .transport-input {
   width: 100%;
   padding: 1rem 1.5rem;
@@ -408,7 +388,6 @@ body[data-theme="luxury"] .transport-input:focus {
   transform: translateY(-2px);
 }
 
-/* Submit Button */
 .transport-submit-btn {
   width: 100%;
   padding: 1.2rem 2rem;
@@ -446,7 +425,6 @@ body[data-theme="luxury"] .transport-submit-btn:hover:not(:disabled) {
   box-shadow: 0 10px 30px rgba(255, 255, 255, 0.4);
 }
 
-/* Animations */
 @keyframes transportSlideIn {
   from {
     opacity: 0;
@@ -477,7 +455,6 @@ body[data-theme="luxury"] .transport-submit-btn:hover:not(:disabled) {
   animation: transportSlideOut 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
   .transport-floating-btn {
     bottom: 20px;

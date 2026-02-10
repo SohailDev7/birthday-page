@@ -14,7 +14,6 @@ export const ThemeProvider = ({ children }) => {
   const [currentTheme, setCurrentTheme] = useState('soft');
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Cookie helper functions
   const setCookie = (name, value, days) => {
     const expires = new Date();
     expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -28,14 +27,13 @@ export const ThemeProvider = ({ children }) => {
     return null;
   };
 
-  // Load theme from cookie on mount
   useEffect(() => {
     const savedTheme = getCookie('prachi_theme');
-    console.log('Loaded theme from cookie:', savedTheme); // Debug log
+    console.log('Loaded theme from cookie:', savedTheme); 
     if (savedTheme && (savedTheme === 'soft' || savedTheme === 'luxury')) {
       setCurrentTheme(savedTheme);
     } else {
-      // Set default theme if no cookie exists
+      
       setCookie('prachi_theme', 'soft', 365);
     }
   }, []);
@@ -44,20 +42,18 @@ export const ThemeProvider = ({ children }) => {
     setIsTransitioning(true);
     setTimeout(() => {
       const newTheme = currentTheme === 'soft' ? 'luxury' : 'soft';
-      console.log('Changing theme to:', newTheme); // Debug log
+      console.log('Changing theme to:', newTheme); 
       setCurrentTheme(newTheme);
-      // Save theme preference in cookie for 365 days
+      
       setCookie('prachi_theme', newTheme, 365);
       setTimeout(() => setIsTransitioning(false), 300);
     }, 200);
   };
 
-  // Apply theme to body when currentTheme changes
   useEffect(() => {
-    console.log('Applying theme to body:', currentTheme); // Debug log
+    console.log('Applying theme to body:', currentTheme); 
     document.body.setAttribute('data-theme', currentTheme);
-    
-    // Also update the theme-color meta tag for mobile browsers
+
     const themeColor = currentTheme === 'soft' ? '#fdf2f8' : '#9d174d';
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {

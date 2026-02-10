@@ -10,28 +10,23 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(cors());
-app.use(express.json({ limit: '50mb' })); // Increased limit for base64 images
+app.use(express.json({ limit: '50mb' })); 
 app.use(express.static('public'));
 
-// MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://sohail:sohail786@sauravdonkey.pbt6v.mongodb.net/?appName=sauravdonkeyy';
 
 mongoose.connect(MONGODB_URI)
     .then(() => console.log('✅ Connected to MongoDB Atlas'))
     .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// ==================== SCHEMAS ====================
-
-// Painting Schema
 const paintingSchema = new mongoose.Schema({
     userKey: { type: String, required: true, unique: true },
     displayName: { type: String, required: true },
     paintings: [
         {
             title: { type: String, required: true },
-            drawingData: { type: String, required: true }, // Base64 string
+            drawingData: { type: String, required: true }, 
             createdAt: { type: Date, default: Date.now }
         }
     ],
@@ -41,7 +36,6 @@ const paintingSchema = new mongoose.Schema({
 
 const Painting = mongoose.model('Painting', paintingSchema);
 
-// Movie Schema
 const movieSchema = new mongoose.Schema({
     movieName: { type: String, required: true, trim: true },
     summary: { type: String, required: true },
@@ -64,7 +58,6 @@ movieSchema.pre('save', function (next) {
 
 const Movie = mongoose.model('Movie', movieSchema);
 
-// Review Schema
 const reviewSchema = new mongoose.Schema({
     date: { type: String, required: true },
     likes: { type: String, default: '' },
@@ -87,15 +80,10 @@ const reviewSchema = new mongoose.Schema({
 
 const Review = mongoose.model('Review', reviewSchema);
 
-// ==================== ROUTES ====================
-
-// --- PAINTING ROUTES ---
-
-// GET all equipped paintings (for map display)
 app.get('/api/paintings', async (req, res) => {
     try {
         const galleries = await Painting.find();
-        // Convert array to object map { userKey: equippedDrawingData }
+        
         const map = {};
         galleries.forEach(g => {
             if (g.paintings && g.paintings.length > 0) {
@@ -110,7 +98,6 @@ app.get('/api/paintings', async (req, res) => {
     }
 });
 
-// GET full gallery by userKey
 app.get('/api/paintings/:userKey', async (req, res) => {
     try {
         const gallery = await Painting.findOne({ userKey: req.params.userKey });
@@ -120,7 +107,6 @@ app.get('/api/paintings/:userKey', async (req, res) => {
     }
 });
 
-// POST save a new painting to user gallery (Overwrite if index provided)
 app.post('/api/paintings', async (req, res) => {
     try {
         const { userKey, displayName, drawingData, title, index } = req.body;
@@ -140,12 +126,11 @@ app.post('/api/paintings', async (req, res) => {
             });
         } else {
             if (typeof index === 'number' && index >= 0 && index < 8) {
-                // Overwrite or set specific index
+                
                 if (index < gallery.paintings.length) {
                     gallery.paintings[index] = { title, drawingData };
                 } else {
-                    // If index is further ahead but < 8, we just push or fill gaps
-                    // For simplicity, if they want slot 5 but only have 2, we just push
+
                     gallery.paintings.push({ title, drawingData });
                 }
             } else {
@@ -165,7 +150,6 @@ app.post('/api/paintings', async (req, res) => {
     }
 });
 
-// PATCH equip a painting
 app.patch('/api/paintings/:userKey/equip', async (req, res) => {
     try {
         const { index } = req.body;
@@ -186,7 +170,6 @@ app.patch('/api/paintings/:userKey/equip', async (req, res) => {
     }
 });
 
-// DELETE a painting from gallery
 app.delete('/api/paintings/:userKey/:index', async (req, res) => {
     try {
         const { userKey, index } = req.params;
@@ -196,7 +179,6 @@ app.delete('/api/paintings/:userKey/:index', async (req, res) => {
 
         gallery.paintings.splice(index, 1);
 
-        // Adjust equipped index if needed
         if (gallery.equippedIndex >= gallery.paintings.length) {
             gallery.equippedIndex = Math.max(0, gallery.paintings.length - 1);
         }
@@ -209,9 +191,6 @@ app.delete('/api/paintings/:userKey/:index', async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 });
-
-
-// --- MOVIE ROUTES ---
 
 app.get('/api/movies', async (req, res) => {
     try {
@@ -297,15 +276,12 @@ app.delete('/api/movies/:id', async (req, res) => {
 app.get('/api/stats', async (req, res) => {
     try {
         const totalMovies = await Movie.countDocuments();
-        // ... Simplified stats for brevity, add back full logic if needed or assume user just wants basic stats
+        
         res.json({ success: true, data: { totalMovies } });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error fetching stats', error: error.message });
     }
 });
-
-
-// --- REVIEW ROUTES ---
 
 app.get('/api/reviews', async (req, res) => {
     try {
@@ -336,8 +312,6 @@ app.delete('/api/reviews/:id', async (req, res) => {
     }
 });
 
-
-// Utility function
 function isValidUrl(string) {
     try {
         new URL(string);
@@ -347,7 +321,6 @@ function isValidUrl(string) {
     }
 }
 
-// Health check
 app.get('/api/health', (req, res) => {
     res.json({
         success: true,

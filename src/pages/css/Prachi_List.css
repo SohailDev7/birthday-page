@@ -1,9 +1,7 @@
-/* ===== MODERN MINIMALIST PRACHI LIST - COMPLETE REDESIGN ===== */
 
-/* Import modern font */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* CSS Variables for consistent theming */
 :root {
   --soft-bg-primary: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
   --soft-bg-secondary: rgba(255, 255, 255, 0.95);
@@ -22,7 +20,6 @@
   --luxury-shadow: 0 8px 32px rgba(255, 255, 255, 0.08);
 }
 
-/* Base Reset & Global Styles */
 * {
   margin: 0;
   padding: 0;
@@ -37,26 +34,22 @@
   background-attachment: fixed;
 }
 
-/* Soft Theme */
 [data-theme="soft"] .prachi-list-page {
   background: var(--soft-bg-primary);
   color: var(--soft-text-primary);
 }
 
-/* Luxury Theme */
 [data-theme="luxury"] .prachi-list-page {
   background: var(--luxury-bg-primary);
   color: var(--luxury-text-primary);
 }
 
-/* Modern Container */
 .prachi-list-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
 }
 
-/* ===== HEADER SECTION ===== */
 .prachi-header {
   text-align: center;
   margin-bottom: 3rem;
@@ -88,7 +81,6 @@
   margin-bottom: 2rem;
 }
 
-/* Header Actions */
 .prachi-header-actions {
   display: flex;
   justify-content: center;
@@ -97,7 +89,6 @@
   flex-wrap: wrap;
 }
 
-/* Server Status Alert */
 .server-status-alert {
   display: inline-flex;
   align-items: center;
@@ -121,7 +112,6 @@
   color: #fbbf24;
 }
 
-/* ===== CONTROLS SECTION ===== */
 .controls-section {
   margin-bottom: 3rem;
 }
@@ -153,7 +143,6 @@
   align-items: end;
 }
 
-/* Search Bar */
 .search-wrapper {
   position: relative;
 }
@@ -207,7 +196,6 @@
   opacity: 0.5;
 }
 
-/* Filter Dropdown */
 .filter-dropdown {
   position: relative;
 }
@@ -248,7 +236,6 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* View Toggle */
 .view-toggle-group {
   display: flex;
   border-radius: 16px;
@@ -299,7 +286,6 @@
   color: #9d174d;
 }
 
-/* Refresh Button */
 .refresh-btn-modern {
   padding: 1rem 1.5rem;
   border-radius: 16px;
@@ -345,7 +331,6 @@
   transform: none !important;
 }
 
-/* ===== MOVIE SECTIONS ===== */
 .movies-section {
   margin-bottom: 4rem;
 }
@@ -411,7 +396,7 @@
   background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(251, 191, 36, 0.2));
   color: #fbbf24;
 }
-/* ===== MOVIE CARD - CONSISTENT DUAL THEME ===== */
+
 .movie-card-modern {
   border-radius: 16px;
   overflow: hidden;
@@ -424,7 +409,6 @@
   flex-direction: column;
 }
 
-/* Card Backgrounds - Using Your Variables */
 [data-theme="soft"] .movie-card-modern {
   background: var(--soft-bg-secondary);
   border-color: var(--soft-border);
@@ -437,7 +421,6 @@
   box-shadow: var(--luxury-shadow);
 }
 
-/* Watched Status Colors - Consistent with Theme */
 .movie-card-modern.watched-by-prachi {
   background:  #afd7f2 !important;
   border-color: rgba(236, 72, 153, 0.3) !important;
@@ -453,20 +436,17 @@
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
 }
 
-/* ===== GRID VIEW STYLES ===== */
 .movie-card-modern.grid-view {
   display: flex;
   flex-direction: column;
 }
 
-/* Grid View Poster */
 .movie-poster-modern.grid-view {
   position: relative;
   overflow: hidden;
   aspect-ratio: 3/4;
 }
 
-/* ===== LIST VIEW STYLES ===== */
 .movie-card-modern.list-view {
   display: flex;
   flex-direction: row;
@@ -477,7 +457,6 @@
   min-height: 200px;
 }
 
-/* List View Poster */
 .movie-poster-modern.list-view {
   width: 120px;
   height: 180px;
@@ -487,7 +466,6 @@
   overflow: hidden;
 }
 
-/* Common Poster Styles */
 .movie-poster-modern {
   position: relative;
   overflow: hidden;
@@ -522,7 +500,6 @@
   background: linear-gradient(135deg, #9d174d, #be185d);
 }
 
-/* Poster Overlay - Only Audience Tag */
 .poster-overlay {
   position: absolute;
   top: 0;
@@ -536,7 +513,6 @@
   padding: 1rem;
 }
 
-/* List View specific overlay adjustments */
 .movie-poster-modern.list-view .poster-overlay {
   padding: 0.75rem;
   background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.4));
@@ -564,13 +540,11 @@
   color: white;
 }
 
-/* List View specific audience tag */
 .movie-poster-modern.list-view .audience-tag {
   padding: 0.3rem 0.6rem;
   font-size: 0.65rem;
 }
 
-/* Movie Content */
 .movie-content-modern {
   padding: 1rem;
   flex: 1;
@@ -579,7 +553,6 @@
   gap: 0.75rem;
 }
 
-/* List View specific content adjustments */
 .movie-card-modern.list-view .movie-content-modern {
   padding: 0;
   flex: 1;
@@ -598,7 +571,6 @@
   margin-bottom: 0.5rem;
 }
 
-/* List View specific title */
 .movie-card-modern.list-view .movie-title-modern {
   text-align: left;
   font-size: 1.25rem;
@@ -614,7 +586,6 @@
   color: var(--luxury-text-primary);
 }
 
-/* Rating Section - Below Title */
 .rating-section {
   display: flex;
   justify-content: center;
@@ -622,7 +593,6 @@
   gap: 0.5rem;
 }
 
-/* List View specific rating */
 .movie-card-modern.list-view .rating-section {
   justify-content: flex-start;
 }
@@ -663,14 +633,12 @@
   color: var(--luxury-text-secondary);
 }
 
-/* Action Buttons - THEMED CONSISTENTLY */
 .movie-actions {
   display: flex;
   gap: 0.5rem;
   margin-top: auto;
 }
 
-/* List View specific actions */
 .movie-card-modern.list-view .movie-actions {
   margin-top: 0;
   justify-content: flex-start;
@@ -691,7 +659,6 @@
   gap: 0.4rem;
 }
 
-/* List View specific button sizing */
 .movie-card-modern.list-view .action-btn {
   flex: 0 1 auto;
   padding: 0.5rem 0.75rem;
@@ -703,7 +670,6 @@
   transition: all 0.3s ease;
 }
 
-/* Soft Theme Buttons */
 [data-theme="soft"] .watch-toggle-btn {
   border-color: var(--soft-border);
   color: var(--soft-text-secondary);
@@ -735,7 +701,6 @@
   box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
 }
 
-/* Luxury Theme Buttons */
 [data-theme="luxury"] .watch-toggle-btn {
   border-color: var(--luxury-border);
   color: var(--luxury-text-secondary);
@@ -768,7 +733,6 @@
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
 }
 
-/* Admin Actions */
 .admin-actions {
   display: flex;
   gap: 0.5rem;
@@ -785,7 +749,6 @@
   border-color: var(--luxury-border);
 }
 
-/* List View specific admin actions */
 .movie-card-modern.list-view .admin-actions {
   margin-top: 1rem;
   justify-content: flex-start;
@@ -807,7 +770,6 @@
   gap: 0.3rem;
 }
 
-/* List View specific admin buttons */
 .movie-card-modern.list-view .admin-btn {
   flex: 0 1 auto;
   padding: 0.4rem 0.75rem;
@@ -842,7 +804,6 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Delete Button Styles */
 .delete-btn {
   background: transparent;
   border: 1px solid;
@@ -872,7 +833,6 @@
   background: #ef4444;
 }
 
-/* Enhanced hover effects */
 .movie-card-modern {
   cursor: pointer;
 }
@@ -882,7 +842,6 @@
   transform: translateY(0);
 }
 
-/* Focus states for accessibility */
 .action-btn:focus,
 .admin-btn:focus {
   outline: 2px solid;
@@ -899,7 +858,6 @@
   outline-color: var(--luxury-accent);
 }
 
-/* List View Summary Text (if you decide to add it back) */
 .movie-summary-modern {
   font-size: 0.9rem;
   line-height: 1.5;
@@ -919,7 +877,6 @@
   margin-bottom: 0.5rem;
 }
 
-/* Responsive adjustments for list view */
 @media (max-width: 768px) {
   .movie-card-modern.list-view {
     flex-direction: column;
@@ -944,7 +901,7 @@
     flex: 1;
   }
 }
-/* ===== HORIZONTAL SCROLLING ===== */
+
 .horizontal-scroll-section-modern {
   position: relative;
   margin: 2rem 0;
@@ -1031,7 +988,6 @@
   width: 300px;
 }
 
-/* ===== LOADING & EMPTY STATES ===== */
 .loading-state-modern {
   display: flex;
   flex-direction: column;
@@ -1085,7 +1041,6 @@
   opacity: 0.5;
 }
 
-/* ===== ADMIN FLOATING BUTTON ===== */
 .admin-floating-btn-modern {
   position: fixed;
   bottom: 2rem;
@@ -1119,7 +1074,6 @@
   color: #9d174d;
 }
 
-/* ===== MODALS - MODERN DESIGN ===== */
 .modal-overlay-modern {
   position: fixed;
   top: 0;
@@ -1180,7 +1134,6 @@
   overflow-y: auto;
 }
 
-/* ===== ANIMATIONS ===== */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -1208,7 +1161,6 @@
   }
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 1200px) {
   .controls-grid {
     grid-template-columns: 1fr 1fr;
@@ -1284,7 +1236,6 @@
   }
 }
 
-/* Utility Classes */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1311,7 +1262,6 @@
   background-clip: text;
 }
 
-/* ===== ADMIN PANEL - DUAL THEME ===== */
 .admin-panel .modal-content {
   border-radius: 20px;
   overflow: hidden;
@@ -1320,7 +1270,6 @@
   transition: all 0.3s ease;
 }
 
-/* Soft Theme */
 [data-theme="soft"] .admin-panel .modal-content {
   background: var(--soft-bg-secondary);
   border-color: var(--soft-border);
@@ -1370,7 +1319,6 @@
   box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
 }
 
-/* Luxury Theme */
 [data-theme="luxury"] .admin-panel .modal-content {
   background: var(--luxury-bg-secondary);
   border-color: var(--luxury-border);
@@ -1422,7 +1370,6 @@
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
 }
 
-/* Badge Styles */
 [data-theme="soft"] .admin-panel .badge {
   font-weight: 600;
   font-size: 0.8rem;
@@ -1466,7 +1413,6 @@
   border: 1px solid var(--luxury-border);
 }
 
-/* Loading Spinner */
 [data-theme="soft"] .admin-panel .spinner-border {
   color: var(--soft-accent);
 }
@@ -1475,7 +1421,6 @@
   color: var(--luxury-accent);
 }
 
-/* Text Colors */
 [data-theme="soft"] .admin-panel .text-muted {
   color: var(--soft-text-secondary) !important;
 }
@@ -1484,7 +1429,6 @@
   color: var(--luxury-text-secondary) !important;
 }
 
-/* Empty State */
 [data-theme="soft"] .admin-panel .display-1 {
   color: var(--soft-text-secondary);
   opacity: 0.5;
@@ -1495,7 +1439,6 @@
   opacity: 0.5;
 }
 
-/* Close Button */
 [data-theme="soft"] .admin-panel .btn-close {
   filter: invert(0.3);
 }
@@ -1504,14 +1447,12 @@
   filter: invert(1);
 }
 
-/* Header Actions */
 .admin-panel .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .admin-panel .modal-body {
     padding: 1.5rem;
@@ -1535,7 +1476,6 @@
   }
 }
 
-/* Button Transitions */
 .admin-panel .btn {
   transition: all 0.3s ease;
   border: none;
@@ -1546,12 +1486,10 @@
   transform: translateY(0);
 }
 
-/* Modal Backdrop */
 .admin-panel.modal-backdrop {
   backdrop-filter: blur(8px);
 }
 
-/* ===== FULL REVIEW MODAL - DUAL THEME ===== */
 .full-review-modal .modal-content {
   border-radius: 20px;
   overflow: hidden;
@@ -1560,7 +1498,6 @@
   transition: all 0.3s ease;
 }
 
-/* Full Review Modal - Soft Theme */
 [data-theme="soft"] .full-review-modal .modal-content {
   background: var(--soft-bg-secondary);
   border-color: var(--soft-border);
@@ -1591,7 +1528,6 @@
   padding: 1rem 2rem;
 }
 
-/* Full Review Modal - Luxury Theme */
 [data-theme="luxury"] .full-review-modal .modal-content {
   background: var(--luxury-bg-secondary);
   border-color: var(--luxury-border);
@@ -1622,7 +1558,6 @@
   padding: 1rem 2rem;
 }
 
-/* Review Poster Placeholder */
 [data-theme="soft"] .review-poster-placeholder {
   background: linear-gradient(135deg, #ec4899, #db2777);
   color: white;
@@ -1635,7 +1570,6 @@
   font-size: 3rem;
 }
 
-/* Watch Link Section */
 [data-theme="soft"] .watch-link-section {
   background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(236, 72, 153, 0.05)) !important;
   border: 1px solid var(--soft-border) !important;
@@ -1646,7 +1580,6 @@
   border: 1px solid var(--luxury-border) !important;
 }
 
-/* Watch Now Button */
 [data-theme="soft"] .watch-now-btn {
   background: linear-gradient(135deg, #22c55e, #16a34a) !important;
   border: none !important;
@@ -1672,7 +1605,6 @@
   box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
 }
 
-/* Watch Link URL */
 [data-theme="soft"] .watch-link-url a {
   color: var(--soft-text-secondary);
   font-size: 0.9rem;
@@ -1691,7 +1623,6 @@
   color: var(--luxury-accent);
 }
 
-/* Badges in Full Review */
 [data-theme="soft"] .full-review-modal .badge.bg-primary {
   background: linear-gradient(135deg, var(--soft-accent), #db2777) !important;
 }
@@ -1706,7 +1637,6 @@
   border: 1px solid var(--luxury-border);
 }
 
-/* Text Colors */
 [data-theme="soft"] .full-review-modal .text-success {
   color: #16a34a !important;
 }
@@ -1723,7 +1653,6 @@
   color: #fbbf24 !important;
 }
 
-/* Stars */
 [data-theme="soft"] .full-review-modal .star.filled {
   color: var(--soft-accent);
 }
@@ -1740,7 +1669,6 @@
   opacity: 0.3;
 }
 
-/* ===== ADD MOVIE MODAL - DUAL THEME ===== */
 .add-movie-modal .modal-content {
   border-radius: 20px;
   overflow: hidden;
@@ -1749,7 +1677,6 @@
   transition: all 0.3s ease;
 }
 
-/* Add Movie Modal - Soft Theme */
 [data-theme="soft"] .add-movie-modal .modal-content {
   background: var(--soft-bg-secondary);
   border-color: var(--soft-border);
@@ -1774,7 +1701,6 @@
   padding: 2rem;
 }
 
-/* Add Movie Modal - Luxury Theme */
 [data-theme="luxury"] .add-movie-modal .modal-content {
   background: var(--luxury-bg-secondary);
   border-color: var(--luxury-border);
@@ -1799,7 +1725,6 @@
   padding: 2rem;
 }
 
-/* Form Controls */
 [data-theme="soft"] .add-movie-modal .form-control,
 [data-theme="soft"] .add-movie-modal .form-select {
   background: rgba(255, 255, 255, 0.9);
@@ -1830,7 +1755,6 @@
   color: var(--luxury-text-primary);
 }
 
-/* Form Labels */
 [data-theme="soft"] .add-movie-modal .form-label {
   color: var(--soft-text-primary);
   font-weight: 600;
@@ -1841,7 +1765,6 @@
   font-weight: 600;
 }
 
-/* Buttons */
 [data-theme="soft"] .add-movie-modal .btn-primary {
   background: linear-gradient(135deg, var(--soft-accent), #db2777);
   border-color: var(--soft-accent);
@@ -1895,7 +1818,6 @@
   color: #9d174d;
 }
 
-/* Placeholder Text */
 [data-theme="soft"] .add-movie-modal .form-control::placeholder {
   color: var(--soft-text-secondary);
   opacity: 0.6;
@@ -1906,7 +1828,6 @@
   opacity: 0.6;
 }
 
-/* Close Buttons */
 [data-theme="soft"] .full-review-modal .btn-close,
 [data-theme="soft"] .add-movie-modal .btn-close {
   filter: invert(0.3);
@@ -1917,7 +1838,6 @@
   filter: invert(1);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .full-review-modal .modal-body,
   .add-movie-modal .modal-body {
@@ -1930,7 +1850,6 @@
   }
 }
 
-/* Button Transitions */
 .full-review-modal .btn,
 .add-movie-modal .btn {
   transition: all 0.3s ease;
@@ -1943,13 +1862,10 @@
   transform: translateY(0);
 }
 
-/* Modal Backdrop */
 .full-review-modal.modal-backdrop,
 .add-movie-modal.modal-backdrop {
   backdrop-filter: blur(8px);
 }
-
-/* ===== MOVIE SEARCH STYLES - DUAL THEME SUPPORT ===== */
 
 .movie-search-section {
   border-bottom: 2px solid;
@@ -2019,7 +1935,6 @@
   transform: translateY(-50%);
 }
 
-/* Search Type Tabs */
 .search-type-tabs {
   margin-bottom: 1rem;
 }
@@ -2061,7 +1976,6 @@
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
 }
 
-/* Search Results */
 .search-results-container {
   max-height: 400px;
   overflow-y: auto;
@@ -2232,7 +2146,6 @@
   border: 1px solid rgba(236, 72, 153, 0.5);
 }
 
-/* Selected Movie Info */
 .selected-movie-info {
   padding: 1.5rem;
   border-radius: 16px;
@@ -2329,7 +2242,6 @@
   opacity: 0.8;
 }
 
-/* Manual Entry Divider */
 .manual-entry-divider {
   text-align: center;
   margin: 2rem 0;
@@ -2364,7 +2276,6 @@
   color: var(--luxury-text-secondary);
 }
 
-/* Loading States */
 .search-loading {
   display: flex;
   align-items: center;
@@ -2381,7 +2292,6 @@
   color: var(--luxury-text-secondary);
 }
 
-/* Error States */
 .search-error {
   padding: 1rem;
   border-radius: 12px;
@@ -2401,7 +2311,6 @@
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-/* Empty Results */
 .search-empty {
   padding: 2rem;
   text-align: center;
@@ -2416,7 +2325,6 @@
   color: var(--luxury-text-secondary);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .search-results-container {
     max-height: 300px;
@@ -2468,7 +2376,6 @@
   }
 }
 
-/* Scrollbar Styling */
 .search-results-container::-webkit-scrollbar {
   width: 6px;
 }
@@ -2493,7 +2400,6 @@
   border-radius: 3px;
 }
 
-/* Animation for search results */
 @keyframes fadeInUp {
   from {
     opacity: 0;

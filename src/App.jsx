@@ -51,7 +51,6 @@ const ScrollProgressBar = () => {
   );
 };
 
-// Page transition wrapper with 3D effects
 const PageTransition = ({ children }) => {
   return (
     <motion.div
@@ -88,14 +87,13 @@ const PageTransition = ({ children }) => {
   );
 };
 
-// Wrapper for animated routes
 const AnimatedRoutes = () => {
   const location = useLocation();
 
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        {/* Routes will be defined in the parent */}
+        {}
       </Routes>
     </AnimatePresence>
   );
@@ -118,7 +116,6 @@ const NavLayout = ({ children }) => (
   </div>
 );
 
-// Prachi Layout - includes NowPlayingOverlay only for Prachi pages
 const PrachiLayout = ({ children }) => (
   <div className="app">
     <FloatingElements />
@@ -133,7 +130,6 @@ const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
-  // Show loading spinner or nothing while checking authentication
   if (isLoading) {
     return (
       <div className="loading-container" style={{
@@ -149,19 +145,16 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  // If not authenticated, redirect to login with return url
   if (!isAuthenticated) {
     return <Navigate to="/" state={{ from: location }} replace />;
   }
 
-  // If authenticated, render the protected component
   return children;
 };
 
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
-  // Show loading spinner or nothing while checking authentication
   if (isLoading) {
     return (
       <div className="loading-container" style={{
@@ -177,15 +170,12 @@ const PublicRoute = ({ children }) => {
     );
   }
 
-  // If authenticated, redirect to home
   if (isAuthenticated) {
     return <Navigate to="/prachi/home" replace />;
   }
 
-  // If not authenticated, render the public component
   return children;
 };
-
 
 function App() {
   const { currentTheme: theme } = useTheme();
@@ -201,7 +191,7 @@ function App() {
             </SimpleLayout>
           } />
 
-          {/* Protected routes */}
+          {}
           <Route path="/prachi/home" element={
             <ProtectedRoute>
               <PrachiLayout>
@@ -282,7 +272,7 @@ function App() {
             </ProtectedRoute>
           } />
 
-          {/* Yuzence Routes */}
+          {}
           <Route path="/yuzence/home" element={
             <ProtectedRoute>
               <Yuzence_Home />
@@ -295,7 +285,7 @@ function App() {
             </ProtectedRoute>
           } />
 
-          {/* Catch all route - redirect to home */}
+          {}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

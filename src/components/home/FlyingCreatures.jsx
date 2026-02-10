@@ -229,7 +229,7 @@ export const Butterflies = () => {
 };
 
 export const PixelFlyingSohail = ({ delay = 0, yPosition = '15%', duration = 30 }) => {
-    const p = 5; // Pixel size
+    const p = 5; 
     return (
         <motion.div
             className="absolute z-50"
@@ -255,7 +255,7 @@ export const PixelFlyingSohail = ({ delay = 0, yPosition = '15%', duration = 30 
                     ease: "easeInOut"
                 }}
             >
-                {/* 1. FLOWING GOLDEN CAPE (Far Back) */}
+                {}
                 <motion.div
                     className="absolute"
                     style={{
@@ -276,15 +276,15 @@ export const PixelFlyingSohail = ({ delay = 0, yPosition = '15%', duration = 30 
                     transition={{ duration: 0.5, repeat: Infinity }}
                 />
 
-                {/* 2. LEGS (Back Layer) */}
+                {}
                 <div className="absolute" style={{ left: p * 4, top: p * 18, zIndex: 5, display: 'flex', gap: p }}>
-                    {/* Left Leg */}
+                    {}
                     <motion.div
                         style={{ width: p * 4, height: p * 6, background: '#333', border: '3px solid #000' }}
                         animate={{ rotate: [0, 5, 0] }}
                         transition={{ duration: 2, repeat: Infinity }}
                     />
-                    {/* Right Leg */}
+                    {}
                     <motion.div
                         style={{ width: p * 4, height: p * 6, background: '#333', border: '3px solid #000' }}
                         animate={{ rotate: [0, -5, 0] }}
@@ -292,7 +292,7 @@ export const PixelFlyingSohail = ({ delay = 0, yPosition = '15%', duration = 30 
                     />
                 </div>
 
-                {/* 3. TORSO (Middle Layer) */}
+                {}
                 <div
                     className="absolute"
                     style={{
@@ -308,12 +308,12 @@ export const PixelFlyingSohail = ({ delay = 0, yPosition = '15%', duration = 30 
                         alignItems: 'center'
                     }}
                 >
-                    {/* Core Detail */}
+                    {}
                     <div style={{ width: p * 4, height: p * 4, border: '2px solid rgba(0,0,0,0.1)', background: 'rgba(255,255,255,0.2)' }} />
                 </div>
 
-                {/* 4. ARMS (Side Layers) */}
-                {/* Left Arm (Relaxed) */}
+                {}
+                {}
                 <div
                     className="absolute"
                     style={{
@@ -328,7 +328,7 @@ export const PixelFlyingSohail = ({ delay = 0, yPosition = '15%', duration = 30 
                     }}
                 />
 
-                {/* Right Arm (WAVING!) */}
+                {}
                 <motion.div
                     className="absolute"
                     style={{
@@ -349,11 +349,11 @@ export const PixelFlyingSohail = ({ delay = 0, yPosition = '15%', duration = 30 
                         repeatDelay: 1
                     }}
                 >
-                    {/* Hand */}
+                    {}
                     <div style={{ width: p * 3, height: p * 3, background: '#D2B48C', border: '2px solid #000', position: 'absolute', bottom: -p, left: 0 }} />
                 </motion.div>
 
-                {/* 5. HEAD (Top Layer) */}
+                {}
                 <div
                     className="absolute"
                     style={{
@@ -366,33 +366,33 @@ export const PixelFlyingSohail = ({ delay = 0, yPosition = '15%', duration = 30 
                         zIndex: 20
                     }}
                 >
-                    {/* Hair */}
+                    {}
                     <div className="absolute bg-[#1a1a1a]" style={{ left: 0, top: 0, width: p * 8, height: p * 2.5 }} />
                     <div className="absolute bg-[#1a1a1a]" style={{ left: 0, top: 0, width: p * 2, height: p * 4 }} />
                     <div className="absolute bg-[#1a1a1a]" style={{ left: p * 6, top: 0, width: p * 2, height: p * 4 }} />
 
-                    {/* Eyes - Facing us */}
+                    {}
                     <div className="absolute bg-white" style={{ left: p, top: p * 4, width: p * 2, height: p, border: '1px solid #000' }} />
                     <div className="absolute bg-white" style={{ right: p, top: p * 4, width: p * 2, height: p, border: '1px solid #000' }} />
                     <div className="absolute bg-[#FFD700]" style={{ left: p + 0.5 * p, top: p * 4, width: p, height: p, boxShadow: '0 0 10px #FFD700' }} />
                     <div className="absolute bg-[#FFD700]" style={{ right: p + 0.5 * p, top: p * 4, width: p, height: p, boxShadow: '0 0 10px #FFD700' }} />
 
-                    {/* Crown */}
+                    {}
                     <div className="absolute" style={{ left: p, top: -p * 4, width: p * 6, height: p * 4, zIndex: 25 }}>
-                        {/* Crown Base */}
+                        {}
                         <div className="absolute bg-[#FFD700]" style={{ left: 0, top: p * 3, width: p * 6, height: p, border: '1px solid #000' }} />
-                        {/* Left Spike */}
+                        {}
                         <div className="absolute bg-[#FFD700]" style={{ left: 0, top: p, width: p, height: p * 2, border: '1px solid #000' }} />
-                        {/* Center Large Spike */}
+                        {}
                         <div className="absolute bg-[#FFD700]" style={{ left: p * 2, top: 0, width: p * 2, height: p * 3, border: '1px solid #000' }} />
-                        {/* Right Spike */}
+                        {}
                         <div className="absolute bg-[#FFD700]" style={{ left: p * 5, top: p, width: p, height: p * 2, border: '1px solid #000' }} />
-                        {/* Red Gem */}
+                        {}
                         <div className="absolute bg-red-600" style={{ left: p * 2.5, top: p * 1.5, width: p, height: p, boxShadow: '0 0 5px #ff0000' }} />
                     </div>
                 </div>
 
-                {/* Divine Particles around him */}
+                {}
                 {[...Array(6)].map((_, i) => (
                     <motion.div
                         key={i}

@@ -1,13 +1,12 @@
 .tic-tac-toe-container {
   min-height: 100vh;
-  padding: 80px 1rem 1rem; /* Account for navbar */
+  padding: 80px 1rem 1rem; 
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Comic Neue', cursive;
 }
 
-/* Theme-based backgrounds */
 .tic-tac-toe-container.soft {
   background: linear-gradient(135deg, var(--pink-50) 0%, var(--soft-pink) 50%, var(--pastel-pink) 100%);
 }
@@ -16,7 +15,6 @@
   background: linear-gradient(135deg, var(--pink-800) 0%, var(--pink-700) 50%, var(--pink-600) 100%);
 }
 
-/* Main Layout */
 .game-layout {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -26,7 +24,6 @@
   align-items: start;
 }
 
-/* Left Side - Game Board */
 .game-board-section {
   display: flex;
   flex-direction: column;
@@ -58,7 +55,6 @@
   text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.2);
 }
 
-/* Game Board */
 .board-container {
   display: flex;
   justify-content: center;
@@ -135,7 +131,6 @@
   color: #dc2626;
 }
 
-/* Game Controls */
 .game-controls {
   display: flex;
   flex-direction: column;
@@ -213,7 +208,6 @@
   background: linear-gradient(135deg, var(--luxury-primary), var(--luxury-accent));
 }
 
-/* Right Side - Players */
 .players-section {
   display: flex;
   flex-direction: column;
@@ -371,7 +365,6 @@
   color: var(--luxury-text);
 }
 
-/* Confetti */
 .confetti-container {
   position: fixed;
   top: 0;
@@ -389,13 +382,11 @@
   border-radius: 2px;
 }
 
-/* Animations */
 @keyframes pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.05); }
 }
 
-/* Mobile Layout */
 @media (max-width: 768px) {
   .tic-tac-toe-container {
     padding: 80px 0.5rem 0.5rem;
@@ -453,7 +444,6 @@
   }
 }
 
-/* Small mobile */
 @media (max-width: 480px) {
   .player-card {
     min-width: 120px;

@@ -215,7 +215,6 @@ By checking the box below, you indicate your complete, total, and enthusiastic a
     }
   ];
 
-
   useEffect(() => {
     let interval;
     if (isTimedRoundActive && timer > 0) {
@@ -233,7 +232,6 @@ By checking the box below, you indicate your complete, total, and enthusiastic a
     return () => clearInterval(interval);
   }, [isTimedRoundActive, timer]);
 
-
   useEffect(() => {
     if (currentRound === 9) {
       setDragWords(['chor', 'Soil', 'not', 'is', 'a', 'definitely'].sort(() => Math.random() - 0.5));
@@ -241,13 +239,11 @@ By checking the box below, you indicate your complete, total, and enthusiastic a
     }
   }, [currentRound]);
 
-
   useEffect(() => {
     if (currentRound === 14) {
       setScrambledText('S0l p1z n07 4 ch0r');
     }
   }, [currentRound]);
-
 
   useEffect(() => {
     if (currentRound === 12) {
@@ -276,7 +272,6 @@ By checking the box below, you indicate your complete, total, and enthusiastic a
   const showSequence = (sequence) => {
     setIsShowingSequence(true);
 
-
     const cells = document.querySelectorAll('.memory-cell');
     cells.forEach(cell => {
       cell.style.backgroundColor = '';
@@ -295,7 +290,6 @@ By checking the box below, you indicate your complete, total, and enthusiastic a
           cell.style.backgroundColor = currentColor.color;
           cell.classList.add('active');
 
-
           setTimeout(() => {
             cell.style.backgroundColor = '';
             cell.classList.remove('active');
@@ -310,7 +304,6 @@ By checking the box below, you indicate your complete, total, and enthusiastic a
         }, 500);
       }
     };
-
 
     setTimeout(showNextColor, 500);
   };
@@ -331,13 +324,11 @@ By checking the box below, you indicate your complete, total, and enthusiastic a
         clickedCell.classList.remove('user-click');
       }, 300);
 
-
       const isCorrect = memorySequence[userSequence.length]?.index === clickedIndex;
 
       if (isCorrect) {
         const newUserSequence = [...userSequence, clickedIndex];
         setUserSequence(newUserSequence);
-
 
         if (newUserSequence.length === memorySequence.length) {
           if (sequenceLevel < 3) {

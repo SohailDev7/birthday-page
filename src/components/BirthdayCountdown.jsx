@@ -1,4 +1,4 @@
-// components/BirthdayCountdown.jsx
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Row, Col } from 'react-bootstrap';
@@ -13,7 +13,7 @@ const BirthdayCountdown = () => {
   const calculateTimeLeft = () => {
     const now = new Date();
     const currentYear = now.getFullYear();
-    let nextBirthday = new Date(currentYear, 5, 14); // June 14
+    let nextBirthday = new Date(currentYear, 5, 14); 
     
     if (now > nextBirthday) {
       nextBirthday = new Date(currentYear + 1, 5, 14);

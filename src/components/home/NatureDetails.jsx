@@ -2,12 +2,12 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const Stars = React.memo(() => {
-    // Reduced star count for performance
+    
     const stars = useMemo(() => [...Array(20)].map((_, i) => ({
         id: i,
         left: Math.random() * 100,
         top: Math.random() * 60,
-        duration: 3 + Math.random() * 3, // Slower, less updates
+        duration: 3 + Math.random() * 3, 
         delay: Math.random() * 2
     })), []);
 
@@ -22,17 +22,17 @@ export const Stars = React.memo(() => {
                         top: `${star.top}%`,
                         imageRendering: 'pixelated',
                         boxShadow: '0 0 3px #fff',
-                        willChange: 'opacity, transform' // Optimizer hint
+                        willChange: 'opacity, transform' 
                     }}
                     animate={{
-                        opacity: [0.3, 0.8, 0.3], // Simpler keyframes
+                        opacity: [0.3, 0.8, 0.3], 
                         scale: [1, 1.2, 1]
                     }}
                     transition={{
                         duration: star.duration,
                         repeat: Infinity,
                         delay: star.delay,
-                        ease: "linear" // Linear is cheaper than spring/bezier
+                        ease: "linear" 
                     }}
                 />
             ))}
@@ -42,28 +42,25 @@ export const Stars = React.memo(() => {
 
 export const PixelTree = () => {
     const [stage, setStage] = useState(0);
-    const p = 4; // pixel scale
+    const p = 4; 
 
     useEffect(() => {
-        // 0 -> 1 (Sapling -> Small): 60s
-        // 1 -> 2 (Small -> Medium): 120s
-        // 2 -> 3 (Medium -> Large): 180s
+
         const interval = setInterval(() => {
             setStage(s => Math.min(s + 1, 3));
-        }, 60000); // Check every minute (adjust for smoother if needed, but per request 3 mins)
+        }, 60000); 
 
         return () => clearInterval(interval);
     }, []);
 
-    // Terraria Tree Colors
-    const trunkColor = '#5C3C24'; // Dark brown
+    const trunkColor = '#5C3C24'; 
     const darkTrunk = '#3E2723';
-    const leafColor = '#38B44A'; // Forest green
+    const leafColor = '#38B44A'; 
     const darkLeaf = '#2E7D32';
 
     return (
         <div className="absolute" style={{ bottom: '80px', left: '80%', zIndex: 9 }}>
-            {/* Stage 0: Sapling (0-60s) */}
+            {}
             {stage === 0 && (
                 <motion.div
                     initial={{ scale: 0, y: 10 }}
@@ -71,15 +68,15 @@ export const PixelTree = () => {
                     className="relative"
                     style={{ width: p * 4, height: p * 6 }}
                 >
-                    {/* Stem */}
+                    {}
                     <div className="absolute" style={{ left: p * 1.5, top: p * 4, width: p, height: p * 2, background: trunkColor }} />
-                    {/* Leaves */}
+                    {}
                     <div className="absolute" style={{ left: p * 1, top: p * 2, width: p * 2, height: p * 2, background: leafColor }} />
                     <div className="absolute" style={{ left: p * 0.5, top: p * 3, width: p * 3, height: p, background: darkLeaf }} />
                 </motion.div>
             )}
 
-            {/* Stage 1: Small Tree (60-120s) */}
+            {}
             {stage === 1 && (
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
@@ -87,17 +84,17 @@ export const PixelTree = () => {
                     className="relative"
                     style={{ width: p * 8, height: p * 12 }}
                 >
-                    {/* Trunk */}
+                    {}
                     <div className="absolute" style={{ left: p * 3, top: p * 6, width: p * 2, height: p * 6, background: trunkColor }} />
                     <div className="absolute" style={{ left: p * 3, top: p * 11, width: p * 2, height: p, background: darkTrunk }} />
-                    {/* Canopy */}
+                    {}
                     <div className="absolute" style={{ left: p * 1, top: p * 2, width: p * 6, height: p * 4, background: leafColor }} />
                     <div className="absolute" style={{ left: 0, top: p * 3, width: p * 8, height: p * 2, background: darkLeaf, opacity: 0.3 }} />
                     <div className="absolute" style={{ left: p * 2, top: 0, width: p * 4, height: p * 2, background: leafColor }} />
                 </motion.div>
             )}
 
-            {/* Stage 2: Medium Tree (120-180s) */}
+            {}
             {stage === 2 && (
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
@@ -105,23 +102,23 @@ export const PixelTree = () => {
                     className="relative"
                     style={{ width: p * 12, height: p * 20 }}
                 >
-                    {/* Trunk */}
+                    {}
                     <div className="absolute" style={{ left: p * 5, top: p * 8, width: p * 2, height: p * 12, background: trunkColor }} />
                     <div className="absolute" style={{ left: p * 5, top: p * 19, width: p * 2, height: p, background: darkTrunk }} />
-                    {/* Branch left */}
+                    {}
                     <div className="absolute" style={{ left: p * 3, top: p * 10, width: p * 2, height: p, background: trunkColor }} />
 
-                    {/* Canopy */}
+                    {}
                     <div className="absolute" style={{ left: p * 2, top: p * 2, width: p * 8, height: p * 6, background: leafColor }} />
                     <div className="absolute" style={{ left: 0, top: p * 4, width: p * 12, height: p * 4, background: leafColor }} />
                     <div className="absolute" style={{ left: p * 3, top: 0, width: p * 6, height: p * 2, background: leafColor }} />
-                    {/* Detail pixels */}
+                    {}
                     <div className="absolute" style={{ left: p * 2, top: p * 4, width: p, height: p, background: darkLeaf }} />
                     <div className="absolute" style={{ left: p * 9, top: p * 3, width: p, height: p, background: darkLeaf }} />
                 </motion.div>
             )}
 
-            {/* Stage 3: Large Tree (180s+) */}
+            {}
             {stage === 3 && (
                 <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
@@ -129,24 +126,24 @@ export const PixelTree = () => {
                     className="relative"
                     style={{ width: p * 16, height: p * 30 }}
                 >
-                    {/* Trunk */}
+                    {}
                     <div className="absolute" style={{ left: p * 7, top: p * 10, width: p * 2, height: p * 20, background: trunkColor }} />
-                    <div className="absolute" style={{ left: p * 6, top: p * 28, width: p * 4, height: p * 2, background: darkTrunk }} /> {/* Base */}
+                    <div className="absolute" style={{ left: p * 6, top: p * 28, width: p * 4, height: p * 2, background: darkTrunk }} /> {}
 
-                    {/* Branches */}
+                    {}
                     <div className="absolute" style={{ left: p * 4, top: p * 14, width: p * 3, height: p, background: trunkColor }} />
                     <div className="absolute" style={{ left: p * 9, top: p * 12, width: p * 3, height: p, background: trunkColor }} />
 
-                    {/* Main Canopy */}
+                    {}
                     <div className="absolute" style={{ left: p * 3, top: p * 2, width: p * 10, height: p * 8, background: leafColor }} />
                     <div className="absolute" style={{ left: p * 1, top: p * 5, width: p * 14, height: p * 6, background: leafColor }} />
                     <div className="absolute" style={{ left: p * 5, top: 0, width: p * 6, height: p * 3, background: leafColor }} />
 
-                    {/* Side leaf puffs */}
+                    {}
                     <div className="absolute" style={{ left: 0, top: p * 6, width: p * 2, height: p * 2, background: leafColor }} />
                     <div className="absolute" style={{ left: p * 14, top: p * 6, width: p * 2, height: p * 2, background: leafColor }} />
 
-                    {/* Shadow/Detail */}
+                    {}
                     <div className="absolute" style={{ left: p * 4, top: p * 8, width: p * 2, height: p * 2, background: darkLeaf }} />
                     <div className="absolute" style={{ left: p * 10, top: p * 4, width: p * 2, height: p * 2, background: darkLeaf }} />
                 </motion.div>
@@ -156,7 +153,7 @@ export const PixelTree = () => {
 };
 
 export const PixelGrass = () => {
-    const p = 4; // pixel scale
+    const p = 4; 
     const blocksCount = 50;
 
     return (
@@ -170,40 +167,40 @@ export const PixelGrass = () => {
 
                 return (
                     <div key={i} className="flex-1 relative h-full">
-                        {/* Grass Top Block */}
+                        {}
                         <div className="absolute top-0 left-0 w-full h-[25%]" style={{ background: grassColor }}>
-                            {/* Highlight pixels */}
+                            {}
                             <div className="absolute top-0 left-0 w-1/2 h-[33%]" style={{ background: lightGrass, opacity: 0.3 }} />
                             <div className="absolute top-[33%] right-0 w-[40%] h-[33%]" style={{ background: lightGrass, opacity: 0.2 }} />
-                            {/* Shadow pixels at bottom of grass layer */}
+                            {}
                             <div className="absolute bottom-0 left-0 w-full h-[25%]" style={{ background: darkGrass, opacity: 0.4 }} />
 
-                            {/* Random specular highlights */}
+                            {}
                             {i % 2 === 0 && <div className="absolute top-[20%] left-[10%] w-[15%] h-[15%]" style={{ background: lightGrass }} />}
                             {i % 5 === 0 && <div className="absolute top-[40%] right-[20%] w-[10%] h-[10%]" style={{ background: lightGrass, opacity: 0.5 }} />}
                         </div>
 
-                        {/* Dirt Layer */}
+                        {}
                         <div className="absolute top-[25%] left-0 w-full h-[75%]" style={{ background: dirtColor }}>
-                            {/* Random dirt bits/rocks */}
+                            {}
                             {i % 2 === 0 && <div className="absolute top-[20%] left-[30%] w-[15%] h-[15%]" style={{ background: darkDirt }} />}
                             {i % 3 === 0 && <div className="absolute top-[50%] right-[10%] w-[10%] h-[12%]" style={{ background: darkDirt }} />}
                             {i % 4 === 0 && <div className="absolute top-[70%] left-[60%] w-[12%] h-[10%]" style={{ background: darkDirt }} />}
 
-                            {/* Texture shading */}
+                            {}
                             <div className="absolute inset-0" style={{
                                 background: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(0,0,0,0.05) 4px, rgba(0,0,0,0.05) 8px)'
                             }} />
                         </div>
 
-                        {/* Hanging Grass Detail over Dirt */}
+                        {}
                         <div className="absolute top-[25%] left-0 w-[20%] h-[15%]" style={{ background: grassColor }} />
                         <div className="absolute top-[25%] left-[40%] w-[25%] h-[25%]" style={{ background: grassColor }} />
                         <div className="absolute top-[25%] right-0 w-[15%] h-[10%]" style={{ background: grassColor }} />
                         <div className="absolute top-[35%] left-[10%] w-[10%] h-[10%]" style={{ background: darkGrass, opacity: 0.5 }} />
                         <div className="absolute top-[45%] left-[45%] w-[15%] h-[12%]" style={{ background: darkGrass, opacity: 0.4 }} />
 
-                        {/* Periodic Grass Tufts sticking UP */}
+                        {}
                         {i % 6 === 0 && (
                             <div className="absolute bottom-full left-[20%] w-[8px] h-[12px] bg-[#7DB342]" style={{
                                 clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)'
@@ -222,7 +219,7 @@ export const PixelGrass = () => {
 };
 
 export const PixelWildflowers = React.memo(() => {
-    // Reduced flower count
+    
     const flowers = useMemo(() => [...Array(10)].map((_, i) => ({
         id: i,
         left: 5 + Math.random() * 90,
@@ -238,12 +235,12 @@ export const PixelWildflowers = React.memo(() => {
                     key={f.id}
                     className="absolute bottom-0"
                     style={{ left: `${f.left}%`, scale: f.scale, willChange: 'transform' }}
-                    animate={{ rotate: [-3, 3, -3] }} // Reduced rotation range
+                    animate={{ rotate: [-3, 3, -3] }} 
                     transition={{ duration: 4, repeat: Infinity, delay: f.delay, ease: "easeInOut" }}
                 >
-                    {/* Stem */}
+                    {}
                     <div className="absolute bottom-0 left-1 w-1 h-4 bg-green-700" />
-                    {/* Petals */}
+                    {}
                     <div className="absolute bottom-3 left-0 w-3 h-3" style={{ background: f.color, imageRendering: 'pixelated', clipPath: 'polygon(0% 20%, 20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%)' }}>
                         <div className="absolute inset-1 bg-white opacity-40" />
                     </div>
@@ -254,7 +251,7 @@ export const PixelWildflowers = React.memo(() => {
 });
 
 export const FloatingPollen = React.memo(({ timeOfDay }) => {
-    // Reduced particle count
+    
     const particles = useMemo(() => [...Array(15)].map((_, i) => ({
         id: i,
         left: Math.random() * 100,
@@ -283,7 +280,7 @@ export const FloatingPollen = React.memo(({ timeOfDay }) => {
                         willChange: 'transform, opacity'
                     }}
                     animate={{
-                        x: [0, 50, 0], // Simplified path
+                        x: [0, 50, 0], 
                         y: [0, -20, 0],
                         opacity: [0, 0.5, 0]
                     }}

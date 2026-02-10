@@ -1,4 +1,4 @@
-// components/NowPlayingOverlay.jsx
+
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -15,13 +15,12 @@ import {
 import { useTheme } from '../context/ThemeContext';
 import './NowPlayingOverlay.css';
 
-// Import all your music files
 import noonenoticed from '../assets/songs/noonenoticed.mp3';
 import aboutyou from '../assets/songs/aboutyou.mp3';
 
 const NowPlayingOverlay = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [viewMode, setViewMode] = useState('full'); // 'closed', 'compact', 'full'
+  const [viewMode, setViewMode] = useState('full'); 
   const [currentSong, setCurrentSong] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -31,7 +30,6 @@ const NowPlayingOverlay = () => {
   const progressBarRef = useRef(null);
   const { currentTheme } = useTheme();
 
-  // Music library with imported files
   const musicLibrary = [
     {
       id: 1,
@@ -53,7 +51,6 @@ const NowPlayingOverlay = () => {
     }
   ];
 
-  // Cookie helper functions
   const setCookie = (name, value, days) => {
     const expires = new Date();
     expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -67,12 +64,10 @@ const NowPlayingOverlay = () => {
     return null;
   };
 
-  // Load playback state and view mode from cookies
   useEffect(() => {
     const savedViewMode = getCookie('nowPlayingViewMode');
     const savedState = localStorage.getItem('nowPlayingState');
-    
-    // Set view mode from cookie
+
     if (savedViewMode && ['closed', 'compact', 'full'].includes(savedViewMode)) {
       setViewMode(savedViewMode);
     }
@@ -93,12 +88,10 @@ const NowPlayingOverlay = () => {
     }
   }, []);
 
-  // Save view mode to cookie
   useEffect(() => {
     setCookie('nowPlayingViewMode', viewMode, 365);
   }, [viewMode]);
 
-  // Save playback state to localStorage
   useEffect(() => {
     if (currentSong) {
       const state = {
@@ -119,7 +112,6 @@ const NowPlayingOverlay = () => {
     }
   }, [currentSong, currentTime, progress, isPlaying]);
 
-  // Handle audio events
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -150,7 +142,6 @@ const NowPlayingOverlay = () => {
     };
   }, [currentTime, isPlaying, isDragging]);
 
-  // Audio time update handler
   const handleTimeUpdate = () => {
     if (audioRef.current && !isDragging) {
       const current = audioRef.current.currentTime;
@@ -160,7 +151,6 @@ const NowPlayingOverlay = () => {
     }
   };
 
-  // Play/pause toggle
   const togglePlayPause = async () => {
     if (!audioRef.current || !currentSong) return;
 
@@ -178,7 +168,6 @@ const NowPlayingOverlay = () => {
     }
   };
 
-  // Select and play a song
   const playSong = async (song, resetTime = true) => {
     const wasPlaying = isPlaying;
     setCurrentSong(song);
@@ -208,7 +197,6 @@ const NowPlayingOverlay = () => {
     }, 100);
   };
 
-  // Skip to next song
   const nextSong = () => {
     if (currentSong) {
       const currentIndex = musicLibrary.findIndex(song => song.id === currentSong.id);
@@ -217,7 +205,6 @@ const NowPlayingOverlay = () => {
     }
   };
 
-  // Skip to previous song
   const prevSong = () => {
     if (currentSong) {
       const currentIndex = musicLibrary.findIndex(song => song.id === currentSong.id);
@@ -226,13 +213,11 @@ const NowPlayingOverlay = () => {
     }
   };
 
-  // Change view mode
   const setViewModeWithSave = (mode) => {
     setViewMode(mode);
     setCookie('nowPlayingViewMode', mode, 365);
   };
 
-  // Progress bar drag handlers
   const handleProgressMouseDown = (e) => {
     setIsDragging(true);
     updateProgress(e);
@@ -257,7 +242,6 @@ const NowPlayingOverlay = () => {
     }
   };
 
-  // Touch handlers for mobile
   const handleProgressTouchStart = (e) => {
     setIsDragging(true);
     updateProgress(e.touches[0]);
@@ -298,7 +282,6 @@ const NowPlayingOverlay = () => {
     }
   };
 
-  // Format time (seconds to MM:SS)
   const formatTime = (seconds) => {
     if (isNaN(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
@@ -308,7 +291,7 @@ const NowPlayingOverlay = () => {
 
   return (
     <>
-      {/* Hidden audio element */}
+      {}
       <audio
         ref={audioRef}
         src={currentSong?.url}
@@ -317,7 +300,7 @@ const NowPlayingOverlay = () => {
         onError={(e) => console.error('Audio element error:', e)}
       />
 
-      {/* Closed State - Small Music Button */}
+      {}
       <AnimatePresence>
         {viewMode === 'closed' && (
           <motion.button
@@ -341,7 +324,7 @@ const NowPlayingOverlay = () => {
         )}
       </AnimatePresence>
 
-      {/* Compact Player */}
+      {}
       <AnimatePresence>
         {viewMode === 'compact' && (
           <motion.div
@@ -351,7 +334,7 @@ const NowPlayingOverlay = () => {
             exit={{ x: -100, opacity: 0 }}
             transition={{ type: "spring", stiffness: 100 }}
           >
-            {/* Song Info in Compact Mode */}
+            {}
             {currentSong && (
               <div className="compact-song-info">
                 <div className="compact-album-art">
@@ -416,7 +399,7 @@ const NowPlayingOverlay = () => {
         )}
       </AnimatePresence>
 
-      {/* Full Player */}
+      {}
       <AnimatePresence>
         {viewMode === 'full' && (
           <motion.div
@@ -426,7 +409,7 @@ const NowPlayingOverlay = () => {
             exit={{ x: -400, opacity: 0 }}
             transition={{ type: "spring", stiffness: 100 }}
           >
-            {/* Header with controls */}
+            {}
             <div className="player-header">
               <div className="player-title">
                 <Music size={16} />
@@ -457,7 +440,7 @@ const NowPlayingOverlay = () => {
               </div>
             </div>
 
-            {/* Current Song Info */}
+            {}
             {currentSong && (
               <div className="player-current-info">
                 <div className="player-album-art">
@@ -476,7 +459,7 @@ const NowPlayingOverlay = () => {
               </div>
             )}
 
-            {/* Controls */}
+            {}
             <div className="player-controls-main">
               <button 
                 className="control-btn"
@@ -503,7 +486,7 @@ const NowPlayingOverlay = () => {
               </button>
             </div>
 
-            {/* Progress Bar */}
+            {}
             {currentSong && (
               <div className="player-progress-section">
                 <div className="player-time-display">
@@ -531,7 +514,7 @@ const NowPlayingOverlay = () => {
         )}
       </AnimatePresence>
 
-      {/* Library Sidebar */}
+      {}
       <AnimatePresence>
         {isExpanded && (
           <>

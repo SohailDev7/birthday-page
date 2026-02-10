@@ -22,7 +22,6 @@ const TicTacToe = () => {
     [0, 4, 8], [2, 4, 6]
   ];
 
-  // Initialize game
   const initGame = () => {
     setGameState(Array(9).fill(''));
     setCurrentPlayer('O');
@@ -34,7 +33,6 @@ const TicTacToe = () => {
     setShowConfetti(false);
   };
 
-  // Update scores when game ends
   useEffect(() => {
     if (!gameActive && winner) {
       setScores(prev => ({
@@ -46,19 +44,16 @@ const TicTacToe = () => {
     }
   }, [gameActive, winner]);
 
-  // Check for winner
   const checkWinner = (board, player) => {
     return winningConditions.some(condition =>
       condition.every(index => board[index] === player)
     );
   };
 
-  // Check for draw
   const checkDraw = (board) => {
     return !board.includes('');
   };
 
-  // Find winning move
   const findWinningMove = (board, player) => {
     for (let condition of winningConditions) {
       const [a, b, c] = condition;
@@ -72,37 +67,31 @@ const TicTacToe = () => {
     return -1;
   };
 
-  // Check if player is about to win
   const isPlayerAboutToWin = (board) => {
     return findWinningMove(board, 'O') !== -1;
   };
 
-  // AI Move with cheating
   const makeAIMove = (currentBoard) => {
     let moveIndex = -1;
     const newBoard = [...currentBoard];
 
-    // 1. Try to win
     moveIndex = findWinningMove(newBoard, 'X');
 
-    // 2. Block player or cheat
     if (moveIndex === -1) {
       const playerWinIndex = findWinningMove(newBoard, 'O');
 
       if (playerWinIndex !== -1 && isCheating) {
         setIsCheating(true);
 
-        // Cheat by making two moves if possible
         const emptyCells = newBoard
           .map((cell, index) => cell === '' ? index : null)
           .filter(val => val !== null);
 
         if (emptyCells.length > 1) {
-          // Make first cheating move
+          
           const firstCheatIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
           newBoard[firstCheatIndex] = 'X';
 
-          // Make second cheating move (the blocking move)
           moveIndex = playerWinIndex;
         } else if (emptyCells.length === 1) {
           moveIndex = emptyCells[0];
@@ -112,12 +101,10 @@ const TicTacToe = () => {
       }
     }
 
-    // 3. Take center
     if (moveIndex === -1 && newBoard[4] === '') {
       moveIndex = 4;
     }
 
-    // 4. Random move
     if (moveIndex === -1) {
       const emptyCells = newBoard
         .map((cell, index) => cell === '' ? index : null)
@@ -135,48 +122,40 @@ const TicTacToe = () => {
     return newBoard;
   };
 
-  // Handle cell click
   const handleCellClick = async (index) => {
     if (aiTurnInProgress || !gameActive || currentPlayer === 'X' || gameState[index] !== '') {
       return;
     }
 
-    // Player makes move
     const newBoard = [...gameState];
     newBoard[index] = 'O';
     setGameState(newBoard);
 
-    // Check if player is about to win (trigger cheating)
     if (isPlayerAboutToWin(newBoard) && !labelsSwitched) {
       setIsCheating(true);
     }
 
-    // Check if player won (but we'll cheat)
     if (checkWinner(newBoard, 'O') && !labelsSwitched) {
       setLabelsSwitched(true);
-      setWinner('X'); // Cheat: declare Soil Chor as winner
+      setWinner('X'); 
       setGameActive(false);
       setShowConfetti(true);
       return;
     }
 
-    // Check for draw
     if (checkDraw(newBoard)) {
       setWinner(null);
       setGameActive(false);
       return;
     }
 
-    // AI's turn
     setCurrentPlayer('X');
     setAiTurnInProgress(true);
 
-    // AI move with delay
     setTimeout(() => {
       const aiBoard = makeAIMove(newBoard);
       setGameState(aiBoard);
 
-      // Check if AI won
       if (checkWinner(aiBoard, 'X')) {
         setWinner('X');
         setGameActive(false);
@@ -184,7 +163,6 @@ const TicTacToe = () => {
         return;
       }
 
-      // Check for draw
       if (checkDraw(aiBoard)) {
         setWinner(null);
         setGameActive(false);
@@ -196,7 +174,6 @@ const TicTacToe = () => {
     }, 500 + Math.random() * 1000);
   };
 
-  // Confetti effect
   useEffect(() => {
     if (showConfetti) {
       const timer = setTimeout(() => setShowConfetti(false), 3000);
@@ -204,7 +181,6 @@ const TicTacToe = () => {
     }
   }, [showConfetti]);
 
-  // Animation variants
   const cellVariants = {
     hidden: { scale: 0, rotate: -180 },
     visible: {
@@ -242,14 +218,14 @@ const TicTacToe = () => {
   return (
     <div className={`tic-tac-toe-container ${currentTheme}`}>
       <div className="game-layout">
-        {/* Left Side - Game Board */}
+        {}
         <motion.div
           className="game-board-section"
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
         >
-          {/* Header */}
+          {}
           <motion.div
             className="game-header"
             initial={{ y: -20, opacity: 0 }}
@@ -272,7 +248,7 @@ const TicTacToe = () => {
             </motion.h1>
           </motion.div>
 
-          {/* Game Board */}
+          {}
           <motion.div
             className="board-container"
             variants={containerVariants}
@@ -307,7 +283,7 @@ const TicTacToe = () => {
             </div>
           </motion.div>
 
-          {/* Status & Controls */}
+          {}
           <motion.div
             className="game-controls"
             initial={{ opacity: 0, y: 20 }}
@@ -373,14 +349,14 @@ const TicTacToe = () => {
           </motion.div>
         </motion.div>
 
-        {/* Right Side - Players & Scores */}
+        {}
         <motion.div
           className="players-section"
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          {/* Player O - Prachi */}
+          {}
           <motion.div
             className={`player-card player-o ${currentPlayer === 'O' && gameActive ? 'active' : ''} ${winner === 'O' ? 'winner' : ''}`}
             animate={{
@@ -409,7 +385,7 @@ const TicTacToe = () => {
             </div>
           </motion.div>
 
-          {/* VS Divider */}
+          {}
           <motion.div
             className="vs-divider"
             animate={{ rotate: [0, 5, -5, 0] }}
@@ -418,7 +394,7 @@ const TicTacToe = () => {
             VS
           </motion.div>
 
-          {/* Player X - Soil Chor */}
+          {}
           <motion.div
             className={`player-card player-x ${currentPlayer === 'X' && gameActive ? 'active' : ''} ${winner === 'X' ? 'winner' : ''}`}
             animate={{
@@ -447,7 +423,7 @@ const TicTacToe = () => {
             </div>
           </motion.div>
 
-          {/* Draws Counter */}
+          {}
           <motion.div
             className="draws-counter"
             initial={{ opacity: 0 }}
@@ -459,7 +435,7 @@ const TicTacToe = () => {
         </motion.div>
       </div>
 
-      {/* Confetti */}
+      {}
       <AnimatePresence>
         {showConfetti && <ConfettiEffect />}
       </AnimatePresence>
@@ -467,7 +443,6 @@ const TicTacToe = () => {
   );
 };
 
-// Confetti Component
 const ConfettiEffect = () => {
   return (
     <div className="confetti-container">

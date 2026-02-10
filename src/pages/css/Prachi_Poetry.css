@@ -1,11 +1,10 @@
-/* PoemPage.css */
+
 .poetry-app {
     min-height: 100vh;
     font-family: 'Georgia', 'Times New Roman', serif;
     overflow-x: hidden;
 }
 
-/* Navigation */
 .poetry-navbar {
     background: rgba(255, 255, 255, 0.95) !important;
     backdrop-filter: blur(10px);
@@ -42,13 +41,11 @@
     color: white;
 }
 
-/* Main Container */
 .poetry-container {
     padding-top: 100px;
     max-width: 1200px;
 }
 
-/* Selection View */
 .selection-view {
     text-align: center;
 }
@@ -73,7 +70,6 @@
     font-style: italic;
 }
 
-/* Year Selection */
 .year-selection {
     margin-bottom: 3rem;
 }
@@ -158,7 +154,6 @@
     display: inline-block;
 }
 
-/* Preview Section */
 .preview-section {
     max-width: 500px;
     margin: 0 auto;
@@ -223,7 +218,6 @@
     box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
 }
 
-/* PDF View */
 .pdf-view {
     background: white;
     border-radius: 20px;
@@ -301,7 +295,6 @@
     text-decoration: none;
 }
 
-/* PDF Embed */
 .pdf-embed-wrapper {
     padding: 2rem;
     background: #F9FAFB;
@@ -313,7 +306,6 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* PDF Footer */
 .pdf-footer {
     padding: 1.5rem 2rem;
     background: #F3F4F6;
@@ -333,7 +325,6 @@
     color: #EC4899;
 }
 
-/* Theme Support */
 body[data-theme="luxury"] .poetry-navbar {
     background: rgba(157, 23, 77, 0.95) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -374,7 +365,6 @@ body[data-theme="luxury"] .pdf-embed-wrapper {
     background: rgba(255, 255, 255, 0.05);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .main-title {
         font-size: 2.5rem;
@@ -423,7 +413,6 @@ body[data-theme="luxury"] .pdf-embed-wrapper {
     }
 }
 
-/* PDF Viewer Styles */
 .pdf-viewer-container {
   display: flex;
   flex-direction: column;
@@ -501,7 +490,6 @@ body[data-theme="luxury"] .pdf-embed-wrapper {
   height: auto;
 }
 
-/* Portrait orientation for PDF */
 .react-pdf__Page {
   display: flex;
   justify-content: center;
@@ -513,7 +501,6 @@ body[data-theme="luxury"] .pdf-embed-wrapper {
   border-radius: 4px;
 }
 
-/* Loading and Error States */
 .pdf-loading {
   display: flex;
   flex-direction: column;
@@ -547,7 +534,6 @@ body[data-theme="luxury"] .pdf-embed-wrapper {
   border: 1px solid #f5c6cb;
 }
 
-/* Update PDF embed wrapper for portrait */
 .pdf-embed-wrapper {
   padding: 1rem;
   background: #f8f9fa;
@@ -557,7 +543,6 @@ body[data-theme="luxury"] .pdf-embed-wrapper {
   justify-content: center;
 }
 
-/* Theme Support for PDF Viewer */
 body[data-theme="luxury"] .pdf-viewer-container {
   background: rgba(255, 255, 255, 0.95);
 }
@@ -576,7 +561,6 @@ body[data-theme="luxury"] .scale-info {
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* Responsive PDF Viewer */
 @media (max-width: 768px) {
   .pdf-controls {
     flex-direction: column;

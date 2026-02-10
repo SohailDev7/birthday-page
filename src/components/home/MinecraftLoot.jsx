@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 export const MinecraftLoot = () => {
-    // We'll create some "items" that look like Minecraft loot
+    
     const items = useMemo(() => [
         { name: 'Diamond', color: '#b9f2ff', pos: { left: '10%', top: '20%' }, delay: 0 },
         { name: 'Emerald', color: '#50fa7b', pos: { left: '85%', top: '15%' }, delay: 2 },
@@ -31,9 +31,9 @@ export const MinecraftLoot = () => {
                         ease: "linear"
                     }}
                 >
-                    {/* Simplified CSS-only pixel items */}
+                    {}
                     <div className="relative w-6 h-6" style={{ background: item.color, boxShadow: 'inset -2px -2px 0 rgba(0,0,0,0.2), 2px 2px 0 rgba(255,255,255,0.4)', border: '1px solid #000' }}>
-                        {/* Shading */}
+                        {}
                         <div className="absolute top-0 left-0 w-2 h-2 bg-white/40" />
                         <div className="absolute bottom-0 right-0 w-2 h-2 bg-black/20" />
                     </div>

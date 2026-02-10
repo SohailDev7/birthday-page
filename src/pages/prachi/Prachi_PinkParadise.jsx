@@ -1,4 +1,4 @@
-// components/PinkParadise.jsx
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Star, Sparkles, Home, GamepadIcon, User, Lock, Play } from 'lucide-react';
@@ -34,7 +34,6 @@ const Prachi_PinkParadise = () => {
     },
   ];
 
-  // Properly distributed floating elements with exact positions
   const floatingElements = [
     {
       icon: Heart,
@@ -94,7 +93,6 @@ const Prachi_PinkParadise = () => {
     }
   ];
 
-  // Properly distributed sparkle positions
   const sparklePositions = [
     { top: '20%', left: '15%' },
     { top: '15%', right: '20%' },
@@ -138,18 +136,17 @@ const Prachi_PinkParadise = () => {
 
   return (
     <div className="pink-paradise-page">
-      {/* Ultra Kawaii Pink SVG Background with 120 FPS Animations */}
+      {}
       <PinkSVGBackground />
 
-
-      {/* Main Content with proper spacing */}
+      {}
       <motion.div
         className="paradise-container"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
       >
-        {/* Header with proper spacing */}
+        {}
         <motion.div
           className="paradise-header"
           variants={itemVariants}
@@ -189,7 +186,7 @@ const Prachi_PinkParadise = () => {
           />
         </motion.div>
 
-        {/* Games Grid */}
+        {}
         <motion.div
           className="games-grid"
           variants={containerVariants}
@@ -208,7 +205,7 @@ const Prachi_PinkParadise = () => {
               onHoverEnd={() => setHoveredGame(null)}
               onClick={() => handleGameClick(game)}
             >
-              {/* Game Icon */}
+              {}
               <motion.div
                 className="game-icon"
                 animate={
@@ -235,13 +232,13 @@ const Prachi_PinkParadise = () => {
                 <span className="icon-emoji">{game.icon}</span>
               </motion.div>
 
-              {/* Game Content */}
+              {}
               <div className="game-content">
                 <h3 className="game-title">{game.title}</h3>
                 <p className="game-description">{game.description}</p>
               </div>
 
-              {/* Action Button */}
+              {}
               <div className="game-action">
                 {game.available ? (
                   <Nav.Link
@@ -267,7 +264,7 @@ const Prachi_PinkParadise = () => {
                 )}
               </div>
 
-              {/* Hover Effect */}
+              {}
               <AnimatePresence>
                 {hoveredGame === game.id && (
                   <motion.div
@@ -280,7 +277,7 @@ const Prachi_PinkParadise = () => {
                 )}
               </AnimatePresence>
 
-              {/* Corner Decoration */}
+              {}
               <motion.div
                 className="corner-decoration"
                 animate={{
@@ -298,7 +295,7 @@ const Prachi_PinkParadise = () => {
           ))}
         </motion.div>
 
-        {/* Footer */}
+        {}
         <motion.div
           className="paradise-footer"
           variants={itemVariants}

@@ -3,7 +3,6 @@ import { Container, Row, Col, Card, Button, Form, Badge, Dropdown, Spinner, Butt
 import { useTheme } from '../../context/ThemeContext';
 import { Settings, RefreshCw, Grid, List, Search, Filter, AlertTriangle, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 
-// Import components
 import AddMovieModal from '../../components/AddMovieModal';
 import AdminPanel from '../../components/AdminPanel';
 import FullReviewModal from '../../components/FullReviewModal';
@@ -25,9 +24,8 @@ const Prachi_List = () => {
   const [serverDown, setServerDown] = useState(false);
   const [wakingServer, setWakingServer] = useState(false);
   const [showServerModal, setShowServerModal] = useState(false);
-  const [serverStatus, setServerStatus] = useState('checking'); // 'checking', 'sleeping', 'active'
+  const [serverStatus, setServerStatus] = useState('checking'); 
 
-  // Refs for horizontal scrolling
   const forSoilRef = useRef(null);
   const forPrachiRef = useRef(null);
   const allMoviesRef = useRef(null);
@@ -35,7 +33,6 @@ const Prachi_List = () => {
   const API_BASE_URL = 'https://express-umdy.onrender.com/api';
   const SERVER_URL = 'https://express-umdy.onrender.com';
 
-  // Form state - isolated
   const [formData, setFormData] = useState({
     movieName: '',
     summary: '',
@@ -49,7 +46,6 @@ const Prachi_List = () => {
     watchLink: ''
   });
 
-  // Enhanced server status check with timeout
   const checkServerStatus = async (timeout = 10000) => {
     try {
       const controller = new AbortController();
@@ -71,25 +67,22 @@ const Prachi_List = () => {
     }
   };
 
-  // Enhanced wake up server with better feedback
   const wakeUpServer = async () => {
     setWakingServer(true);
     setServerStatus('checking');
 
     try {
-      // First, ping the server directly to wake it up
+      
       console.log('Pinging server to wake it up...');
       await fetch(SERVER_URL, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-      }).catch(() => { }); // Ignore errors for the initial ping
+      }).catch(() => { }); 
 
-      // Then open in new tab for user visibility
       window.open(SERVER_URL, '_blank');
 
-      // Try to ping the server multiple times with better feedback
       let attempts = 0;
-      const maxAttempts = 12; // 60 seconds total (12 * 5s)
+      const maxAttempts = 12; 
 
       const attemptWakeUp = async () => {
         attempts++;
@@ -102,10 +95,9 @@ const Prachi_List = () => {
           setServerDown(false);
           setWakingServer(false);
 
-          // Small delay to show "active" status
           setTimeout(() => {
             setShowServerModal(false);
-            // Reload movies after server is up
+            
             loadMovies();
           }, 1500);
 
@@ -114,7 +106,7 @@ const Prachi_List = () => {
 
         if (attempts < maxAttempts) {
           setServerStatus('waking');
-          // Wait 5 seconds before next attempt
+          
           setTimeout(attemptWakeUp, 5000);
         } else {
           setServerStatus('sleeping');
@@ -123,7 +115,6 @@ const Prachi_List = () => {
         }
       };
 
-      // Start attempting to wake up
       setTimeout(attemptWakeUp, 3000);
 
     } catch (error) {
@@ -134,13 +125,11 @@ const Prachi_List = () => {
     }
   };
 
-  // Enhanced load movies with 15-second timeout
   const loadMovies = async () => {
     try {
       setLoading(true);
       setServerDown(false);
 
-      // Set a 15-second timeout for the movie loading
       const loadTimeout = setTimeout(() => {
         console.log('Movie loading timeout reached - showing server wake modal');
         setServerDown(true);
@@ -168,7 +157,6 @@ const Prachi_List = () => {
       console.error('Failed to load movies:', error);
       clearTimeout(loadTimeout);
 
-      // Check if it's a server connectivity issue
       const isServerUp = await checkServerStatus(5000);
       if (!isServerUp) {
         setServerDown(true);
@@ -181,7 +169,6 @@ const Prachi_List = () => {
     }
   };
 
-  // Save movie with error handling
   const saveMovie = async (movieData, isEdit = false) => {
     try {
       const url = isEdit ? `${API_BASE_URL}/movies/${editingMovie._id}` : `${API_BASE_URL}/movies`;
@@ -201,7 +188,6 @@ const Prachi_List = () => {
     } catch (error) {
       console.error('Failed to save movie:', error);
 
-      // Check server status on error
       const isServerUp = await checkServerStatus();
       if (!isServerUp) {
         setServerDown(true);
@@ -214,7 +200,6 @@ const Prachi_List = () => {
     }
   };
 
-  // Delete movie with error handling
   const deleteMovie = async (id) => {
     try {
       const response = await fetch(`${API_BASE_URL}/movies/${id}`, {
@@ -227,7 +212,6 @@ const Prachi_List = () => {
     } catch (error) {
       console.error('Failed to delete movie:', error);
 
-      // Check server status on error
       const isServerUp = await checkServerStatus();
       if (!isServerUp) {
         setServerDown(true);
@@ -240,7 +224,6 @@ const Prachi_List = () => {
     }
   };
 
-  // Toggle watched status with error handling
   const toggleWatched = async (id) => {
     try {
       const response = await fetch(`${API_BASE_URL}/movies/${id}/toggle-watched`, {
@@ -253,7 +236,6 @@ const Prachi_List = () => {
     } catch (error) {
       console.error('Failed to toggle watched status:', error);
 
-      // Check server status on error
       const isServerUp = await checkServerStatus();
       if (!isServerUp) {
         setServerDown(true);
@@ -266,18 +248,17 @@ const Prachi_List = () => {
     }
   };
 
-  // Initialize with server check
   useEffect(() => {
     const initializeApp = async () => {
       setLoading(true);
-      // First check if server is awake
+      
       const isServerUp = await checkServerStatus(10000);
       if (!isServerUp) {
         setServerDown(true);
         setShowServerModal(true);
         setLoading(false);
       } else {
-        // Server is up, load movies
+        
         await loadMovies();
       }
     };
@@ -285,14 +266,13 @@ const Prachi_List = () => {
     initializeApp();
   }, []);
 
-  // FIXED: Event handlers without event parameter requirement
   const handleAddMovie = async () => {
     try {
       const result = await saveMovie(formData);
       setMovies(prev => [result.data, ...prev]);
       handleCloseModals();
     } catch (error) {
-      // Error handled in saveMovie
+      
     }
   };
 
@@ -304,7 +284,7 @@ const Prachi_List = () => {
       ));
       handleCloseModals();
     } catch (error) {
-      // Error handled in saveMovie
+      
     }
   };
 
@@ -315,7 +295,7 @@ const Prachi_List = () => {
       await deleteMovie(movieId);
       setMovies(prev => prev.filter(movie => movie._id !== movieId));
     } catch (error) {
-      // Error handled in deleteMovie
+      
     }
   };
 
@@ -328,11 +308,10 @@ const Prachi_List = () => {
           : movie
       ));
     } catch (error) {
-      // Error handled in toggleWatched
+      
     }
   };
 
-  // Modal management
   const handleCloseModals = () => {
     setShowAddMovie(false);
     setShowAdmin(false);
@@ -373,7 +352,6 @@ const Prachi_List = () => {
     });
   };
 
-  // Horizontal scroll functions
   const scrollLeft = (ref) => {
     if (ref && ref.current) {
       ref.current.scrollBy({ left: -300, behavior: 'smooth' });
@@ -386,7 +364,6 @@ const Prachi_List = () => {
     }
   };
 
-  // Filtering and sorting - unwatched movies first
   const filteredMovies = movies
     .filter(movie => {
       const matchesFilter = filter === 'all' ||
@@ -401,7 +378,7 @@ const Prachi_List = () => {
       return matchesFilter && matchesSearch;
     })
     .sort((a, b) => {
-      // Unwatched movies first, then by creation date (newest first)
+      
       if (a.watched === 'not watched' && b.watched === 'watched') return -1;
       if (a.watched === 'watched' && b.watched === 'not watched') return 1;
       return new Date(b.createdAt) - new Date(a.createdAt);
@@ -410,7 +387,7 @@ const Prachi_List = () => {
   const forSoilMovies = movies
     .filter(movie => movie.targetAudience === 'For Soil')
     .sort((a, b) => {
-      // Unwatched movies first, then by creation date (newest first)
+      
       if (a.watched === 'not watched' && b.watched === 'watched') return -1;
       if (a.watched === 'watched' && b.watched === 'not watched') return 1;
       return new Date(b.createdAt) - new Date(a.createdAt);
@@ -419,22 +396,19 @@ const Prachi_List = () => {
   const forPrachiMovies = movies
     .filter(movie => movie.targetAudience === 'For Prachi')
     .sort((a, b) => {
-      // Unwatched movies first, then by creation date (newest first)
+      
       if (a.watched === 'not watched' && b.watched === 'watched') return -1;
       if (a.watched === 'watched' && b.watched === 'not watched') return 1;
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
-  // Check if section needs horizontal scrolling (more than 4 movies)
   const needsHorizontalScroll = (movies) => viewMode === 'grid' && movies.length > 4;
 
-  // Horizontal Movie Section Component with forwardRef
   const HorizontalMovieSection = forwardRef(({ title, movies, badgeColor }, ref) => {
     if (movies.length === 0) return null;
 
     const unwatchedCount = movies.filter(movie => movie.watched === 'not watched').length;
 
-    // If in list view mode, always show as list
     if (viewMode === 'list') {
       return (
         <div className="movies-section">
@@ -471,7 +445,6 @@ const Prachi_List = () => {
       );
     }
 
-    // Grid view mode
     return (
       <div className="movies-section">
         <div className="section-header-modern">
@@ -489,7 +462,7 @@ const Prachi_List = () => {
         </div>
 
         {needsHorizontalScroll(movies) ? (
-          // Horizontal scrolling section
+          
           <div className="horizontal-scroll-section-modern">
             <div className="scroll-container-modern">
               <button
@@ -526,7 +499,7 @@ const Prachi_List = () => {
             </div>
           </div>
         ) : (
-          // Regular grid for 4 or fewer movies
+          
           <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
             {movies
               .filter(movie => movie.movieName.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -547,17 +520,15 @@ const Prachi_List = () => {
     );
   });
 
-  // Add display name for better debugging
   HorizontalMovieSection.displayName = 'HorizontalMovieSection';
 
-  // Regular Movie Section Component (for main movies grid)
   const RegularMovieSection = ({ movies }) => {
     if (movies.length === 0) return null;
 
     return (
       <div>
         {viewMode === 'list' ? (
-          // List view
+          
           <div>
             {movies.map(movie => (
               <div key={movie._id} className="mb-3">
@@ -571,7 +542,7 @@ const Prachi_List = () => {
             ))}
           </div>
         ) : (
-          // Grid view
+          
           <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
             {movies.map(movie => (
               <div key={movie._id} className="col">
@@ -591,7 +562,7 @@ const Prachi_List = () => {
 
   return (
     <div className={`prachi-list-page ${currentTheme}`} data-theme={currentTheme}>
-      {/* Enhanced Server Wake-up Modal */}
+      {}
       <Modal show={showServerModal} onHide={() => setShowServerModal(false)} centered className="server-wake-modal">
         <Modal.Header closeButton className="bg-warning text-dark">
           <Modal.Title>
@@ -612,7 +583,7 @@ const Prachi_List = () => {
               Then come back to this page and click "Refresh Movies".
             </div>
 
-            {/* Server Status Display */}
+            {}
             {serverStatus === 'checking' && (
               <div className="mt-3">
                 <Spinner animation="border" size="sm" className="me-2" />
@@ -660,7 +631,7 @@ const Prachi_List = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Floating Admin Button */}
+      {}
       <button
         className="admin-floating-btn-modern"
         onClick={() => setShowAdmin(true)}
@@ -669,7 +640,7 @@ const Prachi_List = () => {
       </button>
 
       <div className="prachi-list-container">
-        {/* Header */}
+        {}
         <div className="prachi-header">
           <h1 className="prachi-title">🎬 Pringles Cinema List</h1>
           <p className="prachi-subtitle">Made for sharing each other movies</p>
@@ -690,11 +661,11 @@ const Prachi_List = () => {
           </div>
         </div>
 
-        {/* Controls */}
+        {}
         <div className="controls-section">
           <div className="controls-card">
             <div className="controls-grid">
-              {/* Search */}
+              {}
               <div className="search-wrapper">
                 <Search className="search-icon" size={20} />
                 <input
@@ -706,7 +677,7 @@ const Prachi_List = () => {
                 />
               </div>
 
-              {/* Filter Dropdown */}
+              {}
               <div className="filter-dropdown">
                 <select
                   className="filter-toggle"
@@ -721,7 +692,7 @@ const Prachi_List = () => {
                 </select>
               </div>
 
-              {/* View Toggle */}
+              {}
               <div className="view-toggle-group">
                 <button
                   className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
@@ -737,7 +708,7 @@ const Prachi_List = () => {
                 </button>
               </div>
 
-              {/* Refresh Button */}
+              {}
               <button
                 className="refresh-btn-modern"
                 onClick={loadMovies}
@@ -749,7 +720,7 @@ const Prachi_List = () => {
           </div>
         </div>
 
-        {/* Loading State */}
+        {}
         {loading && (
           <div className="loading-state-modern">
             <div className="loading-spinner"></div>
@@ -758,7 +729,7 @@ const Prachi_List = () => {
           </div>
         )}
 
-        {/* Server Down State */}
+        {}
         {serverDown && !loading && (
           <div className="empty-state-modern">
             <div className="empty-icon">😴</div>
@@ -776,10 +747,10 @@ const Prachi_List = () => {
           </div>
         )}
 
-        {/* Movie Sections */}
+        {}
         {!loading && !serverDown && (
           <>
-            {/* For Prachi's Watchlist */}
+            {}
             {forPrachiMovies.length > 0 && (filter === 'all' || filter === 'for-prachi') && (
               <HorizontalMovieSection
                 title="🌸 For Prachi's Watchlist"
@@ -789,7 +760,7 @@ const Prachi_List = () => {
               />
             )}
 
-            {/* For Soil's Watchlist */}
+            {}
             {forSoilMovies.length > 0 && (filter === 'all' || filter === 'for-soil') && (
               <HorizontalMovieSection
                 title="🍿 For Soil's Watchlist"
@@ -799,7 +770,7 @@ const Prachi_List = () => {
               />
             )}
 
-            {/* Main Movies Grid */}
+            {}
             {filteredMovies.length > 0 && (
               <div className="movies-section">
                 <div className="section-header-modern">
@@ -827,7 +798,7 @@ const Prachi_List = () => {
         )}
       </div>
 
-      {/* Modals */}
+      {}
       <AddMovieModal
         show={showAddMovie}
         onHide={handleCloseModals}

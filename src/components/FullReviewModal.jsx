@@ -57,7 +57,7 @@ const FullReviewModal = ({ movie, onClose }) => {
                 </span>
               </div>
               
-              {/* Watch Now Button Section */}
+              {}
               {movie.watchLink && movie.watchLink.trim() !== '' && (
                 <Card className="watch-link-section">
                   <Card.Body className="text-center p-3">

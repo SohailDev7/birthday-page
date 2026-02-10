@@ -1,9 +1,8 @@
-// PDFViewer.js
+
 import React, { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { FaChevronLeft, FaChevronRight, FaExpand, FaCompress } from 'react-icons/fa';
 
-// Fix PDF.js worker - use correct version
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 const PDFViewer = ({ pdfFile }) => {
@@ -40,7 +39,7 @@ const PDFViewer = ({ pdfFile }) => {
 
   return (
     <div className="pdf-viewer-container">
-      {/* Controls */}
+      {}
       <div className="pdf-controls">
         <div className="control-group">
           <button 
@@ -75,7 +74,7 @@ const PDFViewer = ({ pdfFile }) => {
         </div>
       </div>
 
-      {/* PDF Content */}
+      {}
       <div className="pdf-content">
         {error ? (
           <div className="pdf-error">

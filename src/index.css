@@ -1,12 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  /* Custom CSS Variables for Themes */
+  
   --font-luxury: 'Playfair Display', 'Georgia', serif;
   --font-elegant: 'Cormorant Garamond', 'Times New Roman', serif;
   --font-modern: 'Inter', 'Arial', sans-serif;
 
-  /* Soft Theme Colors */
   --soft-bg: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%);
   --soft-card: rgba(255, 255, 255, 0.9);
   --soft-text: #831843;
@@ -14,7 +13,6 @@
   --soft-secondary: #f472b6;
   --soft-accent: #f9a8d4;
 
-  /* Luxury Theme Colors */
   --luxury-bg: linear-gradient(135deg, #9d174d 0%, #be185d 50%, #db2777 100%);
   --luxury-card: rgba(255, 255, 255, 0.1);
   --luxury-text: #ffffff;
@@ -23,7 +21,6 @@
   --luxury-accent: #f472b6;
 }
 
-/* Animation Keyframes */
 @keyframes shine {
   0% {
     left: -100%;
@@ -89,7 +86,6 @@
   }
 }
 
-/* Custom Utility Classes */
 @layer utilities {
   .luxury-font {
     font-family: var(--font-luxury);
@@ -173,7 +169,6 @@
   }
 }
 
-/* Luxury theme overrides */
 body[data-theme="luxury"] .gradient-text {
   background: linear-gradient(135deg, var(--luxury-primary), var(--luxury-secondary), var(--luxury-accent));
   -webkit-background-clip: text;

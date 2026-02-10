@@ -1,4 +1,4 @@
-// pages/Prachi_Home.jsx
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Container, Row, Col, Card, Badge } from 'react-bootstrap';
@@ -91,7 +91,7 @@ const Prachi_Home = () => {
         className="pt-5"
       >
         <Container className="mt-5 pt-5">
-          {/* Hero Section */}
+          {}
           <motion.section
             className="text-center py-5 my-5 relative"
             variants={itemVariants}

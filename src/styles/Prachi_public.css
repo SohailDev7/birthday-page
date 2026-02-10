@@ -1,4 +1,4 @@
-/* src/styles/simple.css */
+
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Patrick+Hand&display=swap');
 
 * {
@@ -14,7 +14,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Utility Classes */
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
 .items-center { align-items: center; }
@@ -68,7 +67,6 @@ body {
 .z-20 { z-index: 20; }
 .z-50 { z-index: 50; }
 
-/* Custom Classes */
 .glass-morphism {
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
@@ -116,7 +114,6 @@ body {
   left: 100%;
 }
 
-/* Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-20px); }
@@ -135,7 +132,6 @@ body {
   animation: spin-slow 3s linear infinite;
 }
 
-/* Font Classes */
 .font-dancing {
   font-family: 'Dancing Script', cursive;
 }
@@ -150,7 +146,6 @@ body {
 .text-5xl { font-size: 3rem; }
 .text-6xl { font-size: 3.75rem; }
 
-/* Container */
 .container {
   width: 100%;
   margin-left: auto;
@@ -183,7 +178,6 @@ body {
   }
 }
 
-/* Grid */
 .grid { display: grid; }
 .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }

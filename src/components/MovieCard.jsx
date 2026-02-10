@@ -5,11 +5,11 @@ const MovieCard = ({
   movie, 
   onToggleWatched,
   onCardClick,
-  // Admin props - only used when showAdminActions is true
+  
   showAdminActions = false,
   onEdit = null,
   onDelete = null,
-  viewMode = 'grid' // Add viewMode prop
+  viewMode = 'grid' 
 }) => {
   const renderStars = (score) => {
     return Array.from({ length: 5 }, (_, index) => (
@@ -24,13 +24,12 @@ const MovieCard = ({
     if (action) action();
   };
 
-  // Determine card background based on watched status and target audience
   const getCardBackgroundClass = () => {
     if (movie.watched === 'watched') {
       if (movie.targetAudience === 'For Soil') {
-        return 'watched-by-prachi'; // Blue for Prachi watching Soil's movie
+        return 'watched-by-prachi'; 
       } else if (movie.targetAudience === 'For Prachi') {
-        return 'watched-by-soil'; // Pink for Soil watching Prachi's movie
+        return 'watched-by-soil'; 
       }
     }
     return '';
@@ -43,7 +42,7 @@ const MovieCard = ({
       className={cardClass} 
       onClick={() => onCardClick(movie)}
     >
-      {/* Poster Section */}
+      {}
       <div className={`movie-poster-modern ${viewMode}-view`}>
         {movie.posterUrl ? (
           <img 
@@ -57,7 +56,7 @@ const MovieCard = ({
           </div>
         )}
         
-        {/* Poster Overlay - Only Audience Tag */}
+        {}
         <div className="poster-overlay">
           <div className={`audience-tag ${movie.targetAudience === 'For Soil' ? 'soil' : 'prachi'}`}>
             {movie.targetAudience.replace('For ', '')}
@@ -65,14 +64,14 @@ const MovieCard = ({
         </div>
       </div>
 
-      {/* Content Section */}
+      {}
       <div className="movie-content-modern">
-        {/* Movie Title */}
+        {}
         <h3 className="movie-title-modern">
           {movie.movieName}
         </h3>
 
-        {/* Rating Section - Below Title */}
+        {}
         <div className="rating-section">
           <div className="rating-stars">
             {renderStars(movie.soilScore)}
@@ -82,7 +81,7 @@ const MovieCard = ({
           </span>
         </div>
 
-        {/* Action Buttons */}
+        {}
         <div className="movie-actions">
           <button
             className={`action-btn watch-toggle-btn ${movie.watched === 'watched' ? 'watched' : ''}`}
@@ -106,7 +105,7 @@ const MovieCard = ({
           )}
         </div>
 
-        {/* Admin Actions - Only show when explicitly enabled */}
+        {}
         {showAdminActions && (
           <div className="admin-actions">
             <button

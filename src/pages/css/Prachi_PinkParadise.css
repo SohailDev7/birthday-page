@@ -1,4 +1,4 @@
-/* components/css/Prachi_PinkParadise.css */
+
 .pink-paradise-page {
   min-height: 100vh;
   padding: 2rem 1rem;
@@ -10,7 +10,6 @@
   font-family: 'Comic Neue', cursive;
 }
 
-/* Theme Base Styles */
 body[data-theme="soft"] .pink-paradise-page {
   background: linear-gradient(135deg, #fff0f6 0%, #fce7f3 50%, #fbcfe8 100%);
 }
@@ -27,7 +26,6 @@ body[data-theme="luxury"] .pink-paradise-page {
   z-index: 10;
 }
 
-/* Header Styles */
 .paradise-header {
   text-align: center;
   margin-bottom: 4rem;
@@ -85,7 +83,6 @@ body[data-theme="luxury"] .title-underline {
   background: linear-gradient(90deg, #ffffff, #fbcfe8, #f472b6);
 }
 
-/* Games Grid */
 .games-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -93,7 +90,6 @@ body[data-theme="luxury"] .title-underline {
   margin-bottom: 4rem;
 }
 
-/* Game Card */
 .game-card {
   background: var(--soft-card);
   border-radius: 2rem;
@@ -146,7 +142,6 @@ body[data-theme="luxury"] .game-card {
   100% { left: 150%; }
 }
 
-/* Game Icon */
 .game-icon {
   width: 5rem;
   height: 5rem;
@@ -162,7 +157,6 @@ body[data-theme="luxury"] .game-card {
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
 }
 
-/* Game Content */
 .game-content {
   flex: 1;
   display: flex;
@@ -200,12 +194,10 @@ body[data-theme="luxury"] .game-description {
   color: #fbcfe8;
 }
 
-/* Game Action */
 .game-action {
   width: 100%;
 }
 
-/* Nav.Link Styling for Play Button */
 .play-button {
   width: 100%;
   padding: 0.9rem 1.5rem;
@@ -248,7 +240,6 @@ body[data-theme="luxury"] .play-button:hover {
   text-decoration: none !important;
 }
 
-/* Remove default Nav.Link styles */
 .play-button:hover,
 .play-button:focus,
 .play-button:active {
@@ -276,7 +267,6 @@ body[data-theme="luxury"] .play-button:hover {
   opacity: 0.7;
 }
 
-/* Hover Effect */
 .game-hover-effect {
   position: absolute;
   top: 0;
@@ -295,7 +285,6 @@ body[data-theme="luxury"] .game-hover-effect {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(251, 207, 232, 0.1));
 }
 
-/* Corner Decoration */
 .corner-decoration {
   position: absolute;
   bottom: 1rem;
@@ -311,7 +300,6 @@ body[data-theme="luxury"] .corner-decoration {
   color: #ffffff;
 }
 
-/* Footer */
 .paradise-footer {
   text-align: center;
   padding: 2rem 0;
@@ -330,7 +318,6 @@ body[data-theme="luxury"] .footer-text {
   color: #fbcfe8;
 }
 
-/* Floating Elements - Fixed positioning */
 .floating-element {
   position: fixed;
   z-index: 1;
@@ -346,7 +333,6 @@ body[data-theme="luxury"] .floating-element {
   color: #fbcfe8;
 }
 
-/* Sparkle Decorations - Fixed positioning */
 .sparkle {
   position: fixed;
   width: 0.75rem;
@@ -366,7 +352,6 @@ body[data-theme="luxury"] .sparkle {
   box-shadow: 0 0 10px #ffffff;
 }
 
-/* Particles */
 .particles-container {
   position: fixed;
   top: 0;
@@ -393,7 +378,6 @@ body[data-theme="luxury"] .particle {
   background: #ffffff;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .pink-paradise-page {
     padding: 1rem 0.5rem;
@@ -421,7 +405,6 @@ body[data-theme="luxury"] .particle {
     font-size: 1.3rem;
   }
 
-  /* Hide some decorative elements on mobile */
   .floating-element:nth-child(n+5),
   .sparkle:nth-child(n+6) {
     display: none;
@@ -457,7 +440,6 @@ body[data-theme="luxury"] .particle {
   }
 }
 
-/* Enhanced hover effects */
 .game-card:hover {
   transform: translateY(-8px);
 }
@@ -470,7 +452,6 @@ body[data-theme="luxury"] .game-card:hover {
   box-shadow: 0 20px 50px rgba(255, 255, 255, 0.2);
 }
 
-/* Loading animation for cards */
 @keyframes cardEntrance {
   from {
     opacity: 0;
@@ -487,7 +468,6 @@ body[data-theme="luxury"] .game-card:hover {
   animation-fill-mode: both;
 }
 
-/* Stagger animation for cards */
 .game-card:nth-child(1) { animation-delay: 0.1s; }
 .game-card:nth-child(2) { animation-delay: 0.2s; }
 .game-card:nth-child(3) { animation-delay: 0.3s; }
@@ -495,7 +475,6 @@ body[data-theme="luxury"] .game-card:hover {
 .game-card:nth-child(5) { animation-delay: 0.5s; }
 .game-card:nth-child(6) { animation-delay: 0.6s; }
 
-/* Gradient text animation */
 .paradise-title {
   background-size: 200% 200%;
   animation: gradientShift 3s ease infinite;
@@ -507,14 +486,12 @@ body[data-theme="luxury"] .game-card:hover {
   100% { background-position: 0% 50%; }
 }
 
-/* Focus states for accessibility */
 .play-button:focus,
 .disabled-button:focus {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
 
-/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .game-card,
   .floating-element,

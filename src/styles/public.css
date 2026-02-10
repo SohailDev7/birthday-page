@@ -23,7 +23,6 @@ body {
   height: 100vh;
 }
 
-/* SVG Background Animations */
 .svg-bg {
   position: fixed;
   inset: 0;
@@ -67,7 +66,6 @@ body {
   75% { transform: translateY(-15px) rotate(3deg); }
 }
 
-/* Welcome Screen Styles */
 .welcome-screen {
   position: fixed;
   inset: 0;
@@ -127,14 +125,12 @@ body {
   letter-spacing: -0.02em;
 }
 
-/* Background Colors */
 .bg-default { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); }
 .bg-yuzence { background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); }
 .bg-prachi { background: linear-gradient(135deg, #fff0f8 0%, #ffe6f2 100%); }
 .bg-manash { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); }
 .bg-sameer { background: linear-gradient(135deg, #fff8f0 0%, #ffedd5 100%); }
 
-/* Apple Dialog Styles */
 .apple-dialog {
   position: fixed;
   top: 50%;
@@ -255,7 +251,6 @@ body {
   transform: none;
 }
 
-/* Loading spinner */
 .spinner {
   width: 16px;
   height: 16px;
@@ -272,7 +267,6 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive Design */
 @media (max-width: 480px) {
   .apple-dialog {
     width: 90%;
@@ -288,7 +282,6 @@ body {
   }
 }
 
-/* Home page container */
 .home-container {
   position: relative;
   width: 100%;

@@ -49,7 +49,7 @@ export const MinecraftParticles = () => {
                         }
                     },
                     shape: {
-                        type: "square", // Minecraft theme: everything is square
+                        type: "square", 
                     },
                     size: {
                         value: { min: 2, max: 5 },

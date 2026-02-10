@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-// Custom hook to use auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -12,11 +11,10 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // specific user key (e.g., 'prachi', 'yuzence')
+  const [user, setUser] = useState(null); 
   const [isLoading, setIsLoading] = useState(true);
   const [checkedInitialAuth, setCheckedInitialAuth] = useState(false);
 
-  // Cookie helper functions
   const setCookie = (name, value, days) => {
     const expires = new Date();
     expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -34,9 +32,8 @@ export const AuthProvider = ({ children }) => {
     document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
   };
 
-  // Check if a specific user has a valid session
   const checkUserSession = (userKey) => {
-    // Sohail must verify his divinity every single time he logs in
+    
     if (userKey === 'sohail') return false;
 
     const authCookie = getCookie(`${userKey}_auth`);
@@ -47,18 +44,16 @@ export const AuthProvider = ({ children }) => {
       if (now < parseInt(authExpiry)) {
         return true;
       } else {
-        // Token expired, clear specific cookies logic could go here, 
-        // but we normally handle cleanup on failed validation or logout
+
         return false;
       }
     }
     return false;
   };
 
-  // Check for existing authentication on mount
   useEffect(() => {
     const initAuth = () => {
-      // Check who was last logged in
+      
       const lastUser = getCookie('portal_last_user');
 
       if (lastUser && checkUserSession(lastUser)) {
@@ -75,10 +70,8 @@ export const AuthProvider = ({ children }) => {
   const login = (userKey) => {
     setUser(userKey);
 
-    // Skip cookie persistence for Sohail - He must verify his divinity every time
     if (userKey === 'sohail') return;
 
-    // Set auth cookie that expires in 30 days
     const expiryTime = new Date().getTime() + (30 * 24 * 60 * 60 * 1000);
     setCookie(`${userKey}_auth`, 'true', 30);
     setCookie(`${userKey}_auth_expiry`, expiryTime.toString(), 30);

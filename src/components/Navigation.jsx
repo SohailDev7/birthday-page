@@ -30,7 +30,7 @@ const Navigation = () => {
 
   return (
     <>
-      {/* Theme Transition Overlay */}
+      {}
       <AnimatePresence>
         {isTransitioning && (
           <motion.div
@@ -43,7 +43,7 @@ const Navigation = () => {
         )}
       </AnimatePresence>
 
-      {/* Navigation Bar */}
+      {}
       <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -68,7 +68,7 @@ const Navigation = () => {
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between">
-            {/* Logo */}
+            {}
             <Link
               to="/prachi/home"
               className="flex items-center gap-2 group"

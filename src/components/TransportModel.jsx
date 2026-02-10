@@ -8,7 +8,6 @@ const TransportModel = ({ isOpen, onClose }) => {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const navigate = useNavigate();
 
-  // Define valid codes and their redirect paths
   const validCodes = {
     'canyouwinme': '/prachi/tictactoe',
     'prachisachor': '/prachi/chor',
@@ -18,14 +17,12 @@ const TransportModel = ({ isOpen, onClose }) => {
     'prachi-cookie': '/prachi/watchlist'
   };
 
-  // Reset when modal opens
   useEffect(() => {
     if (isOpen) {
       setCode('');
       setMessage('');
       setIsUnlocked(false);
-      
-      // Focus input after animation
+
       setTimeout(() => {
         const input = document.getElementById('transport-input');
         if (input) input.focus();
@@ -41,8 +38,7 @@ const TransportModel = ({ isOpen, onClose }) => {
     if (validCodes[enteredCode]) {
       setIsUnlocked(true);
       setMessage('🎉 Access granted! Transporting...');
-      
-      // Redirect after delay
+
       setTimeout(() => {
         navigate(validCodes[enteredCode]);
         onClose();
@@ -54,7 +50,7 @@ const TransportModel = ({ isOpen, onClose }) => {
 
   const handleChange = (e) => {
     setCode(e.target.value);
-    setMessage(''); // Clear message when typing
+    setMessage(''); 
   };
 
   const clearCode = () => {
@@ -109,7 +105,7 @@ const TransportModel = ({ isOpen, onClose }) => {
               position: 'relative'
             }}
           >
-            {/* Header */}
+            {}
             <div style={{ 
               display: 'flex', 
               justifyContent: 'space-between', 
@@ -148,7 +144,7 @@ const TransportModel = ({ isOpen, onClose }) => {
               </motion.button>
             </div>
 
-            {/* Instructions */}
+            {}
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
               <p style={{ color: 'var(--soft-text)', marginBottom: '1rem' }}>
                 Enter a secret code to unlock hidden features!
@@ -166,7 +162,7 @@ const TransportModel = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* Code Input Form */}
+            {}
             <form onSubmit={handleSubmit}>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <input
@@ -191,7 +187,7 @@ const TransportModel = ({ isOpen, onClose }) => {
                 />
               </motion.div>
 
-              {/* Message Display */}
+              {}
               <AnimatePresence>
                 {message && (
                   <motion.div
@@ -218,7 +214,7 @@ const TransportModel = ({ isOpen, onClose }) => {
                 )}
               </AnimatePresence>
 
-              {/* Action Buttons */}
+              {}
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                 <motion.button
                   type="button"
@@ -261,7 +257,7 @@ const TransportModel = ({ isOpen, onClose }) => {
               </div>
             </form>
 
-            {/* Unlocked Animation */}
+            {}
             <AnimatePresence>
               {isUnlocked && (
                 <motion.div

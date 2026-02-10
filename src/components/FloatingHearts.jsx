@@ -1,4 +1,4 @@
-// components/FloatingHearts.jsx
+
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
@@ -6,7 +6,7 @@ const FloatingHearts = () => {
   const [hearts, setHearts] = useState([]);
 
   useEffect(() => {
-    // Create initial floating hearts
+    
     const initialHearts = Array.from({ length: 15 }, (_, i) => ({
       id: i,
       left: Math.random() * 100,

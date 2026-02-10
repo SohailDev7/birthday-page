@@ -1,22 +1,20 @@
-// components/ProfilePicture.jsx
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw } from 'lucide-react';
 import './ProfilePicture.css';
-// Import images at the top
+
 import image1 from '../assets/images/image1.jpg';
 import image2 from '../assets/images/image2.jpg';
 import image3 from '../assets/images/image3.jpg';
 import image4 from '../assets/images/image4.jpg';
 import image5 from '../assets/images/image5.jpg';
-// Add more imports as needed
 
 const ProfilePicture = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const [isRotating, setIsRotating] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState(false);
 
-  // Array of imported images and emojis
   const profileImages = [
     image1,
     image2,
@@ -26,16 +24,14 @@ const ProfilePicture = () => {
     '🦋',
   ];
 
-  // Helper function to check if item is emoji
   const isEmoji = (item) => {
     return typeof item === 'string' && item.length <= 3;
   };
 
-  // Preload all images on component mount for instant switching
   useEffect(() => {
     const preloadImages = async () => {
       const imagePromises = profileImages
-        .filter(item => !isEmoji(item)) // Filter out emojis, keep only images
+        .filter(item => !isEmoji(item)) 
         .map(src => {
           return new Promise((resolve, reject) => {
             const img = new Image();
@@ -51,13 +47,13 @@ const ProfilePicture = () => {
         console.log('✅ All profile images preloaded successfully!');
       } catch (error) {
         console.warn('⚠️ Some images failed to preload:', error);
-        setImagesLoaded(true); // Still set to true to show component
+        setImagesLoaded(true); 
       }
     };
 
     preloadImages();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run once on mount
+    
+  }, []); 
 
   const changeProfilePicture = () => {
     setIsRotating(true);

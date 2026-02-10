@@ -1,4 +1,4 @@
-/* components/PortalLogin.css */
+
 .portal-login-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #ff9eb5 0%, #ff6b8b 50%, #ff477e 100%);
@@ -155,7 +155,6 @@
   transform: translateY(-2px);
 }
 
-/* QR Scanner Styles */
 .qr-scanner-overlay {
   position: fixed;
   top: 0;
@@ -224,7 +223,6 @@
   transform: translateY(-2px);
 }
 
-/* Floating Hearts */
 .floating-hearts {
   position: fixed;
   top: 0;
@@ -247,7 +245,6 @@
 .floating-heart:nth-child(4) { left: 70%; top: 70%; }
 .floating-heart:nth-child(5) { left: 50%; top: 10%; }
 
-/* Success Overlay */
 .success-overlay {
   position: fixed;
   top: 0;
@@ -275,7 +272,6 @@
   background-clip: text;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .login-card {
     padding: 2rem 1.5rem;
