@@ -43,6 +43,20 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     const [history, setHistory] = useState([]);
     const [historyIndex, setHistoryIndex] = useState(-1);
 
+    // Refs to access fresh state in event listeners
+    const historyRef = useRef([]);
+    const historyIndexRef = useRef(-1);
+
+    // Sync refs with state
+    useEffect(() => {
+        historyRef.current = history;
+        historyIndexRef.current = historyIndex;
+    }, [history, historyIndex]);
+
+
+
+
+
     const [gallery, setGallery] = useState([]);
     const [equippedIndex, setEquippedIndex] = useState(0);
     const [isSaving, setIsSaving] = useState(false);
@@ -218,8 +232,11 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         const canvas = canvasRef.current;
         const dataURL = canvas.toDataURL();
 
-        const newHistory = history.slice(0, historyIndex + 1);
+        // Use ref for current history to avoid stale closures
+        const currentHistory = historyRef.current;
+        const currentIndex = historyIndexRef.current;
 
+        const newHistory = currentHistory.slice(0, currentIndex + 1);
         newHistory.push(dataURL);
 
         setHistory(newHistory);
@@ -765,9 +782,11 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                             <div
                                 className="relative bg-white border-4 border-[#8B4513] overflow-hidden m-auto shadow-[4px_4px_0_rgba(0,0,0,0.3)]"
                                 style={{
-                                    width: '100%',
-                                    aspectRatio: '1',
-                                    maxWidth: '800px',
+                                    width: 'auto',
+                                    height: 'auto',
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    aspectRatio: '1 / 1',
                                     transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
                                     transformOrigin: 'top left',
                                     cursor: isPanMode ? 'grab' : 'auto',
@@ -819,7 +838,9 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                         if (brushPreviewRef.current) brushPreviewRef.current.style.opacity = '0';
                                     }}
                                     onTouchStart={(e) => {
-                                        if (e.touches.length === 2) {
+                                        if (e.touches.length > 1) {
+                                            // Cancel any drawing immediately
+                                            stopDrawing();
 
                                             const dist = Math.hypot(
                                                 e.touches[0].clientX - e.touches[1].clientX,
@@ -872,7 +893,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                             return;
                                         }
                                         const pos = getPos(e);
-                                        draw(e);
+                                        executeDraw(e);
                                         setCursorPos({
                                             x: pos.screenX,
                                             y: pos.screenY,
@@ -1515,15 +1536,15 @@ const UserGallery = ({ users }) => {
 
     return (
         <div className="absolute bottom-20 left-0 w-full flex flex-col justify-end z-20 pointer-events-none">
-            { }
+            {/* Gallery Header */}
             <h2 className="absolute top-[-40vh] left-0 w-full text-center text-xl md:text-2xl text-[#5D4037] font-['Press_Start_2P'] drop-shadow-[2px_2px_0_#FFF] pointer-events-auto">
                 COMMUNITY GALLERY
             </h2>
 
-            { }
-            { }
-            <div className="flex flex-row items-end overflow-x-auto md:overflow-x-visible w-full pointer-events-auto no-scrollbar snap-x snap-mandatory md:snap-none scroll-smooth pb-14 md:justify-center" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                <div className="flex flex-row items-end gap-8 md:gap-16 px-4 md:px-0 md:justify-center w-full md:w-auto">
+            {/* Scroll Container */}
+            {/* Reduced gap to fit all on screen for PC (no carousel) */}
+            <div className="flex flex-row items-end overflow-x-auto md:overflow-x-visible w-full pointer-events-auto no-scrollbar snap-x snap-mandatory md:snap-none scroll-smooth pb-14 md:justify-center px-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <div className="flex flex-row items-end gap-12 md:gap-14 md:justify-center w-max md:w-auto mx-auto">
                     { }
                     <div className="w-[35vw] md:hidden shrink-0" />
 
