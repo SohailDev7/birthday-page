@@ -28,11 +28,12 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     const [isDrawing, setIsDrawing] = useState(false);
     const [color, setColor] = useState('#000000');
     const [brushSize, setBrushSize] = useState(5);
-    const [tool, setTool] = useState('brush'); // brush, eraser, fill, shade, calligraphy, spray, pattern
+    const [tool, setTool] = useState('brush'); // brush, eraser, fill, shade, calligraphy, powder, pattern
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [isPanMode, setIsPanMode] = useState(false);
-    const lastTap = useRef(0);
+    const lastTapRef = useRef({ time: 0, color: null });
+    const touchStateRef = useRef(null); // Separate ref for pinch-zoom state
 
     // Performance & Preview State
     const [shadePopup, setShadePopup] = useState({ show: false, color: '', x: 0, y: 0 });
@@ -52,12 +53,17 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     const [saveSlot, setSaveSlot] = useState(0); // For selecting export slot
     const [pendingExportData, setPendingExportData] = useState(null);
     const [hasTouchedCanvas, setHasTouchedCanvas] = useState(false);
+    const [selectedSlotIndex, setSelectedSlotIndex] = useState(null); // For slot management overlay
 
     // Auth & Mode State
     const [mode, setMode] = useState('view'); // 'view', 'auth', 'edit'
     const [authInput, setAuthInput] = useState('');
     const [authError, setAuthError] = useState(false);
     const [showKeypad, setShowKeypad] = useState(false);
+
+    // Exit Warning State
+    const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+    const [pendingExitAction, setPendingExitAction] = useState(null); // { type: 'close' | 'newSlot', index?: number }
 
     // Initialize canvas & history & Gallery
     useEffect(() => {
@@ -333,16 +339,14 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
             ctx.translate(x, y);
             ctx.rotate(Math.PI / 4);
             ctx.fillRect(-width / 2, -height / 2, width, height);
-        } else if (tool === 'spray') {
+        } else if (tool === 'powder') {
             ctx.fillStyle = color;
-            ctx.globalAlpha = 0.8; // Increased opacity
+            ctx.globalAlpha = 0.8;
 
             // Much Higher density for visible "powder" look
-            const particleCount = Math.max(80, Math.floor(brushSize * 20)); // Even more particles
-            // Radius scales but stays manageable
+            const particleCount = Math.max(80, Math.floor(brushSize * 20));
             const radius = brushSize * 1.2;
-            // Larger particles for larger brushes - drastically increased
-            const pSize = Math.max(2, Math.floor(brushSize / 2)); // Bigger particles
+            const pSize = Math.max(2, Math.floor(brushSize / 2));
 
             for (let i = 0; i < particleCount; i++) {
                 const angle = Math.random() * Math.PI * 2;
@@ -411,11 +415,29 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
 
     const clearCanvas = () => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         saveToHistory();
         setHasTouchedCanvas(false);
+    };
+
+    const startNewSlot = (index) => {
+        setEquippedIndex(index);
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Hard reset history for the new slot
+        const dataURL = canvas.toDataURL();
+        setHistory([dataURL]);
+        setHistoryIndex(0);
+        setHasTouchedCanvas(false);
+        setZoom(1);
+        setPan({ x: 0, y: 0 });
     };
 
     const handleSaveToDatabase = async () => {
@@ -441,6 +463,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                 setPendingExportData(null);
                 setPaintingTitle('');
                 onSave(pendingExportData); // Update local map
+                setHasTouchedCanvas(false); // Reset unsaved state after successful save
             } else {
                 alert(result.message);
             }
@@ -516,16 +539,15 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
 
     const handleColorClick = (c, e) => {
         const now = Date.now();
-        const DOUBLE_TAP_DELAY = 300;
+        const DOUBLE_TAP_DELAY = 400; // Slightly increased for comfort
 
-        if (now - lastTap.current < DOUBLE_TAP_DELAY) {
-            // Success double tap
+        if (lastTapRef.current.color === c && now - lastTapRef.current.time < DOUBLE_TAP_DELAY) {
+            // Success double tap on the same color
             handleColorLongPress(c, e);
         } else {
             setColor(c);
-            // PERSIST TOOL: Remove setTool('brush') so spray/shade stays selected
         }
-        lastTap.current = now;
+        lastTapRef.current = { time: now, color: c };
     };
 
     const handleColorLongPress = (c, e) => {
@@ -533,9 +555,38 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         setShadePopup({
             show: true,
             color: c,
-            x: rect.left,
-            y: rect.top - 80 // Above the button
+            x: rect.left + rect.width / 2,
+            y: rect.top - 10
         });
+    };
+
+    const handleCloseRequest = () => {
+        if (hasTouchedCanvas) {
+            setPendingExitAction({ type: 'close' });
+            setShowUnsavedWarning(true);
+        } else {
+            onClose();
+        }
+    };
+
+    const handleNewSlotRequest = (index) => {
+        if (hasTouchedCanvas) {
+            setPendingExitAction({ type: 'newSlot', index });
+            setShowUnsavedWarning(true);
+        } else {
+            startNewSlot(index);
+        }
+    };
+
+    const confirmExitAction = () => {
+        if (!pendingExitAction) return;
+        if (pendingExitAction.type === 'close') {
+            onClose();
+        } else if (pendingExitAction.type === 'newSlot') {
+            startNewSlot(pendingExitAction.index);
+        }
+        setShowUnsavedWarning(false);
+        setPendingExitAction(null);
     };
 
     // Render using Portal
@@ -570,7 +621,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                 <button onClick={() => handleZoom(zoom + 0.5)} className="hover:text-white">+</button>
                             </div>
                         )}
-                        <button onClick={onClose} className="text-[#8B4513] hover:bg-[#DEB887] p-1 md:p-2 border-2 border-transparent hover:border-[#8B4513] transition-all active:translate-y-1">
+                        <button onClick={handleCloseRequest} className="text-[#8B4513] hover:bg-[#DEB887] p-1 md:p-2 border-2 border-transparent hover:border-[#8B4513] transition-all active:translate-y-1">
                             <X size={20} />
                         </button>
                     </div>
@@ -583,14 +634,16 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                         {/* Canvas Container */}
                         <div className="relative p-1 md:p-3 bg-[#DEB887] border-4 border-[#5D4037] shadow-inner flex-1 overflow-auto flex flex-col items-center min-h-[200px] md:min-h-[300px]">
                             <div
-                                className="relative bg-white border-4 border-[#8B4513] overflow-hidden m-auto shadow-[4px_4px_0_rgba(0,0,0,0.3)] transition-transform"
+                                className="relative bg-white border-4 border-[#8B4513] overflow-hidden m-auto shadow-[4px_4px_0_rgba(0,0,0,0.3)]"
                                 style={{
                                     width: '100%',
                                     aspectRatio: '1',
                                     maxWidth: '800px',
                                     transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
                                     transformOrigin: 'top left',
-                                    cursor: isPanMode ? 'grab' : 'auto'
+                                    cursor: isPanMode ? 'grab' : 'auto',
+                                    transition: isDrawing || (touchStateRef.current?.dist) ? 'none' : 'transform 0.2s ease-out',
+                                    willChange: 'transform'
                                 }}
                             >
                                 <canvas
@@ -642,58 +695,47 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                                 e.touches[0].clientY - e.touches[1].clientY
                                             );
 
-                                            // Calculate center of the two fingers
                                             const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
                                             const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
 
-                                            // Capture current state including center point
-                                            lastTap.current = { dist, zoom, pan, startCenter: { x: centerX, y: centerY } };
+                                            touchStateRef.current = { dist, zoom, pan, startCenter: { x: centerX, y: centerY } };
                                             return;
                                         }
                                         if (tool === 'fill') handleCanvasClick(e);
                                         else startDrawing(e);
                                     }}
                                     onTouchMove={(e) => {
-                                        if (e.touches.length === 2 && lastTap.current?.dist) {
+                                        if (e.touches.length === 2 && touchStateRef.current?.dist) {
                                             const dist = Math.hypot(
                                                 e.touches[0].clientX - e.touches[1].clientX,
                                                 e.touches[0].clientY - e.touches[1].clientY
                                             );
-                                            const scaleFactor = dist / lastTap.current.dist;
-                                            const newZoom = Math.min(3, Math.max(1, lastTap.current.zoom * scaleFactor));
 
-                                            setZoom(newZoom);
+                                            const currentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                                            const currentY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
 
-                                            // Apply centering logic during pinch
-                                            if (newZoom <= 1) {
+                                            const scaleFactor = dist / touchStateRef.current.dist;
+                                            const startZoom = touchStateRef.current.zoom;
+                                            const newZoom = Math.min(3, Math.max(1, startZoom * scaleFactor));
+
+                                            if (newZoom <= 1.05) {
+                                                setZoom(1);
                                                 setPan({ x: 0, y: 0 });
                                             } else {
-                                                // 1. Calculate the theoretical pan based on zoom-out centering
-                                                let targetPanX = 0;
-                                                let targetPanY = 0;
+                                                const startPan = touchStateRef.current.pan;
+                                                const startCenter = touchStateRef.current.startCenter;
+                                                const zoomRatio = newZoom / startZoom;
 
-                                                const startZoom = lastTap.current.zoom;
-                                                // Avoid divide by zero if startZoom was 1.
-                                                if (startZoom > 1) {
-                                                    const ratio = (newZoom - 1) / (startZoom - 1);
-                                                    if (isFinite(ratio)) {
-                                                        targetPanX = lastTap.current.pan.x * ratio;
-                                                        targetPanY = lastTap.current.pan.y * ratio;
-                                                    }
-                                                }
+                                                const zoomPanX = startPan.x + (startCenter.x - startPan.x) * (1 - zoomRatio);
+                                                const zoomPanY = startPan.y + (startCenter.y - startPan.y) * (1 - zoomRatio);
 
-                                                // 2. Add the physical drag offset
-                                                const startX = lastTap.current.startCenter ? lastTap.current.startCenter.x : (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                                                const startY = lastTap.current.startCenter ? lastTap.current.startCenter.y : (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                                                const currentCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                                                const currentCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                                                const dragX = currentX - startCenter.x;
+                                                const dragY = currentY - startCenter.y;
 
-                                                const deltaX = currentCenterX - startX;
-                                                const deltaY = currentCenterY - startY;
-
+                                                setZoom(newZoom);
                                                 setPan({
-                                                    x: targetPanX + deltaX,
-                                                    y: targetPanY + deltaY
+                                                    x: zoomPanX + dragX,
+                                                    y: zoomPanY + dragY
                                                 });
                                             }
                                             return;
@@ -711,7 +753,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                     onTouchEnd={(e) => {
                                         stopDrawing();
                                         setCursorPos(prev => ({ ...prev, show: false }));
-                                        if (e.touches.length < 2) lastTap.current = { ...lastTap.current, dist: null }; // Reset pinch
+                                        if (e.touches.length < 2) touchStateRef.current = null;
                                     }}
                                     style={{
                                         imageRendering: 'pixelated',
@@ -751,7 +793,7 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                 )}
 
                                 {/* Brush Preview */}
-                                {mode === 'edit' && tool !== 'fill' && tool !== 'spray' && tool !== 'pattern' && cursorPos.show && (
+                                {mode === 'edit' && tool !== 'fill' && tool !== 'powder' && tool !== 'pattern' && cursorPos.show && (
                                     <div
                                         className="pointer-events-none absolute border-2 border-white/50 mix-blend-difference rounded-full z-10"
                                         style={{
@@ -836,37 +878,18 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                                 style={{ backgroundColor: c }}
                                             />
                                         ))}
-
-                                        <AnimatePresence>
-                                            {shadePopup.show && (
-                                                <>
-                                                    <div className="fixed inset-0 z-100" onClick={() => setShadePopup({ ...shadePopup, show: false })} />
-                                                    <motion.div
-                                                        initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                        exit={{ opacity: 0, scale: 0.8 }}
-                                                        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-[#F5DEB3] border-4 border-[#8B4513] p-2 flex gap-1 z-101 shadow-[4px_4px_0_#000]"
-                                                        style={{ imageRendering: 'pixelated' }}
-                                                    >
-                                                        {generateShades(shadePopup.color).map(sc => (
-                                                            <button
-                                                                key={sc}
-                                                                onClick={() => { setColor(sc); setShadePopup({ ...shadePopup, show: false }); }}
-                                                                className="w-6 h-6 border-2 border-black hover:scale-110"
-                                                                style={{ backgroundColor: sc }}
-                                                            />
-                                                        ))}
-                                                    </motion.div>
-                                                </>
-                                            )}
-                                        </AnimatePresence>
                                     </div>
 
                                     {/* Tools */}
                                     <div className="flex items-center gap-1 shrink-0 px-2 border-l border-[#8B4513]/30">
                                         <button onClick={() => setTool('brush')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'brush' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><PixelPaintbrushIcon size={16} /></button>
-                                        <button onClick={() => setTool('calligraphy')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'calligraphy' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="4" transform="rotate(45 12 12)" /></svg></button>
-                                        <button onClick={() => setTool('spray')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'spray' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2" /><circle cx="8" cy="8" r="1" /><circle cx="16" cy="16" r="1" /><circle cx="16" cy="8" r="1" /><circle cx="8" cy="16" r="1" /></svg></button>
+                                        <button onClick={() => setTool('calligraphy')} title="Calligraphy" className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'calligraphy' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="4" transform="rotate(45 12 12)" /></svg></button>
+                                        <button onClick={() => setTool('powder')} title="Powder Brush" className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'powder' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}>
+                                            <div className="flex flex-col items-center gap-0.5">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2" /><circle cx="8" cy="8" r="1" /><circle cx="16" cy="16" r="1" /><circle cx="16" cy="8" r="1" /><circle cx="8" cy="16" r="1" /></svg>
+                                                <span className="text-[4px] font-bold">POWDER</span>
+                                            </div>
+                                        </button>
                                         <button onClick={() => setTool('pattern')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'pattern' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="4" height="4" /><rect x="12" y="4" width="4" height="4" /><rect x="4" y="12" width="4" height="4" /><rect x="12" y="12" width="4" height="4" /></svg></button>
                                         <button onClick={() => setTool('shade')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'shade' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 22h20L12 2z" /><path d="M12 6l-6 16" /><path d="M12 6l6 16" /></svg></button>
                                         <button onClick={() => setTool('fill')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'fill' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 11l-8-8-9 9 8 8 5-5 9-9z" /><path d="M22 22l-5-5" /></svg></button>
@@ -926,19 +949,20 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                             <h3 className="text-[#5D4037] text-[8px] md:text-[10px] mb-1 md:mb-2 flex items-center gap-2 font-bold bg-[#F5DEB3] p-1 md:p-2 border-2 border-[#8B4513] shrink-0">
                                 <Database size={12} /> GALLERY ({(gallery || []).length}/8)
                             </h3>
+
                             <div className="flex md:grid md:grid-cols-2 gap-2 overflow-x-auto md:overflow-y-auto flex-1 p-1 custom-scrollbar-h">
                                 {[...Array(8)].map((_, i) => {
                                     const p = gallery[i];
+                                    const isSelected = equippedIndex === i;
                                     return (
                                         <div
                                             key={i}
-                                            className={`aspect-square w-16 h-16 md:w-auto md:h-auto border-4 relative shrink-0 group cursor-pointer transition-all ${equippedIndex === i ? 'border-green-600 bg-green-100 ring-2 ring-green-600 ring-inset' : 'border-[#8B4513] bg-[#F5DEB3] hover:border-[#5D4037]'}`}
+                                            className={`aspect-square w-16 h-16 md:w-auto md:h-auto border-4 relative shrink-0 group cursor-pointer transition-all ${isSelected ? 'border-green-600 bg-green-100 ring-4 ring-green-600/30' : 'border-[#8B4513] bg-[#F5DEB3] hover:border-[#5D4037]'}`}
                                             onClick={() => {
-                                                if (!p) {
-                                                    clearCanvas();
-                                                    setEquippedIndex(i);
+                                                if (p) {
+                                                    setSelectedSlotIndex(i);
                                                 } else {
-                                                    setEquippedIndex(i);
+                                                    handleNewSlotRequest(i);
                                                 }
                                             }}
                                         >
@@ -947,44 +971,27 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                                     <div className="flex-1 w-full relative min-h-0 p-1">
                                                         <img src={p.drawingData} className="w-full h-full object-contain image-pixelated" alt={p.title} />
 
-                                                        {/* Title Tag - Always Visible */}
-                                                        <div className="absolute top-0 left-0 w-full bg-black/50 text-white text-[5px] text-center p-0.5 truncate pointer-events-none z-10">
-                                                            {p.title}
-                                                        </div>
+                                                        {/* Simple Checkmark corner when equipped */}
+                                                        {isSelected && (
+                                                            <div className="absolute top-0 right-0 bg-green-600 text-white p-0.5 border-l border-b border-white shadow-sm z-10">
+                                                                <Check size={8} />
+                                                            </div>
+                                                        )}
                                                     </div>
 
-                                                    {/* Control Bar - Below Image */}
-                                                    {equippedIndex === i && (
-                                                        <div className="shrink-0 flex items-center gap-1 p-1 bg-[#000000]/10 border-t-2 border-[#8B4513]/20 w-full h-6">
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleEquip(i);
-                                                                    loadPaintingToCanvas(p.drawingData);
-                                                                }}
-                                                                className="flex-1 bg-blue-500 text-white text-[6px] border border-white hover:bg-blue-600 h-full flex items-center justify-center font-bold"
-                                                            >
-                                                                OPEN
-                                                            </button>
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); handleDelete(i); }}
-                                                                className="bg-red-500 text-white px-2 h-full text-[6px] border border-white hover:bg-red-600 flex items-center justify-center font-bold"
-                                                            >
-                                                                DEL
-                                                            </button>
-                                                        </div>
-                                                    )}
-
-                                                    {/* Selection Indicator */}
-                                                    {equippedIndex === i && (
-                                                        <div className="absolute top-0 right-0 bg-green-600 text-white p-0.5 border-l border-b border-white z-20 shadow-sm pointer-events-none">
-                                                            <Check size={6} />
-                                                        </div>
-                                                    )}
+                                                    {/* Title Tag at bottom */}
+                                                    <div className="bg-black/70 text-white text-[5px] text-center p-0.5 truncate pointer-events-none font-bold">
+                                                        {p.title}
+                                                    </div>
                                                 </div>
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center opacity-40 hover:opacity-100 transition-opacity">
+                                                <div className="w-full h-full flex items-center justify-center opacity-40 hover:opacity-100 transition-opacity bg-black/5">
                                                     <span className="text-xl font-bold text-[#8B4513]">+</span>
+                                                    {isSelected && (
+                                                        <div className="absolute top-0 right-0 bg-blue-600 text-white p-0.5 border-l border-b border-white shadow-sm z-10">
+                                                            <Check size={8} />
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
@@ -1064,6 +1071,141 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                     )}
                 </AnimatePresence>
 
+                {/* Slot Management Overlay */}
+                <AnimatePresence>
+                    {selectedSlotIndex !== null && gallery[selectedSlotIndex] && (
+                        <div className="fixed inset-0 z-100000 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                className="bg-[#FFE4C4] border-4 border-[#8B4513] p-4 shadow-[8px_8px_0_#000] w-full max-w-sm flex flex-col gap-4"
+                            >
+                                <div className="flex justify-between items-center bg-[#8B4513] p-2 -m-4 mb-0">
+                                    <span className="text-white text-[10px] font-bold">SLOT {selectedSlotIndex + 1}</span>
+                                    <button onClick={() => setSelectedSlotIndex(null)} className="text-white hover:bg-white/20 p-1">
+                                        <X size={16} />
+                                    </button>
+                                </div>
+
+                                <div className="mt-4 flex flex-col items-center gap-4">
+                                    <h3 className="text-[#5D4037] text-xs font-bold uppercase tracking-tight">
+                                        {gallery[selectedSlotIndex].title}
+                                    </h3>
+
+                                    <div className="w-full aspect-square bg-white border-4 border-[#8B4513] shadow-inner image-pixelated p-2">
+                                        <img
+                                            src={gallery[selectedSlotIndex].drawingData}
+                                            className="w-full h-full object-contain"
+                                            alt="Slot Preview"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col gap-2 w-full">
+                                        <button
+                                            onClick={() => {
+                                                handleEquip(selectedSlotIndex);
+                                                loadPaintingToCanvas(gallery[selectedSlotIndex].drawingData);
+                                                setSelectedSlotIndex(null);
+                                            }}
+                                            className="w-full bg-blue-500 text-white text-[10px] border-4 border-white py-3 flex items-center justify-center font-bold shadow-[4px_4px_0_rgba(0,0,0,0.3)] active:translate-y-1 active:shadow-none transition-all"
+                                        >
+                                            OPEN PAINTING
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                handleDelete(selectedSlotIndex);
+                                                setSelectedSlotIndex(null);
+                                            }}
+                                            className="w-full bg-red-500 text-white text-[10px] border-4 border-white py-3 flex items-center justify-center font-bold shadow-[4px_4px_0_rgba(0,0,0,0.3)] active:translate-y-1 active:shadow-none transition-all"
+                                        >
+                                            DELETE SLOT
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* Color Shade Menu Overlay - MOVED OUTSIDE SCROLLABLE AREA TO PREVENT CLIPPING */}
+                <AnimatePresence>
+                    {shadePopup.show && (
+                        <div className="fixed inset-0 z-[1000000] pointer-events-auto">
+                            <div className="absolute inset-0" onClick={() => setShadePopup({ ...shadePopup, show: false })} />
+                            <motion.div
+                                initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.8 }}
+                                className="fixed bg-[#F5DEB3] border-4 border-[#8B4513] p-2 flex gap-1 shadow-[4px_4px_0_#000]"
+                                style={{
+                                    imageRendering: 'pixelated',
+                                    left: shadePopup.x,
+                                    top: shadePopup.y,
+                                    transform: 'translate(-50%, -100%)'
+                                }}
+                            >
+                                {generateShades(shadePopup.color).map(sc => (
+                                    <button
+                                        key={sc}
+                                        onClick={() => { setColor(sc); setShadePopup({ ...shadePopup, show: false }); }}
+                                        className="w-6 h-6 border-2 border-black hover:scale-110 active:scale-95"
+                                        style={{ backgroundColor: sc }}
+                                    />
+                                ))}
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* Unsaved Changes Warning Overlay */}
+                <AnimatePresence>
+                    {showUnsavedWarning && (
+                        <div className="fixed inset-0 z-[2000000] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                className="bg-[#FFE4C4] border-4 border-[#8B4513] p-6 shadow-[8px_8px_0_#000] w-full max-w-sm flex flex-col gap-4 text-center"
+                            >
+                                <div className="text-red-700 font-bold text-sm flex items-center justify-center gap-2">
+                                    <RotateCcw size={20} /> UNSAVED CHANGES
+                                </div>
+                                <p className="text-[#5D4037] text-[10px] md:text-xs leading-relaxed">
+                                    You have unsaved drawings on the canvas. Moving away now will delete your current progress.
+                                </p>
+
+                                <div className="flex flex-col gap-2 mt-2">
+                                    <button
+                                        onClick={() => {
+                                            setShowUnsavedWarning(false);
+                                            setPendingExportData(canvasRef.current.toDataURL());
+                                            setSaveSlot(equippedIndex);
+                                            setShowSaveDialog(true);
+                                        }}
+                                        className="w-full bg-green-600 text-white text-[10px] border-4 border-white py-3 font-bold shadow-[4px_4px_0_rgba(0,0,0,0.3)] hover:bg-green-700 active:translate-y-1 transition-all"
+                                    >
+                                        SAVE TO SLOT
+                                    </button>
+                                    <button
+                                        onClick={confirmExitAction}
+                                        className="w-full bg-red-500 text-white text-[10px] border-4 border-white py-3 font-bold shadow-[4px_4px_0_rgba(0,0,0,0.3)] hover:bg-red-600 active:translate-y-1 transition-all"
+                                    >
+                                        DISCARD & CONTINUE
+                                    </button>
+                                    <button
+                                        onClick={() => { setShowUnsavedWarning(false); setPendingExitAction(null); }}
+                                        className="w-full bg-[#DEB887] text-[#5D4037] text-[10px] border-4 border-[#8B4513] py-2 font-bold hover:bg-[#D2B48C] active:translate-y-1 transition-all"
+                                    >
+                                        CANCEL
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+
                 {/* View Mode Lock Button - Placed in footer area */}
                 {mode === 'view' && (
                     <div className="flex justify-center p-2">
@@ -1085,31 +1227,19 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
 const GalleryItem = ({ user, userKey, drawingData, onClick }) => {
     return (
         <motion.div
-            whileHover={{ y: -10, scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex flex-col items-center gap-1 group cursor-pointer relative shrink-0"
+            whileHover={{ y: -5, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex flex-col items-center group cursor-pointer relative shrink-0"
             onClick={(e) => {
                 e.stopPropagation();
                 onClick(userKey);
             }}
             style={{ pointerEvents: 'auto' }}
         >
-            {/* Name Placard */}
-            <div
-                className="mb-2 px-2 py-1 bg-[#8B4513] border-2 border-[#3E2723] shadow-[2px_2px_0_rgba(0,0,0,0.3)] transform -rotate-1 group-hover:rotate-0 transition-transform origin-center"
-                style={{ imageRendering: 'pixelated' }}
-            >
-                <span className="text-white text-[8px] md:text-[10px] font-bold font-['Press_Start_2P'] drop-shadow-md">
-                    {user.displayName.toUpperCase()}
-                </span>
-            </div>
-
             {/* Easel/Canvas Container - FLEX COLUMN */}
             <div className="relative flex flex-col items-center">
-
                 {/* Main Canvas Frame */}
                 {/* Canvas is on top of legs */}
-                {/* Standardized to 5:4 aspect ratio internal content box on both mobile (109px width for h-24) and desktop (149px width for h-32) */}
                 <div className="relative z-10 bg-[#DEB887] p-2 border-l-4 border-t-4 border-r-4 border-b-8 border-[#5D4037] shadow-[4px_4px_0_rgba(0,0,0,0.2)] w-24 h-24 md:w-32 md:h-32">
                     {/* Canvas Surface */}
                     <div className="w-full h-full bg-white border-2 border-[#8B4513] relative overflow-hidden flex items-center justify-center image-pixelated">
@@ -1123,25 +1253,48 @@ const GalleryItem = ({ user, userKey, drawingData, onClick }) => {
                                 </div>
                             </div>
                         )}
+
+                        {/* HOVER OVERLAY ON PAINTING SURFACE */}
+                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center gap-1 md:gap-2 pointer-events-none p-1">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onClick(userKey); }}
+                                className="w-full max-w-[80px] py-1 bg-blue-500 text-white text-[7px] md:text-[8px] border-2 border-white font-bold shadow-[2px_2px_0_rgba(0,0,0,0.3)] active:translate-y-0.5 pointer-events-auto"
+                            >
+                                OPEN
+                            </button>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); /* Delete if needed */ }}
+                                className="w-full max-w-[80px] py-1 bg-red-500 text-white text-[7px] md:text-[8px] border-2 border-white font-bold shadow-[2px_2px_0_rgba(0,0,0,0.3)] active:translate-y-0.5 pointer-events-auto"
+                            >
+                                DEL
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 {/* Pixel Art Legs - Rendered as a block element below canvas */}
-                <div className="w-full h-[60px] -mt-3 z-0 flex justify-center pointer-events-none relative">
-                    <svg width="100%" height="60px" viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                <div className="w-full h-[60px] -mt-2 z-0 flex flex-col items-center pointer-events-none relative">
+                    <svg width="100%" height="40px" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
                         {/* Left Leg */}
-                        <path d="M15 0 H25 V10 H24 V20 H23 V30 H22 V40 H21 V50 H20 V60 H15 V60 V50 H16 V40 H17 V30 H18 V20 H19 V10 H20 V0 Z" fill="#5D4037" />
-
+                        <path d="M15 0 H25 V10 H24 V20 H23 V30 H22 V40 H15 V40 V30 H16 V20 H17 V10 H18 V0 Z" fill="#5D4037" />
                         {/* Right Leg */}
-                        <path d="M85 0 H75 V10 H76 V20 H77 V30 H78 V40 H79 V50 H80 V60 H85 V60 V50 H84 V40 H83 V30 H82 V20 H81 V10 H80 V0 Z" fill="#5D4037" />
-
-
+                        <path d="M85 0 H75 V10 H76 V20 H77 V30 H78 V40 H85 V40 V30 H84 V20 H83 V30 H82 V20 H81 V10 H80 V0 Z" fill="#5D4037" />
                         {/* Horizontal Crossbar */}
-                        <rect x="20" y="25" width="60" height="5" fill="#5D4037" />
+                        <rect x="20" y="5" width="60" height="5" fill="#5D4037" />
                     </svg>
 
-                    {/* Ground Shadow - Part of the legs block so it renders properly */}
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-4 bg-black/30 rounded-[100%] blur-sm -z-10" />
+                    {/* Name Placard - ATTACHED TO CROSSBAR AREA */}
+                    <div
+                        className="absolute top-2 px-2 py-1 bg-[#8B4513] border-2 border-[#3E2723] shadow-[2px_2px_0_rgba(0,0,0,0.3)] transform -rotate-1 group-hover:rotate-0 transition-transform origin-center z-20 pointer-events-auto"
+                        style={{ imageRendering: 'pixelated' }}
+                    >
+                        <span className="text-white text-[7px] md:text-[9px] font-bold font-['Press_Start_2P'] drop-shadow-md whitespace-nowrap">
+                            {user.displayName.toUpperCase()}
+                        </span>
+                    </div>
+
+                    {/* Ground Shadow */}
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-3 bg-black/30 rounded-[100%] blur-sm -z-10" />
                 </div>
             </div>
         </motion.div>
@@ -1209,8 +1362,8 @@ const UserGallery = ({ users }) => {
             </h2>
 
             {/* Horizontal Scroll Container for Canvases placed on ground */}
-            {/* pb-32 (128px) ensures legs are fully visible above the 80px grass layer */}
-            <div className="flex flex-row items-end overflow-x-auto md:overflow-x-visible w-full pointer-events-auto no-scrollbar snap-x snap-mandatory md:snap-none scroll-smooth pb-32 md:justify-center" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {/* pb-14 ensures legs are correctly 'planted' near grass top while maintaining space for names */}
+            <div className="flex flex-row items-end overflow-x-auto md:overflow-x-visible w-full pointer-events-auto no-scrollbar snap-x snap-mandatory md:snap-none scroll-smooth pb-14 md:justify-center" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 <div className="flex flex-row items-end gap-8 md:gap-16 px-4 md:px-0 md:justify-center w-full md:w-auto">
                     {/* Start Spacer for centering first item - Mobile Only */}
                     <div className="w-[35vw] md:hidden shrink-0" />
