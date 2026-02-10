@@ -406,7 +406,20 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                         type="text"
                                         maxLength={10}
                                         value={authInput}
-                                        onChange={(e) => setAuthInput(e.target.value)}
+                                        onChange={(e) => {
+                                            let val = e.target.value.replace(/[^0-9-]/g, ''); // Only allow numbers and hyphens
+
+                                            // Handle automatic hyphen insertion
+                                            if (val.length > authInput.length) { // Only add if typing forward
+                                                if (val.length === 4 || val.length === 7) {
+                                                    if (val.charAt(val.length - 1) !== '-') {
+                                                        val += '-';
+                                                    }
+                                                }
+                                            }
+
+                                            setAuthInput(val);
+                                        }}
                                         className={`w-48 p-2 text-center text-sm bg-[#FFF8DC] border-4 outline-none font-['Press_Start_2P'] ${authError ? 'border-red-500 text-red-500' : 'border-[#8B4513] text-[#5D4037]'}`}
                                         placeholder="YYYY-MM-DD"
                                         autoFocus
