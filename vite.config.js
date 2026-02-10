@@ -19,9 +19,6 @@ export default defineConfig({
       }
     }
   },
-  define: {
-    global: 'globalThis',
-  },
   // Optimize audio files for build
   build: {
     assetsInlineLimit: 0, // Don't inline audio files as base64
