@@ -17,6 +17,34 @@
     rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
+  <script>
+    window.onerror = function (msg, url, line, col, error) {
+      var div = document.createElement('div');
+      div.style.color = 'red';
+      div.style.position = 'fixed';
+      div.style.top = '0';
+      div.style.left = '0';
+      div.style.zIndex = '999999';
+      div.style.background = 'white';
+      div.style.padding = '10px';
+      div.style.border = '2px solid red';
+      div.innerHTML = 'Critial Error: ' + msg + '<br>File: ' + url + '<br>Line: ' + line;
+      document.body.appendChild(div);
+    };
+    window.onunhandledrejection = function (event) {
+      var div = document.createElement('div');
+      div.style.color = 'orange';
+      div.style.position = 'fixed';
+      div.style.top = '100px';
+      div.style.left = '0';
+      div.style.zIndex = '999999';
+      div.style.background = 'white';
+      div.style.padding = '10px';
+      div.style.border = '2px solid orange';
+      div.innerHTML = 'Promise Error: ' + event.reason;
+      document.body.appendChild(div);
+    };
+  </script>
   <title>Pookie - Birthday Page</title>
 </head>
 
