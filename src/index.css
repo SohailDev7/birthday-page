@@ -143,6 +143,34 @@
   .animate-transport-out {
     animation: transportSlideOut 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
   }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #F5DEB3;
+    border-left: 2px solid #8B4513;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #8B4513;
+    border: 1px solid #F5DEB3;
+  }
+
+  .custom-scrollbar-h::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .custom-scrollbar-h::-webkit-scrollbar-track {
+    background: #F5DEB3;
+    border-top: 2px solid #8B4513;
+  }
+
+  .custom-scrollbar-h::-webkit-scrollbar-thumb {
+    background: #8B4513;
+    border: 1px solid #F5DEB3;
+  }
 }
 
 /* Luxury theme overrides */

@@ -577,11 +577,11 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                 </div>
 
                 {/* Main Content Area: Sidebar on Desktop */}
-                <div className="flex flex-col md:flex-row gap-2 md:gap-4 flex-1 min-h-0 overflow-hidden">
+                <div className="flex flex-col md:flex-row gap-2 md:gap-3 flex-1 min-h-0 overflow-hidden">
                     {/* Left/Center: Canvas + Toolbar */}
                     <div className="flex-1 flex flex-col gap-2 md:gap-4 min-w-0 overflow-hidden">
                         {/* Canvas Container */}
-                        <div className="relative p-1 md:p-3 bg-[#DEB887] border-4 border-[#5D4037] shadow-inner flex-1 overflow-auto flex flex-col items-center min-h-[300px]">
+                        <div className="relative p-1 md:p-3 bg-[#DEB887] border-4 border-[#5D4037] shadow-inner flex-1 overflow-auto flex flex-col items-center min-h-[200px] md:min-h-[300px]">
                             <div
                                 className="relative bg-white border-4 border-[#8B4513] overflow-hidden m-auto shadow-[4px_4px_0_rgba(0,0,0,0.3)] transition-transform"
                                 style={{
@@ -641,8 +641,13 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                                 e.touches[0].clientX - e.touches[1].clientX,
                                                 e.touches[0].clientY - e.touches[1].clientY
                                             );
-                                            // Capture current pan state too
-                                            lastTap.current = { dist, zoom, pan };
+
+                                            // Calculate center of the two fingers
+                                            const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                                            const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+
+                                            // Capture current state including center point
+                                            lastTap.current = { dist, zoom, pan, startCenter: { x: centerX, y: centerY } };
                                             return;
                                         }
                                         if (tool === 'fill') handleCanvasClick(e);
@@ -663,15 +668,33 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                             if (newZoom <= 1) {
                                                 setPan({ x: 0, y: 0 });
                                             } else {
+                                                // 1. Calculate the theoretical pan based on zoom-out centering
+                                                let targetPanX = 0;
+                                                let targetPanY = 0;
+
                                                 const startZoom = lastTap.current.zoom;
                                                 // Avoid divide by zero if startZoom was 1.
                                                 if (startZoom > 1) {
                                                     const ratio = (newZoom - 1) / (startZoom - 1);
-                                                    setPan({
-                                                        x: lastTap.current.pan.x * ratio,
-                                                        y: lastTap.current.pan.y * ratio
-                                                    });
+                                                    if (isFinite(ratio)) {
+                                                        targetPanX = lastTap.current.pan.x * ratio;
+                                                        targetPanY = lastTap.current.pan.y * ratio;
+                                                    }
                                                 }
+
+                                                // 2. Add the physical drag offset
+                                                const startX = lastTap.current.startCenter ? lastTap.current.startCenter.x : (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                                                const startY = lastTap.current.startCenter ? lastTap.current.startCenter.y : (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                                                const currentCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                                                const currentCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+
+                                                const deltaX = currentCenterX - startX;
+                                                const deltaY = currentCenterY - startY;
+
+                                                setPan({
+                                                    x: targetPanX + deltaX,
+                                                    y: targetPanY + deltaY
+                                                });
                                             }
                                             return;
                                         }
@@ -795,146 +818,103 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
 
                         {/* Toolbar */}
                         {mode === 'edit' && (
-                            <div className="flex flex-wrap items-center gap-2 md:gap-4 bg-[#DEB887] p-2 md:p-3 border-2 border-[#8B4513] shadow-[4px_4px_0_rgba(0,0,0,0.2)]">
-                                {/* Current Color */}
-                                <div className="flex flex-col items-center gap-1 px-1 border-r border-[#8B4513]/30">
-                                    <div className="w-6 h-6 md:w-8 md:h-8 border-4 border-black" style={{ backgroundColor: color }} />
+                            <div className="flex flex-col gap-2 bg-[#DEB887] p-2 md:p-3 border-2 border-[#8B4513] shadow-[4px_4px_0_rgba(0,0,0,0.2)] shrink-0">
+                                {/* Row 1: Colors & Tools (Scrollable on Mobile) */}
+                                <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar-h">
+                                    {/* Current Color */}
+                                    <div className="shrink-0 flex items-center px-1 border-r border-[#8B4513]/30">
+                                        <div className="w-6 h-6 md:w-8 md:h-8 border-2 border-black" style={{ backgroundColor: color }} />
+                                    </div>
+
+                                    {/* Colors Palette */}
+                                    <div className="flex gap-1 p-1 bg-[#F5DEB3] border border-[#8B4513] shrink-0">
+                                        {['#000000', '#FF3B30', '#4CD964', '#007AFF', '#FFCC00', '#FF2D55', '#5856D6', '#8E8E93', '#FFFFFF', '#654321', '#FF6B00', '#00FFFF'].map(c => (
+                                            <button
+                                                key={c}
+                                                onClick={(e) => handleColorClick(c, e)}
+                                                className={`w-5 h-5 md:w-6 md:h-6 border-2 border-black transition-transform hover:scale-110 active:scale-90 shrink-0 ${color === c ? 'ring-2 ring-white scale-110' : ''}`}
+                                                style={{ backgroundColor: c }}
+                                            />
+                                        ))}
+
+                                        <AnimatePresence>
+                                            {shadePopup.show && (
+                                                <>
+                                                    <div className="fixed inset-0 z-100" onClick={() => setShadePopup({ ...shadePopup, show: false })} />
+                                                    <motion.div
+                                                        initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                        exit={{ opacity: 0, scale: 0.8 }}
+                                                        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-[#F5DEB3] border-4 border-[#8B4513] p-2 flex gap-1 z-101 shadow-[4px_4px_0_#000]"
+                                                        style={{ imageRendering: 'pixelated' }}
+                                                    >
+                                                        {generateShades(shadePopup.color).map(sc => (
+                                                            <button
+                                                                key={sc}
+                                                                onClick={() => { setColor(sc); setShadePopup({ ...shadePopup, show: false }); }}
+                                                                className="w-6 h-6 border-2 border-black hover:scale-110"
+                                                                style={{ backgroundColor: sc }}
+                                                            />
+                                                        ))}
+                                                    </motion.div>
+                                                </>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+
+                                    {/* Tools */}
+                                    <div className="flex items-center gap-1 shrink-0 px-2 border-l border-[#8B4513]/30">
+                                        <button onClick={() => setTool('brush')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'brush' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><PixelPaintbrushIcon size={16} /></button>
+                                        <button onClick={() => setTool('calligraphy')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'calligraphy' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="4" transform="rotate(45 12 12)" /></svg></button>
+                                        <button onClick={() => setTool('spray')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'spray' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2" /><circle cx="8" cy="8" r="1" /><circle cx="16" cy="16" r="1" /><circle cx="16" cy="8" r="1" /><circle cx="8" cy="16" r="1" /></svg></button>
+                                        <button onClick={() => setTool('pattern')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'pattern' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="4" height="4" /><rect x="12" y="4" width="4" height="4" /><rect x="4" y="12" width="4" height="4" /><rect x="12" y="12" width="4" height="4" /></svg></button>
+                                        <button onClick={() => setTool('shade')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'shade' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 22h20L12 2z" /><path d="M12 6l-6 16" /><path d="M12 6l6 16" /></svg></button>
+                                        <button onClick={() => setTool('fill')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'fill' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 11l-8-8-9 9 8 8 5-5 9-9z" /><path d="M22 22l-5-5" /></svg></button>
+                                        <button onClick={() => setTool('eraser')} className={`p-1.5 md:p-2 border-2 transition-all ${tool === 'eraser' ? 'bg-[#8B4513] text-white border-black' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513]'}`}><Eraser size={16} /></button>
+                                    </div>
                                 </div>
 
-                                {/* Colors */}
-                                <div className="flex gap-1 p-1 bg-[#F5DEB3] border border-[#8B4513] flex-wrap justify-center relative flex-1 min-w-[120px]">
-                                    {['#000000', '#FF3B30', '#4CD964', '#007AFF', '#FFCC00', '#FF2D55', '#5856D6', '#8E8E93', '#FFFFFF', '#654321', '#FF6B00', '#00FFFF'].map(c => (
-                                        <button
-                                            key={c}
-                                            onClick={(e) => handleColorClick(c, e)}
-                                            className={`w-5 h-5 md:w-6 md:h-6 border-2 border-black transition-transform hover:scale-110 active:scale-90 ${color === c ? 'ring-2 ring-white scale-110' : ''}`}
-                                            style={{ backgroundColor: c }}
+                                {/* Row 2: Slider, History, and Actions */}
+                                <div className="flex flex-wrap items-center gap-2 md:gap-4 overflow-x-auto py-1">
+                                    {/* Brush Size Slider */}
+                                    <div className="flex items-center gap-2 px-2 border-r border-[#8B4513]/30 min-w-0">
+                                        <span className="text-[7px] text-[#5D4037] whitespace-nowrap">SIZE</span>
+                                        <input
+                                            type="range"
+                                            min="1"
+                                            max="50"
+                                            value={brushSize}
+                                            onChange={(e) => setBrushSize(parseInt(e.target.value))}
+                                            className="w-16 md:w-32 accent-[#8B4513] h-2 bg-[#F5DEB3] rounded-lg appearance-none cursor-pointer border border-[#8B4513]"
                                         />
-                                    ))}
+                                        <span className="text-[8px] text-[#5D4037] min-w-[15px]">{brushSize}</span>
+                                    </div>
 
-                                    <AnimatePresence>
-                                        {shadePopup.show && (
-                                            <>
-                                                <div className="fixed inset-0 z-100" onClick={() => setShadePopup({ ...shadePopup, show: false })} />
-                                                <motion.div
-                                                    initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                    exit={{ opacity: 0, scale: 0.8 }}
-                                                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-[#F5DEB3] border-4 border-[#8B4513] p-2 flex gap-1 z-101 shadow-[4px_4px_0_#000]"
-                                                    style={{ imageRendering: 'pixelated' }}
-                                                >
-                                                    {generateShades(shadePopup.color).map(sc => (
-                                                        <button
-                                                            key={sc}
-                                                            onClick={() => { setColor(sc); setShadePopup({ ...shadePopup, show: false }); }}
-                                                            className="w-6 h-6 border-2 border-black hover:scale-110"
-                                                            style={{ backgroundColor: sc }}
-                                                        />
-                                                    ))}
-                                                </motion.div>
-                                            </>
-                                        )}
-                                    </AnimatePresence>
-                                </div>
+                                    {/* History */}
+                                    <div className="flex gap-1 px-2 border-r border-[#8B4513]/30">
+                                        <button onClick={handleUndo} disabled={historyIndex <= 0} className="p-1.5 border-2 bg-[#F5DEB3] border-[#8B4513] text-[#5D4037] disabled:opacity-50 hover:bg-[#DEB887] active:scale-95"><Undo size={14} /></button>
+                                        <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className="p-1.5 border-2 bg-[#F5DEB3] border-[#8B4513] text-[#5D4037] disabled:opacity-50 hover:bg-[#DEB887] active:scale-95"><Redo size={14} /></button>
+                                    </div>
 
-                                {/* Tools */}
-                                <div className="flex items-center gap-1 md:gap-2">
-                                    <button
-                                        onClick={() => setTool('brush')}
-                                        title="Solid Brush"
-                                        className={`p-2 border-2 transition-all active:scale-95 ${tool === 'brush' ? 'bg-[#8B4513] text-white border-black shadow-[inset_2px_2px_0_rgba(0,0,0,0.3)]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513] shadow-[2px_2px_0_rgba(0,0,0,0.1)] hover:bg-[#DEB887]'}`}
-                                    >
-                                        <PixelPaintbrushIcon size={18} />
-                                    </button>
-
-                                    <button
-                                        onClick={() => setTool('calligraphy')}
-                                        title="Calligraphy"
-                                        className={`p-2 border-2 transition-all active:scale-95 ${tool === 'calligraphy' ? 'bg-[#8B4513] text-white border-black shadow-[inset_2px_2px_0_rgba(0,0,0,0.3)]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513] shadow-[2px_2px_0_rgba(0,0,0,0.1)] hover:bg-[#DEB887]'}`}
-                                    >
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="4" transform="rotate(45 12 12)" /></svg>
-                                    </button>
-
-                                    <button
-                                        onClick={() => setTool('spray')}
-                                        title="Spray"
-                                        className={`p-2 border-2 transition-all active:scale-95 ${tool === 'spray' ? 'bg-[#8B4513] text-white border-black shadow-[inset_2px_2px_0_rgba(0,0,0,0.3)]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513] shadow-[2px_2px_0_rgba(0,0,0,0.1)] hover:bg-[#DEB887]'}`}
-                                    >
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2" /><circle cx="8" cy="8" r="1" /><circle cx="16" cy="16" r="1" /><circle cx="16" cy="8" r="1" /><circle cx="8" cy="16" r="1" /></svg>
-                                    </button>
-
-                                    <button
-                                        onClick={() => setTool('pattern')}
-                                        title="Pixel Pattern"
-                                        className={`p-2 border-2 transition-all active:scale-95 ${tool === 'pattern' ? 'bg-[#8B4513] text-white border-black shadow-[inset_2px_2px_0_rgba(0,0,0,0.3)]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513] shadow-[2px_2px_0_rgba(0,0,0,0.1)] hover:bg-[#DEB887]'}`}
-                                    >
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="4" height="4" /><rect x="12" y="4" width="4" height="4" /><rect x="4" y="12" width="4" height="4" /><rect x="12" y="12" width="4" height="4" /></svg>
-                                    </button>
-
-                                    <button
-                                        onClick={() => setTool('shade')}
-                                        title="Shading Brush"
-                                        className={`p-2 border-2 transition-all active:scale-95 ${tool === 'shade' ? 'bg-[#8B4513] text-white border-black shadow-[inset_2px_2px_0_rgba(0,0,0,0.3)]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513] shadow-[2px_2px_0_rgba(0,0,0,0.1)] hover:bg-[#DEB887]'}`}
-                                    >
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 22h20L12 2z" /><path d="M12 6l-6 16" /><path d="M12 6l6 16" /></svg>
-                                    </button>
-
-                                    <button
-                                        onClick={() => setTool('fill')}
-                                        title="Fill Bucket"
-                                        className={`p-2 border-2 transition-all active:scale-95 ${tool === 'fill' ? 'bg-[#8B4513] text-white border-black shadow-[inset_2px_2px_0_rgba(0,0,0,0.3)]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513] shadow-[2px_2px_0_rgba(0,0,0,0.1)] hover:bg-[#DEB887]'}`}
-                                    >
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 11l-8-8-9 9 8 8 5-5 9-9z" /><path d="M22 22l-5-5" /></svg>
-                                    </button>
-
-                                    <button
-                                        onClick={() => setTool('eraser')}
-                                        title="Eraser"
-                                        className={`p-2 border-2 transition-all active:scale-95 ${tool === 'eraser' ? 'bg-[#8B4513] text-white border-black shadow-[inset_2px_2px_0_rgba(0,0,0,0.3)]' : 'bg-[#F5DEB3] text-[#5D4037] border-[#8B4513] shadow-[2px_2px_0_rgba(0,0,0,0.1)] hover:bg-[#DEB887]'}`}
-                                    >
-                                        <Eraser size={18} />
-                                    </button>
-                                </div>
-
-                                {/* Brush Size Slider */}
-                                <div className="flex items-center gap-2 px-3 border-l border-r border-[#8B4513]/30">
-                                    <span className="text-[8px] text-[#5D4037] hidden md:block">SIZE</span>
-                                    <input
-                                        type="range"
-                                        min="1"
-                                        max="50"
-                                        value={brushSize}
-                                        onChange={(e) => setBrushSize(parseInt(e.target.value))}
-                                        className="w-20 md:w-32 accent-[#8B4513] h-2 bg-[#F5DEB3] rounded-lg appearance-none cursor-pointer border border-[#8B4513]"
-                                    />
-                                    <span className="text-[10px] text-[#5D4037] min-w-[20px]">{brushSize}</span>
-                                </div>
-
-                                {/* History */}
-                                <div className="flex gap-1 pl-2">
-                                    <button onClick={handleUndo} disabled={historyIndex <= 0} className="p-2 border-2 bg-[#F5DEB3] border-[#8B4513] text-[#5D4037] hover:bg-[#DEB887] disabled:opacity-50 transition-all active:scale-90"><Undo size={18} /></button>
-                                    <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className="p-2 border-2 bg-[#F5DEB3] border-[#8B4513] text-[#5D4037] hover:bg-[#DEB887] disabled:opacity-50 transition-all active:scale-90"><Redo size={18} /></button>
-                                </div>
-
-                                {/* Export/Clear */}
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => {
-                                            setPendingExportData(canvasRef.current.toDataURL());
-                                            setSaveSlot(equippedIndex); // Default to current
-                                            setShowSaveDialog(true);
-                                        }}
-                                        disabled={!gallery}
-                                        className={`px-2 md:px-3 py-1.5 md:py-2 bg-[#90EE90] text-[#006400] text-[8px] md:text-[10px] border-2 border-[#006400] shadow-[2px_2px_0_#006400] disabled:opacity-50 flex items-center gap-1`}
-                                    >
-                                        <Download size={10} /> EXPORT
-                                    </button>
-                                    <button
-                                        onClick={clearCanvas}
-                                        className="px-2 md:px-3 py-1.5 md:py-2 bg-[#FFB6C1] text-[#8B0000] text-[8px] md:text-[10px] border-2 border-[#8B0000] shadow-[2px_2px_0_#8B0000]"
-                                    >
-                                        <RotateCcw size={10} /> CLEAR
-                                    </button>
+                                    {/* Export/Clear */}
+                                    <div className="flex gap-1 ml-auto">
+                                        <button
+                                            onClick={() => {
+                                                setPendingExportData(canvasRef.current.toDataURL());
+                                                setSaveSlot(equippedIndex);
+                                                setShowSaveDialog(true);
+                                            }}
+                                            className="px-2 py-1 bg-[#90EE90] text-[#006400] text-[8px] border-2 border-[#006400] shadow-[1px_1px_0_#006400] flex items-center gap-1 active:translate-y-0.5"
+                                        >
+                                            <Download size={8} /> EXPORT
+                                        </button>
+                                        <button
+                                            onClick={clearCanvas}
+                                            className="px-2 py-1 bg-[#FFB6C1] text-[#8B0000] text-[8px] border-2 border-[#8B0000] shadow-[1px_1px_0_#8B0000] flex items-center gap-1 active:translate-y-0.5"
+                                        >
+                                            <RotateCcw size={8} /> CLEAR
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -942,24 +922,22 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
 
                     {/* Right: Sidebar Gallery (Desktop) / Bottom Gallery (Mobile) */}
                     {mode === 'edit' && (
-                        <div className="w-full md:w-64 bg-[#DEB887] p-2 md:p-3 border-2 md:border-4 border-[#8B4513] shadow-inner flex flex-col min-h-0 overflow-hidden">
-                            <h3 className="text-[#5D4037] text-[10px] mb-2 flex items-center gap-2 font-bold bg-[#F5DEB3] p-2 border-2 border-[#8B4513]">
-                                <Database size={14} /> GALLERY ({(gallery || []).length}/8)
+                        <div className="w-full md:w-64 bg-[#DEB887] p-1 md:p-3 border-t-4 md:border-l-4 border-[#8B4513] shadow-inner flex flex-col min-h-0 overflow-hidden shrink-0">
+                            <h3 className="text-[#5D4037] text-[8px] md:text-[10px] mb-1 md:mb-2 flex items-center gap-2 font-bold bg-[#F5DEB3] p-1 md:p-2 border-2 border-[#8B4513] shrink-0">
+                                <Database size={12} /> GALLERY ({(gallery || []).length}/8)
                             </h3>
-                            <div className="grid grid-cols-4 md:grid-cols-2 gap-2 overflow-y-auto flex-1 pr-1 custom-scrollbar">
+                            <div className="flex md:grid md:grid-cols-2 gap-2 overflow-x-auto md:overflow-y-auto flex-1 p-1 custom-scrollbar-h">
                                 {[...Array(8)].map((_, i) => {
                                     const p = gallery[i];
                                     return (
                                         <div
                                             key={i}
-                                            className={`aspect-square border-4 relative group cursor-pointer transition-all ${equippedIndex === i ? 'border-green-600 bg-green-100 ring-2 ring-green-600 ring-inset' : 'border-[#8B4513] bg-[#F5DEB3] hover:border-[#5D4037]'}`}
+                                            className={`aspect-square w-16 h-16 md:w-auto md:h-auto border-4 relative shrink-0 group cursor-pointer transition-all ${equippedIndex === i ? 'border-green-600 bg-green-100 ring-2 ring-green-600 ring-inset' : 'border-[#8B4513] bg-[#F5DEB3] hover:border-[#5D4037]'}`}
                                             onClick={() => {
                                                 if (!p) {
-                                                    // Empty slot: clear and prepare
                                                     clearCanvas();
                                                     setEquippedIndex(i);
                                                 } else {
-                                                    // Filled slot: Just select it (to show options), don't auto-open
                                                     setEquippedIndex(i);
                                                 }
                                             }}
