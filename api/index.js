@@ -28,7 +28,14 @@ mongoose.connect(MONGODB_URI)
 const paintingSchema = new mongoose.Schema({
     userKey: { type: String, required: true, unique: true },
     displayName: { type: String, required: true },
-    drawingData: { type: String, required: true }, // Base64 string
+    paintings: [
+        {
+            title: { type: String, required: true },
+            drawingData: { type: String, required: true }, // Base64 string
+            createdAt: { type: Date, default: Date.now }
+        }
+    ],
+    equippedIndex: { type: Number, default: 0 },
     updatedAt: { type: Date, default: Date.now }
 });
 
@@ -84,55 +91,121 @@ const Review = mongoose.model('Review', reviewSchema);
 
 // --- PAINTING ROUTES ---
 
-// GET all paintings
+// GET all equipped paintings (for map display)
 app.get('/api/paintings', async (req, res) => {
     try {
-        const paintings = await Painting.find();
-        // Convert array to object map { userKey: drawingData }
-        const paintingMap = paintings.reduce((acc, curr) => {
-            acc[curr.userKey] = curr.drawingData;
-            return acc;
-        }, {});
-        res.json({ success: true, data: paintingMap });
+        const galleries = await Painting.find();
+        // Convert array to object map { userKey: equippedDrawingData }
+        const map = {};
+        galleries.forEach(g => {
+            if (g.paintings && g.paintings.length > 0) {
+                const idx = g.equippedIndex || 0;
+                map[g.userKey] = g.paintings[idx] ? g.paintings[idx].drawingData : g.paintings[0].drawingData;
+            }
+        });
+        res.json({ success: true, data: map });
     } catch (err) {
         console.error('Error fetching paintings:', err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
 
-// GET painting by userKey
+// GET full gallery by userKey
 app.get('/api/paintings/:userKey', async (req, res) => {
     try {
-        const painting = await Painting.findOne({ userKey: req.params.userKey });
-        res.json({ success: true, data: painting ? painting.drawingData : null });
+        const gallery = await Painting.findOne({ userKey: req.params.userKey });
+        res.json({ success: true, data: gallery });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
 });
 
-// POST save painting
+// POST save a new painting to user gallery (Overwrite if index provided)
 app.post('/api/paintings', async (req, res) => {
     try {
-        const { userKey, displayName, drawingData } = req.body;
+        const { userKey, displayName, drawingData, title, index } = req.body;
 
-        if (!userKey || !drawingData) {
-            return res.status(400).json({ success: false, message: 'Missing userKey or drawingData' });
+        if (!userKey || !drawingData || !title) {
+            return res.status(400).json({ success: false, message: 'Missing userKey, drawingData, or title' });
         }
 
-        const painting = await Painting.findOneAndUpdate(
-            { userKey },
-            {
+        let gallery = await Painting.findOne({ userKey });
+
+        if (!gallery) {
+            gallery = new Painting({
                 userKey,
                 displayName: displayName || userKey,
-                drawingData,
-                updatedAt: Date.now()
-            },
-            { upsert: true, new: true }
-        );
+                paintings: [{ title, drawingData }],
+                equippedIndex: 0
+            });
+        } else {
+            if (typeof index === 'number' && index >= 0 && index < 8) {
+                // Overwrite or set specific index
+                if (index < gallery.paintings.length) {
+                    gallery.paintings[index] = { title, drawingData };
+                } else {
+                    // If index is further ahead but < 8, we just push or fill gaps
+                    // For simplicity, if they want slot 5 but only have 2, we just push
+                    gallery.paintings.push({ title, drawingData });
+                }
+            } else {
+                if (gallery.paintings.length >= 8) {
+                    return res.status(400).json({ success: false, message: 'Max 8 paintings reached' });
+                }
+                gallery.paintings.push({ title, drawingData });
+            }
+            gallery.updatedAt = Date.now();
+        }
 
-        res.json({ success: true, message: 'Painting saved successfully', data: painting });
+        await gallery.save();
+        res.json({ success: true, message: 'Painting saved to gallery', data: gallery });
     } catch (err) {
         console.error('Error saving painting:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// PATCH equip a painting
+app.patch('/api/paintings/:userKey/equip', async (req, res) => {
+    try {
+        const { index } = req.body;
+        const gallery = await Painting.findOne({ userKey: req.params.userKey });
+
+        if (!gallery) return res.status(404).json({ success: false, message: 'Gallery not found' });
+        if (index < 0 || index >= gallery.paintings.length) {
+            return res.status(400).json({ success: false, message: 'Invalid index' });
+        }
+
+        gallery.equippedIndex = index;
+        gallery.updatedAt = Date.now();
+        await gallery.save();
+
+        res.json({ success: true, message: 'Painting equipped', equippedIndex: index });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// DELETE a painting from gallery
+app.delete('/api/paintings/:userKey/:index', async (req, res) => {
+    try {
+        const { userKey, index } = req.params;
+        const gallery = await Painting.findOne({ userKey });
+
+        if (!gallery) return res.status(404).json({ success: false, message: 'Gallery not found' });
+
+        gallery.paintings.splice(index, 1);
+
+        // Adjust equipped index if needed
+        if (gallery.equippedIndex >= gallery.paintings.length) {
+            gallery.equippedIndex = Math.max(0, gallery.paintings.length - 1);
+        }
+
+        gallery.updatedAt = Date.now();
+        await gallery.save();
+
+        res.json({ success: true, message: 'Painting deleted', data: gallery });
+    } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
 });

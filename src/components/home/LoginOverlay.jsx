@@ -14,8 +14,12 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
 
     // Configuration based on user
     const getPasswordConfig = (key) => {
-        if (key === 'prachi') {
-            return {
+        const configs = {
+            yuzence: {
+                correct: "yuz_blue",
+                hints: ["The color of your ocean... 🌊", "Yuz + a color! 🎨", "Think Blue! 💙"]
+            },
+            prachi: {
                 correct: "pr1ngles",
                 hints: [
                     "Hmm... what could the password be? 🤔",
@@ -24,10 +28,30 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
                     "Hint: Maybe something you'd find in a snack aisle? 🛒",
                     "Hint: It's not food, but a food brand! 🏷️"
                 ]
-            };
-        }
-        // Default for others
-        return {
+            },
+            manash: {
+                correct: "man_dark",
+                hints: ["Welcome to the shadows... 🌑", "Man + his favorite theme! 🖤", "Opposite of light! 💡"]
+            },
+            sameer: {
+                correct: "sam_sun",
+                hints: ["Golden rays... ☀️", "Sam + a celestial body! ⭐", "The center of the solar system! 🌞"]
+            },
+            saurav: {
+                correct: "sau_green",
+                hints: ["The nature's favorite color... 🌿", "Sau + a color! 🍏", "Think Emerald! 💚"]
+            },
+            sama: {
+                correct: "sama_vibe",
+                hints: ["It's all about the energy... ✨", "Sama + something you feel! 🎶", "Good vibes only! 🌈"]
+            },
+            aaditya: {
+                correct: "adi_kale",
+                hints: ["Uta ja kale hapsi", "Adi + a kale! ⚙️", "The artificial intelligence! 💻"]
+            }
+        };
+
+        return configs[key] || {
             correct: "password",
             hints: [
                 "Just guess 'password' 😉",
