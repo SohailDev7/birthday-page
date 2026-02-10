@@ -608,9 +608,9 @@ const UserGallery = ({ users }) => {
             {/* Horizontal Scroll Container for Canvases placed on ground */}
             {/* pb-32 (128px) ensures legs are fully visible above the 80px grass layer */}
             <div className="flex flex-row items-end overflow-x-auto w-full pointer-events-auto no-scrollbar snap-x snap-mandatory scroll-smooth pb-32" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                <div className="flex flex-row items-end gap-12 md:gap-32 px-[35vw] md:px-[40vw]">
-                    {/* Start Spacer */}
-                    <div className="w-[5vw] shrink-0" />
+                <div className="flex flex-row items-end gap-8 md:gap-32 px-4 md:px-[30vw]">
+                    {/* Start Spacer for centering first item */}
+                    <div className="w-[35vw] md:w-[10vw] shrink-0" />
 
                     {Object.entries(users).map(([key, user]) => (
                         <motion.div
@@ -628,8 +628,8 @@ const UserGallery = ({ users }) => {
                         </motion.div>
                     ))}
 
-                    {/* End Spacer */}
-                    <div className="w-[35vw] shrink-0" />
+                    {/* End Spacer for centering last item */}
+                    <div className="w-[35vw] md:w-[30vw] shrink-0" />
                 </div>
             </div>
 
