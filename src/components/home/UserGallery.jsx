@@ -79,19 +79,26 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
         if (mode !== 'auth') return;
 
         const fetchPic = async () => {
-            if (authInput.toLowerCase() === correctHandle.toLowerCase()) {
+            const input = authInput.trim().toLowerCase();
+            const target = (user.instaHandle || user.displayName || '').toLowerCase();
+
+            console.log("Canvas Auth Debug:", { input, target, user });
+
+            if (input === target && input.length > 0) {
                 setIsFetchingPic(true);
-                // Using unavatar.io as a best-effort public avatar fetcher
-                setProfilePic(`https://unavatar.io/instagram/${correctHandle}`);
-                setTimeout(() => setIsFetchingPic(false), 800);
+                // Try instagram with a forced fallback chain
+                const url = `https://unavatar.io/instagram/${target}?fallback=https://unavatar.io/github/${target}&t=${Date.now()}`;
+                console.log("Fetching from:", url);
+                setProfilePic(url);
             } else {
                 setProfilePic(null);
+                setIsFetchingPic(false);
             }
         };
 
-        const timer = setTimeout(fetchPic, 500);
+        const timer = setTimeout(fetchPic, 300);
         return () => clearTimeout(timer);
-    }, [authInput, mode, correctHandle]);
+    }, [authInput, mode, user, correctHandle]);
 
     const drawStateRef = useRef({
         isDrawing: false,
@@ -987,26 +994,45 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
                                             className="bg-[#FFE4C4] border-4 border-[#8B4513] p-8 flex flex-col items-center gap-6 shadow-[8px_8px_0_#000] w-[320px]"
                                         >
                                             <div className="relative">
-                                                <div className="w-20 h-20 bg-[#DEB887] border-4 border-[#8B4513] rounded-full flex items-center justify-center overflow-hidden shadow-inner">
-                                                    {isFetchingPic ? (
+                                                <div className="w-20 h-20 bg-[#DEB887] border-4 border-[#8B4513] rounded-full flex items-center justify-center overflow-hidden shadow-inner relative">
+                                                    {!profilePic && !isFetchingPic && (
+                                                        <Lock size={32} className="text-[#8B4513] opacity-40" />
+                                                    )}
+
+                                                    {isFetchingPic && (
                                                         <motion.div
                                                             animate={{ rotate: 360 }}
                                                             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                                            className="text-[#8B4513]"
+                                                            className="text-[#8B4513] z-10"
                                                         >
                                                             <Database size={24} />
                                                         </motion.div>
-                                                    ) : profilePic ? (
-                                                        <img src={profilePic} className="w-full h-full object-cover" alt="Profile" />
-                                                    ) : (
-                                                        <Lock size={32} className="text-[#8B4513] opacity-40" />
+                                                    )}
+
+                                                    {profilePic && (
+                                                        <motion.img
+                                                            initial={{ opacity: 0 }}
+                                                            animate={{ opacity: isFetchingPic ? 0 : 1 }}
+                                                            src={profilePic}
+                                                            className="w-full h-full object-cover absolute inset-0"
+                                                            alt="Profile"
+                                                            onLoad={() => {
+                                                                console.log("Profile pic loaded successfully");
+                                                                setIsFetchingPic(false);
+                                                            }}
+                                                            onError={(e) => {
+                                                                console.error("Profile pic failed to load, trying fallback");
+                                                                e.target.src = `https://api.dicebear.com/7.x/pixel-art/svg?seed=${correctHandle}`;
+                                                                setTimeout(() => setIsFetchingPic(false), 500);
+                                                            }}
+                                                        />
                                                     )}
                                                 </div>
                                                 {profilePic && !isFetchingPic && (
                                                     <motion.div
                                                         initial={{ scale: 0 }}
                                                         animate={{ scale: 1 }}
-                                                        className="absolute -bottom-1 -right-1 bg-green-500 border-2 border-white rounded-full p-1"
+                                                        className="absolute -bottom-1 -right-1 bg-green-500 border-2 border-white rounded-full p-1 shadow-md"
                                                     >
                                                         <Check size={12} className="text-white" />
                                                     </motion.div>
@@ -1489,7 +1515,7 @@ const GalleryItem = ({ user, userKey, drawingData, onClick }) => {
 
             <div className="relative flex flex-col items-center">
                 {/* Character standing beside stand */}
-                <div className="absolute -left-14 bottom-0 w-24 h-24 z-20 pointer-events-none">
+                <div className="absolute -left-14 bottom-0 w-24 h-24 z-20 pointer-events-none hidden md:block">
                     <FullBodyCharacter
                         userKey={userKey}
                         userData={user}
