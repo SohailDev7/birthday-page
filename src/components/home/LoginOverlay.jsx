@@ -77,8 +77,8 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
         }
 
         if (password === config.correct) {
-            
-            login(userKey); 
+
+            login(userKey);
 
             setTimeout(() => {
                 if (userKey === 'prachi') {
@@ -89,7 +89,7 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
             }, 500);
 
         } else {
-            
+
             setShake(true);
             setTimeout(() => setShake(false), 500);
 
@@ -135,7 +135,7 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
                 exit={{ scale: 0.8, y: 50, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
                 style={{
-                    
+
                     background: userKey === 'sohail'
                         ? `linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url("https://www.transparenttextures.com/patterns/dark-matter.png"), repeating-linear-gradient(45deg, #1a1a1a 0px, #1a1a1a 4px, #2a2a2a 4px, #2a2a2a 8px)`
                         : `repeating-linear-gradient(45deg, #7d7d7d 0px, #7d7d7d 4px, #8a8a8a 4px, #8a8a8a 8px)`,
@@ -147,7 +147,7 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
                     fontFamily: "'Press Start 2P', monospace"
                 }}
             >
-                {}
+                { }
                 {userKey === 'sohail' && (
                     <>
                         <motion.div
@@ -161,7 +161,7 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
                             }}
                             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                         />
-                        {}
+                        { }
                         {[...Array(20)].map((_, i) => (
                             <motion.div
                                 key={`divine-p-${i}`}
@@ -196,7 +196,7 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
                         ))}
                     </>
                 )}
-                {}
+                { }
                 <div
                     className="flex justify-between items-center p-4 border-b-4 border-black bg-[#C6C6C6]"
                     style={{
@@ -218,10 +218,10 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
                     </button>
                 </div>
 
-                {}
+                { }
                 <div className="p-8 flex flex-col items-center">
 
-                    {}
+                    { }
                     <div
                         className="w-24 h-24 mb-6 relative"
                         style={{
@@ -230,7 +230,7 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
                             boxShadow: '4px 4px 0 rgba(0,0,0,0.5)'
                         }}
                     >
-                        {}
+                        { }
                         {userKey === 'sohail' && (
                             <motion.div
                                 className="absolute inset-0 z-[-1]"
@@ -246,7 +246,7 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
                         <div className="absolute inset-0 flex items-center justify-center text-4xl text-white drop-shadow-md">
                             {userData.displayName[0]}
                         </div>
-                        {}
+                        { }
                         <div className="absolute top-0 left-0 w-2 h-2 bg-white opacity-50"></div>
                         <div className="absolute bottom-0 right-0 w-2 h-2 bg-black opacity-20"></div>
                     </div>
@@ -262,7 +262,7 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
                     </h2>
 
                     <form onSubmit={handleSubmit} className="w-full space-y-6">
-                        {}
+                        { }
                         <div>
                             <label className="block text-[#C6C6C6] text-xs mb-2 pl-1" style={{ textShadow: '2px 2px 0 #000' }}>USERNAME</label>
                             <input
@@ -279,7 +279,7 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
                             />
                         </div>
 
-                        {}
+                        { }
                         {userKey === 'sohail' ? (
                             <div
                                 className="p-6 bg-black/40 border-4 border-dashed mb-8 text-center"
@@ -352,7 +352,7 @@ const LoginOverlay = ({ userKey, userData, onClose }) => {
                             }}
                         >
                             <span className="relative z-10">{userKey === 'sohail' ? 'ASCEND' : 'UNLOCK'}</span>
-                            {}
+                            { }
                             <div
                                 className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity"
                                 style={{ background: userData.color }}

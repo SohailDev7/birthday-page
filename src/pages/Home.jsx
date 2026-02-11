@@ -110,7 +110,8 @@ const Home = () => {
       animation: 'wave',
       timeOfDay: 'day',
       skyGradient: 'linear-gradient(to bottom, #4A90E2 0%, #7CB9E8 50%, #B8E6F5 100%)',
-      dob: '2007-03-27'
+      dob: '2007-03-27',
+      instaHandle: 'yuziiatepluto'
     },
     prachi: {
       color: '#FF2D92',
@@ -120,7 +121,8 @@ const Home = () => {
       animation: 'spin',
       timeOfDay: 'sunset',
       skyGradient: 'linear-gradient(to bottom, #FF6B9D 0%, #FFB3D9 50%, #FFDAF0 100%)',
-      dob: '2007-06-14'
+      dob: '2007-06-14',
+      instaHandle: 'prachiixx_'
     },
     manash: {
       color: '#1D1D1F',
@@ -130,7 +132,8 @@ const Home = () => {
       animation: 'tilt',
       timeOfDay: 'night',
       skyGradient: 'linear-gradient(to bottom, #0f1419 0%, #1a2332 50%, #2d3e50 100%)',
-      dob: '2007-07-02'
+      dob: '2007-07-02',
+      instaHandle: 'chaulagaimanash'
     },
     sameer: {
       color: '#FF9F0A',
@@ -140,7 +143,8 @@ const Home = () => {
       animation: 'bounce',
       timeOfDay: 'day',
       skyGradient: 'linear-gradient(to bottom, #FFA500 0%, #FFD27F 50%, #FFE7B8 100%)',
-      dob: '2000-01-01'
+      dob: '2000-01-01',
+      instaHandle: 'sameer.dhle'
     },
     saurav: {
       color: '#10B981',
@@ -150,7 +154,8 @@ const Home = () => {
       animation: 'jump',
       timeOfDay: 'day',
       skyGradient: 'linear-gradient(to bottom, #10B981 0%, #6EE7B7 50%, #D1FAE5 100%)',
-      dob: '2007-05-13'
+      dob: '2007-05-13',
+      instaHandle: 'sharior13'
     },
     sama: {
       color: '#8B5CF6',
@@ -160,7 +165,8 @@ const Home = () => {
       animation: 'float',
       timeOfDay: 'twilight',
       skyGradient: 'linear-gradient(to bottom, #5B21B6 0%, #8B5CF6 50%, #C4B5FD 100%)',
-      dob: '2000-01-01'
+      dob: '2000-01-01',
+      instaHandle: '_sama_maharjan_'
     },
     sampada: {
       color: '#FF0000',
@@ -171,6 +177,7 @@ const Home = () => {
       timeOfDay: 'day',
       skyGradient: 'linear-gradient(to bottom, #FF0000 0%, #CC0000 50%, #8B0000 100%)',
       dob: '2007-01-28',
+      instaHandle: 'samtrieslife_',
       hasGlasses: true
     },
     aaditya: {
@@ -181,7 +188,8 @@ const Home = () => {
       animation: 'shake',
       timeOfDay: 'day',
       skyGradient: 'linear-gradient(to bottom, #06B6D4 0%, #67E8F9 50%, #CFFAFE 100%)',
-      dob: '2007-03-19'
+      dob: '2007-03-19',
+      instaHandle: 'aditya.pun00'
     },
     sohail: {
       color: '#FFD700',
@@ -193,7 +201,8 @@ const Home = () => {
       skyGradient: 'linear-gradient(to bottom, #FF8C00 0%, #FF4500 50%, #4B0082 100%)',
       isSpecial: true,
       auraColor: '#FFD700',
-      dob: '2007-05-07'
+      dob: '2007-05-07',
+      instaHandle: 'sugarberrybug'
     }
   };
 

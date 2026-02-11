@@ -70,6 +70,28 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     const [mode, setMode] = useState('view');
     const [authInput, setAuthInput] = useState('');
     const [authError, setAuthError] = useState(false);
+    const [profilePic, setProfilePic] = useState(null);
+    const [isFetchingPic, setIsFetchingPic] = useState(false);
+
+    const correctHandle = user.instaHandle || user.displayName.toLowerCase();
+
+    useEffect(() => {
+        if (mode !== 'auth') return;
+
+        const fetchPic = async () => {
+            if (authInput.toLowerCase() === correctHandle.toLowerCase()) {
+                setIsFetchingPic(true);
+                // Using unavatar.io as a best-effort public avatar fetcher
+                setProfilePic(`https://unavatar.io/instagram/${correctHandle}`);
+                setTimeout(() => setIsFetchingPic(false), 800);
+            } else {
+                setProfilePic(null);
+            }
+        };
+
+        const timer = setTimeout(fetchPic, 500);
+        return () => clearTimeout(timer);
+    }, [authInput, mode, correctHandle]);
 
     const drawStateRef = useRef({
         isDrawing: false,
@@ -281,10 +303,11 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
     const handleUnlock = (e) => {
         e.preventDefault();
 
-        if (authInput === user.dob) {
+        if (authInput.toLowerCase() === correctHandle.toLowerCase()) {
             setMode('edit');
             setAuthError(false);
             setAuthInput('');
+            setProfilePic(null);
         } else {
             setAuthError(true);
             setTimeout(() => setAuthError(false), 500);
@@ -957,46 +980,76 @@ const DrawingModal = ({ user, onClose, initialData, onSave }) => {
 
                                 { }
                                 {mode === 'auth' && (
-                                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20 backdrop-blur-sm">
+                                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-20 backdrop-blur-md">
                                         <motion.div
                                             initial={{ y: 20, opacity: 0 }}
                                             animate={{ y: 0, opacity: 1 }}
-                                            className="bg-[#FFE4C4] border-4 border-[#8B4513] p-6 flex flex-col items-center gap-4 shadow-[8px_8px_0_#000]"
+                                            className="bg-[#FFE4C4] border-4 border-[#8B4513] p-8 flex flex-col items-center gap-6 shadow-[8px_8px_0_#000] w-[320px]"
                                         >
-                                            <Lock size={32} className="text-[#8B4513]" />
-                                            <div className="text-center">
-                                                <h3 className="text-[#5D4037] text-xs mb-2">SECURE CANVAS</h3>
-                                                <p className="text-[8px] text-[#8B4513] mb-4">ENTER DOB (YYYY-MM-DD)</p>
+                                            <div className="relative">
+                                                <div className="w-20 h-20 bg-[#DEB887] border-4 border-[#8B4513] rounded-full flex items-center justify-center overflow-hidden shadow-inner">
+                                                    {isFetchingPic ? (
+                                                        <motion.div
+                                                            animate={{ rotate: 360 }}
+                                                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                                            className="text-[#8B4513]"
+                                                        >
+                                                            <Database size={24} />
+                                                        </motion.div>
+                                                    ) : profilePic ? (
+                                                        <img src={profilePic} className="w-full h-full object-cover" alt="Profile" />
+                                                    ) : (
+                                                        <Lock size={32} className="text-[#8B4513] opacity-40" />
+                                                    )}
+                                                </div>
+                                                {profilePic && !isFetchingPic && (
+                                                    <motion.div
+                                                        initial={{ scale: 0 }}
+                                                        animate={{ scale: 1 }}
+                                                        className="absolute -bottom-1 -right-1 bg-green-500 border-2 border-white rounded-full p-1"
+                                                    >
+                                                        <Check size={12} className="text-white" />
+                                                    </motion.div>
+                                                )}
                                             </div>
 
-                                            <input
-                                                type="text"
-                                                maxLength={10}
-                                                value={authInput}
-                                                onChange={(e) => {
-                                                    let val = e.target.value.replace(/[^0-9-]/g, '');
-                                                    if (val.length > authInput.length) {
-                                                        if (val.length === 4 || val.length === 7) {
-                                                            if (val.charAt(val.length - 1) !== '-') val += '-';
-                                                        }
-                                                    }
-                                                    setAuthInput(val);
-                                                }}
-                                                className={`w-48 p-2 text-center text-sm bg-[#FFF8DC] border-4 outline-none font-['Press_Start_2P'] ${authError ? 'border-red-500 text-red-500' : 'border-[#8B4513] text-[#5D4037]'}`}
-                                                placeholder="YYYY-MM-DD"
-                                                autoFocus
-                                            />
+                                            <div className="text-center">
+                                                <h3 className="text-[#5D4037] text-[10px] mb-2 font-bold">IDENTITY VERIFICATION</h3>
+                                                <p className="text-[7px] text-[#8B4513] mb-4 uppercase">Enter your Instagram handle to enable editing</p>
+                                            </div>
 
-                                            <div className="flex gap-2 w-full">
+                                            <div className="w-full relative">
+                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B4513] opacity-40 text-xs">@</span>
+                                                <input
+                                                    type="text"
+                                                    value={authInput}
+                                                    onChange={(e) => setAuthInput(e.target.value)}
+                                                    className={`w-full pl-8 pr-3 py-3 text-center text-[10px] bg-[#FFF8DC] border-4 outline-none font-['Press_Start_2P'] ${authError ? 'border-red-500 text-red-500' : 'border-[#8B4513] text-[#5D4037]'}`}
+                                                    placeholder="username"
+                                                    autoFocus
+                                                />
+                                            </div>
+
+                                            {profilePic && !isFetchingPic && (
+                                                <motion.p
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    className="text-[7px] text-green-700 font-bold"
+                                                >
+                                                    IS THIS YOU? UNLOCK TO EDIT!
+                                                </motion.p>
+                                            )}
+
+                                            <div className="flex gap-3 w-full">
                                                 <button
-                                                    onClick={() => { setMode('view'); setAuthError(false); setAuthInput(''); }}
-                                                    className="flex-1 py-2 text-[8px] bg-[#DEB887] border-2 border-[#8B4513] text-[#5D4037] hover:bg-[#D2B48C]"
+                                                    onClick={() => { setMode('view'); setAuthError(false); setAuthInput(''); setProfilePic(null); }}
+                                                    className="flex-1 py-3 text-[8px] bg-[#DEB887] border-2 border-[#8B4513] text-[#5D4037] hover:bg-[#D2B48C] font-bold"
                                                 >
                                                     CANCEL
                                                 </button>
                                                 <button
                                                     onClick={handleUnlock}
-                                                    className="flex-1 py-2 text-[8px] bg-[#8B4513] border-2 border-[#5D4037] text-[#FFE4C4] hover:bg-[#5D4037]"
+                                                    className="flex-1 py-3 text-[8px] bg-[#8B4513] border-2 border-[#5D4037] text-[#FFE4C4] hover:bg-[#5D4037] font-bold shadow-[4px_4px_0_rgba(0,0,0,0.2)]"
                                                 >
                                                     UNLOCK
                                                 </button>
